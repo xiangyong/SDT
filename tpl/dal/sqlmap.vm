@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<resultMap id="RM.$!{table.className}" class="$!{packageRoot}.dataobject.$!{table.className}DO">
+#foreach($!{column} in $!{table.columns})
+		<result property="${column.javaName}" column="$!{column.dbName}" javaType="$!{column.javaType}" jdbcType="$!{column.dbType}"  />
+#end
+    </resultMap>
+    
+    <sql id="$!{table.className}.columns">#foreach($!{column} in $!{table.columns})#if($!{velocityCount}>1),#end$!{column.dbName}#end</sql>
+	
+	<insert id="$!{systemName}.$!{table.className}.insert">	
+		INSERT INTO $!{table.tableName} (
+			<include refid="$!{table.className}.columns"/>
+	    ) VALUES (
+	       	#foreach($!{column} in $!{table.columns})#if($!{velocityCount}>1),#end #$!{column.javaName}# #end
+	    
+	    )	
+#foreach($!{column} in $!{table.columns})
+#if($!{column.ai})
+		<selectKey resultClass="long" type="post" keyProperty="$!{column.javaName}" >
+            select last_insert_id()
+    	</selectKey>
+#end
+#end
+	</insert>
+	
+	<delete id="$!{systemName}.$!{table.className}.delete">
+		DELETE FROM $!{table.tableName} 
+#set($isStart=false)
+#foreach($!{column} in $!{table.columns})
+#if($!{column.pk})
+		#if($!{isStart})   AND #else WHERE #end
+$!{column.dbName} = #$!{column.javaName}#
+#set($isStart=true)
+#end		 	   
+#end
+    </delete>
+	
+	<update id="$!{systemName}.$!{table.className}.update">
+		UPDATE ${table.tableName} SET #foreach($!{column} in $!{table.columns})#if($!{velocityCount}>1),#end$!{column.dbName} = #$!{column.javaName}# #end
+#set($isStart=false)
+#foreach($!{column} in $!{table.columns})
+#if($!{column.pk})
+#if($!{isStart}) AND #{else}WHERE #end$!{column.dbName} = #$!{column.javaName}#
+#set($isStart=true)
+#end
+#end
+	</update>
+	
+	<select id="$!{systemName}.$!{table.className}.queryCount" resultClass="long" >
+    	SELECT /*$!{systemName}.$!{table.className}.queryCount*/
+    		   count(1)
+		  FROM $!{table.tableName}
+	     WHERE 1=1
+		<!--
+		<isNotNull prepend="AND" property="id"> 
+			<![CDATA[
+			   ID = #id#
+			]]>
+		</isNotNull>
+		-->
+	</select>
+	
+	<select id="$!{systemName}.$!{table.className}.query" resultMap="RM.$!{table.className}" >
+    	SELECT /*$!{systemName}.$!{table.className}.query*/
+    		   <include refid="$!{table.className}.columns"/>
+		  FROM $!{table.tableName}
+	     WHERE 1=1
+		<!--
+		<isNotNull prepend="AND" property="id"> 
+			<![CDATA[
+			   ID = #id#
+			]]>
+		</isNotNull>
+		-->
+		limit #start#, #limit#
+	</select>
+</sqlMap>    

@@ -1,0 +1,100 @@
+package $!{package};
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.alibaba.common.lang.StringUtil;
+
+@Controller
+public class $!{name} {
+
+    public static final String VIEW = "view.vm";
+    public static final String LIST = "list.vm";
+    public static final String OK   = "ok";
+    public static final String STAT = "stat";
+
+    /**
+     * view is for add and edit<br>
+     * add: <b>POST</b> {@link add(ModelMap, String)}<br>
+     * edit: <b>POST</b> {@link modify(ModelMap, String)}
+     * @param modelMap {@link ModelMap}
+     * @param id
+     * @return EDIT
+     */
+    @RequestMapping(value = "/view.htm", method = RequestMethod.GET)
+    public String view(ModelMap modelMap, String id) {
+        if (!StringUtil.isEmpty(id)) {
+            modelMap.addAttribute("opcode", "modify");
+            Object result = null;
+            modelMap.addAttribute("result", result);
+        }
+        return VIEW;
+    }
+
+    /**
+     * add
+     * @param modelMap {@link ModelMap}
+     * @param param
+     */
+    @RequestMapping(value = "/add.json", method = RequestMethod.POST)
+    public void add(ModelMap modelMap, String param) {
+        Object result = null;
+        modelMap.addAttribute("result", result);
+        modelMap.addAttribute(STAT, OK);
+    }
+
+    /**
+     * delete
+     * @param modelMap {@link ModelMap}
+     * @param id
+     */
+    @RequestMapping(value = "/delete.json", method = RequestMethod.POST)
+    public void delete(ModelMap modelMap, String id) {
+        Object result = null;
+        modelMap.addAttribute("result", result);
+        modelMap.addAttribute(STAT, OK);
+    }
+
+    /**
+     * edit
+     * @param modelMap {@link ModelMap}
+     * @param param
+     */
+    @RequestMapping(value = "/edit.json", method = RequestMethod.POST)
+    public void edit(ModelMap modelMap, String param) {
+        Object result = null;
+        modelMap.addAttribute("result", result);
+        modelMap.addAttribute(STAT, OK);
+    }
+
+    /**
+     * list all
+     * edit status {@link editStatus(ModelMap, Long, String)}
+     * @param modelMap {@link ModelMap}
+     * @param query 
+     * @return LIST
+     */
+    @RequestMapping(value = "/list.htm", method = { RequestMethod.GET, RequestMethod.POST })
+    public String list(ModelMap modelMap, String query) {
+        Object result = null;
+        modelMap.addAttribute("result", result);
+        modelMap.addAttribute(STAT, OK);
+        return LIST;
+    }
+
+    /**
+     * edit status
+     * @param modelMap  {@link ModelMap}
+     * @param id        ID
+     * @param status
+     */
+    @RequestMapping(value = "/editStatus.json", method = { RequestMethod.GET, RequestMethod.POST })
+    public void editStatus(ModelMap modelMap, Long id, String status) {
+        Object result = null;
+        modelMap.addAttribute("result", result);
+        modelMap.addAttribute(STAT, OK);
+    }
+
+}

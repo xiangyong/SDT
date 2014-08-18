@@ -1,0 +1,7 @@
+package $!{implPackage};
+
+#if($!{servicePackage} != $!{implPackage})import $!{servicePackage};#end
+
+public class $!{implName} implements $!{serviceName} {
+	
+}

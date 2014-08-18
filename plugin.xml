@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="sdt.hyperlinks.ServiceXmlHyperlinks"
+            id="SDT.ServiceXmlHyperlinks"
+            name="ServiceXmlHyperlinks"
+            targetId="org.eclipse.core.runtime.xml">
+      </hyperlinkDetector>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="SofaPlugin"
+            name="Alipay Sofa">
+      </category>
+      <wizard
+            category="SofaPlugin"
+            class="sdt.wizards.newservice.NewServiceWizard"
+            icon="icons/WebService.png"
+            id="SDT.NewServiceWizard"
+            name="Sofa Service">
+      </wizard>
+      <wizard
+            category="SofaPlugin"
+            class="sdt.wizards.newdal.NewSofaDalWizard"
+            icon="icons/persistenceEntity.png"
+            id="SDT.NewDalWizard"
+            name="Sofa Dal">
+      </wizard>
+      <wizard
+            category="SofaPlugin"
+            class="sdt.wizards.newproject.NewProjectWizard"
+            icon="icons/resourcesRoot.png"
+            id="SDT.NewProjectWizard"
+            name="Sofa Project">
+      </wizard>
+      <wizard
+            category="SofaPlugin"
+            class="sdt.wizards.newcontroller.NewControllerWizard"
+            icon="icons/webRoot.png"
+            id="SDT.NewControllerWizard"
+            name="Sofa Controller">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            id="SDT.decorator1"
+            label="Sofa Decorator"
+            class="sdt.decoration.SofaDecorator"
+            state="true">
+      </decorator>
+   </extension>
+
+
+
+</plugin>

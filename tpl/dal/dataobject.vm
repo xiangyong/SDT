@@ -1,0 +1,23 @@
+package $!{packageRoot}.dataobject;
+
+#foreach($!{import} in $!{table.imports})
+import $!{import};
+#end
+
+public class $!{table.className}DO {
+
+#foreach($!{column} in $!{table.columns})
+	private $!{column.javaTypeShort} $!{column.javaName};
+#end
+
+#foreach($!{column} in $!{table.columns})
+	public void $!{column.setMethod}($!{column.javaTypeShort} $!{column.javaName}){
+		this.$!{column.javaName} = $!{column.javaName};
+	}
+	
+	public $!{column.javaTypeShort} $!{column.getMethod}(){
+		return this.$!{column.javaName};
+	}
+	
+#end
+}

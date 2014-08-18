@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Alipay $!{projectBundleName}
+Bundle-SymbolicName: $!{projectSymbolicName};singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Vendor: Alipay
+Eclipse-LazyStart: false
+Require-Bundle: com.alipay.$!{system}.common.service.facade, com.alipay.$!{system}.biz.shared
+Resource-Filter: $!{projectSpring}.xml

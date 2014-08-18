@@ -1,0 +1,4 @@
+daointerface=$!{projectName}/src/main/java/$!{packageRootDir}/daointerface/$!{table.className}DAO.java
+dataobject	=$!{projectName}/src/main/java/$!{packageRootDir}/dataobject/$!{table.className}DO.java
+ibatis		=$!{projectName}/src/main/java/$!{packageRootDir}/ibatis/Ibatis$!{table.className}DAO.java
+sqlmap		=$!{projectName}/src/main/resources/sqlmap/$!{table.className}-sqlmap-mapping.xml

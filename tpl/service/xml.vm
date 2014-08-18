@@ -1,0 +1,32 @@
+#if(${createXml})<?xml version="1.0" encoding="GBK"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:sofa="http://img.alipay.net/dtd/schema/service"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:webflow="http://www.springframework.org/schema/webflow-config"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://img.alipay.net/dtd/schema/service http://img.alipay.net/dtd/schema/service/sofa-service.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+         http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
+	default-autowire="byName">
+#end
+	<bean id="$!{objectName}" class="$!{implPackage}.$!{implName}"/>
+#if($!{serviceType}==0)
+	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}"/>
+#elseif($!{serviceType}==1)
+	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
+		<sofa:binding.ws />
+	</bean>
+#elseif($!{serviceType}==2)
+	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
+		<sofa:binding.tr />
+	</bean>
+#elseif($!{serviceType}==3)
+	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
+		<sofa:binding.ws />
+		<sofa:binding.tr />
+	</bean>
+#end
+#if(${createXml})</beans>#end

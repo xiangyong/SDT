@@ -1,0 +1,22 @@
+package $!{packageRoot}.daointerface;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.dao.DataAccessException;
+
+import $!{packageRoot}.dataobject.$!{table.className}DO;
+
+public interface $!{table.className}DAO {
+
+	public void insert($!{table.className}DO $!{table.objectName}DO) throws DataAccessException;
+
+	public void delete($!{table.className}DO $!{table.objectName}DO) throws DataAccessException;
+
+	public void update($!{table.className}DO $!{table.objectName}DO) throws DataAccessException;
+
+	public List<$!{table.className}DO> query(Map<String,String> parameters) throws DataAccessException;
+	
+	public long queryCount(Map<String,String> parameters) throws DataAccessException;
+
+}

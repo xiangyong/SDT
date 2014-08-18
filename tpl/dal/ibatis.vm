@@ -1,0 +1,43 @@
+package $!{packageRoot}.ibatis;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+
+import $!{packageRoot}.daointerface.$!{table.className}DAO;
+import $!{packageRoot}.dataobject.$!{table.className}DO;
+
+public class Ibatis$!{table.className}DAO extends SqlMapClientDaoSupport implements $!{table.className}DAO {
+
+	public void insert($!{table.className}DO $!{table.objectName}DO) throws DataAccessException {
+		if($!{table.objectName}DO == null) {
+			throw new IllegalArgumentException("Can't insert a null data object into db.");
+		}
+		getSqlMapClientTemplate().insert("$!{systemName}.$!{table.className}.insert", $!{table.objectName}DO);
+	}
+
+	public void delete($!{table.className}DO $!{table.objectName}DO) throws DataAccessException {
+		getSqlMapClientTemplate().insert("$!{systemName}.$!{table.className}.delete", $!{table.objectName}DO);
+	}
+
+	public void update($!{table.className}DO $!{table.objectName}DO) throws DataAccessException {
+		getSqlMapClientTemplate().insert("$!{systemName}.$!{table.className}.update", $!{table.objectName}DO);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<$!{table.className}DO> query(Map<String,String> parameters) throws DataAccessException {
+		return (List<$!{table.className}DO>)getSqlMapClientTemplate().queryForList("$!{systemName}.$!{table.className}.query", parameters);
+	}
+	
+	public long queryCount(Map<String,String> parameters) throws DataAccessException {
+		Object returnObject = getSqlMapClientTemplate().queryForObject("$!{systemName}.$!{table.className}.queryCount", parameters);
+		if(returnObject == null){
+			return 0L;
+		}
+		
+		return ((Number)returnObject).longValue();
+	}
+
+}
