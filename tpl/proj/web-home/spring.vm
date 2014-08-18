@@ -2,13 +2,55 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:sofa="http://www.alipay.com/schema/service"
 	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:sofa="http://img.alipay.net/dtd/schema/service"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:webflow="http://www.springframework.org/schema/webflow-config"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-         http://img.alipay.net/dtd/schema/service http://img.alipay.net/dtd/schema/service/sofa-service.xsd
          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-         http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
+         http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd
+		 http://www.alipay.com/schema/service http://www.alipay.com/schema/service/sofa-service.xsd"		 
 	default-autowire="byName">
+	<!-- Activates annotation-based bean configuration -->
+	<context:annotation-config />
+
+	<!--
+		The controllers are autodetected POJOs labeled with the @Controller
+		annotation.
+	-->
+	<context:component-scan base-package="$!{projectSymbolicName}" />
+	
+	<!--
+		The messageSource which points to the bundle-jar:/message/errors.
+	-->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+		p:basenames="file:${mmng_templates}/$!{projectSimple}/message/errors"
+		p:defaultEncoding="GBK"
+		p:cacheSeconds="60"/>
+		
+
+<!-- The registry of executable flow definitions,it needs to add your own flow-definition.-->
+	<webflow:flow-registry id="flowRegistry" parent="parentFlowRegistry"
+		flow-builder-services="flowBuilderServices">
+	</webflow:flow-registry>
+	
+	<!-- The Acegi Security definition -->
+	<bean id="objectDefinitionSource" parent="baseObjectDefinitionSource">
+		<property name="editor">
+			<bean
+				class="com.alipay.service.security.acegi.definition.AlipayFilterInvocationDefinitionSourceEditor">
+				<property name="seperator">
+					<value>></value>
+				</property>
+				<property name="locations">
+					<list>
+						<value>classpath:security/security-header.acf</value>
+						<value>bundle-jar:security/$!{security}.acf</value>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
 </beans>

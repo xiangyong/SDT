@@ -3,27 +3,25 @@ package sdt.assist;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.swt.graphics.Point;
 
 public class SofaContentAssistProcessor implements IContentAssistProcessor {
 
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
-		Point range = viewer.getSelectedRange();
-		
-		IDocument doc = viewer.getDocument();
-
-		Collection<String> cs = new ArrayList<String>();
+		// Point range = viewer.getSelectedRange();
+		//		
+		// IDocument doc = viewer.getDocument();
+		//
+		// Collection<String> cs = new ArrayList<String>();
 		Collection<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-		for (String var : cs) {
-			
-		}
+		// for (String var : cs) {
+		//			
+		// }
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 
 	}
