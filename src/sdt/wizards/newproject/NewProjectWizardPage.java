@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import sdt.SDTPlugin;
-import sdt.wizards.CheckboxGroupTypeField;
 import sdt.wizards.NewWizardPage;
 
 @SuppressWarnings("restriction")
