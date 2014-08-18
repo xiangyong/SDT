@@ -1,3 +1,5 @@
 manifest=$!{project}/src/main/resources/META-INF/MANIFEST.MF
 spring=$!{project}/src/main/resources/META-INF/spring/${projectSpring}.xml
+ref=$!{project}/src/main/resources/META-INF/spring/${projectSpring}-ref.xml
 fragment=$!{project}/src/main/resources/OSGI-INF/deployment-fragment.xml
+security=$!{project}/src/main/resources/security/${security}.acf

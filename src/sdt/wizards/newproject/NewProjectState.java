@@ -39,10 +39,16 @@ public class NewProjectState implements NewWizardState {
 	@Override
 	public Change[] computeChanges() {
 		VelocityContext context = new VelocityContext();
-		context.put("project", this.name);
 		context.put("system", this.system);
+		context.put("project", this.name);
+
+		String projectSimple = this.name.substring(this.name.lastIndexOf("-") + 1);
+		context.put("projectSimple", projectSimple);
+		context.put("security", "security-" + projectSimple);
 		context.put("projectBundleName", NameUtil.cap(this.name.replaceAll("-", " ")));
-		context.put("projectSymbolicName", "com.alipay." + this.name.replaceAll("-", "."));
+
+		String defaultPackage = "com.alipay." + this.name.replaceAll("-", ".");
+		context.put("projectSymbolicName", defaultPackage);
 		context.put("projectSpring", this.name.substring(this.name.indexOf("-") + 1));
 		context.put("projectBundleWebName", this.name.substring(this.name.lastIndexOf("-") + 1));
 
@@ -86,8 +92,7 @@ public class NewProjectState implements NewWizardState {
 			try {
 				final IPackageFragmentRoot root = jp.findPackageFragmentRoot(new Path("/" + this.name + "/"
 						+ SDTPlugin.D_JAVA));
-				final IPackageFragment pkg = root.createPackageFragment("com.alipay."
-						+ this.name.replaceAll("-", "."), true, null);
+				final IPackageFragment pkg = root.createPackageFragment(defaultPackage, true, null);
 				CreatePackageChange change = new CreatePackageChange(pkg) {
 					public String getName() {
 						return pkg.getElementName() + " - " + root.getPath().makeRelative();

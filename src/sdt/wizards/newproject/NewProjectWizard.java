@@ -1,7 +1,6 @@
 package sdt.wizards.newproject;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -18,19 +17,9 @@ public class NewProjectWizard extends NewWizard {
 	private NewProjectWizardPage wizardPage;
 
 	protected boolean performFinish(IProgressMonitor monitor) {
-		boolean f = super.performCancel();
+		boolean f = super.performFinish(monitor);
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		IProject project = SDTPlugin.getProject(data.name);
-		String tplProjectName = data.getTemplateProjectName();
-		IProject tProject = SDTPlugin.getProject(tplProjectName);
-
-		{
-			try {
-				tProject.getFile("pom.xml").copy(project.getFile("pom.xml").getFullPath(), true, monitor);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
 
 		{
 			IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
