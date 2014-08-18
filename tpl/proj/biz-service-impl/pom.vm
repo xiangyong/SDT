@@ -24,11 +24,6 @@
 		<!-- project depends -->
 		<dependency>
 			<groupId>com.alipay.$!{system}</groupId>
-			<artifactId>$!{system}-common-service-facade</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.alipay.$!{system}</groupId>
 			<artifactId>$!{system}-biz-shared</artifactId>
 		</dependency>
 	</dependencies>
