@@ -2,3 +2,4 @@ manifest=$!{project}/src/main/resources/META-INF/MANIFEST.MF
 spring=$!{project}/src/main/resources/META-INF/spring/${projectSpring}.xml
 fragment=$!{project}/src/main/resources/OSGI-INF/deployment-fragment.xml
 pom=$!{project}/pom.xml
+project=$!{project}/.project

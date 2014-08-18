@@ -10,11 +10,13 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.resource.DeleteResourceChange;
 
+import sdt.SDTPlugin;
+
 public class CreateDirChange extends Change {
 	protected IFolder folder;
 
-	public CreateDirChange(IFolder folder) {
-		this.folder = folder;
+	public CreateDirChange(String name) {
+		this.folder = SDTPlugin.getFolder(name);
 	}
 
 	@Override

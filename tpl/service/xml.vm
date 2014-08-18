@@ -18,15 +18,16 @@
 #elseif($!{serviceType}==1)
 	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
 		<sofa:binding.ws />
-	</bean>
+	</sofa:service>
 #elseif($!{serviceType}==2)
 	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
 		<sofa:binding.tr />
-	</bean>
+	</sofa:service>
 #elseif($!{serviceType}==3)
 	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
 		<sofa:binding.ws />
 		<sofa:binding.tr />
-	</bean>
+	</sofa:service>
 #end
+
 #if(${createXml})</beans>#end

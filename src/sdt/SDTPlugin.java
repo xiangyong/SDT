@@ -7,9 +7,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -20,7 +24,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.internal.corext.refactoring.nls.changes.CreateFileChange;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -141,10 +148,6 @@ public class SDTPlugin extends AbstractUIPlugin {
 			}
 		}
 		return "";
-	}
-
-	public static CreateFileChange createFileChange(String path, String content) {
-		return new CreateFileChange(new Path(path), content, "GBK");
 	}
 
 	public static TextFileChange createNewFileChange(IFile targetFile, String contents) {
@@ -329,5 +332,92 @@ public class SDTPlugin extends AbstractUIPlugin {
 
 	public static IProject getProject(String name) {
 		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+	}
+
+	public static void printDesc(String name) {
+
+		// TODO
+		IProject project = getProject(name);
+		IProjectDescription desc = null;
+		try {
+			desc = project.getDescription();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		if (desc == null)
+			return;
+
+		System.err.println("###### START ###### " + name);
+		System.err.println("###### PROJECT ######");
+		System.err.println("getBuildSpec ...");
+		for (ICommand f : desc.getBuildSpec()) {
+			System.err.println(f);
+		}
+
+		System.err.println("getDynamicReferences ...");
+		for (IProject f : desc.getDynamicReferences()) {
+			System.err.println(f);
+		}
+
+		System.err.println("getNatureIds ...");
+		for (String f : desc.getNatureIds()) {
+			System.err.println(f);
+		}
+
+		System.err.println("getReferencedProjects ...");
+		for (IProject f : desc.getReferencedProjects()) {
+			System.err.println(f);
+		}
+
+		System.err.println("###### JAVA PROJECT ######");
+		IJavaProject jp = JavaCore.create(project);
+		IClasspathEntry[] ces = null;
+		try {
+			ces = jp.getRawClasspath();
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		if (ces == null || ces.length == 0)
+			return;
+
+		for (IClasspathEntry ce : ces) {
+			System.err.println(ce);
+		}
+		System.err.println("###### END ######");
+
+	}
+
+	public static Collection<IClasspathEntry> getClasspathEntry(String name, int... entryKinds) {
+		List<IClasspathEntry> f = new ArrayList<IClasspathEntry>();
+		IProject project = getProject(name);
+		IProjectDescription desc = null;
+		try {
+			desc = project.getDescription();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		if (desc == null)
+			return f;
+
+		IJavaProject jp = JavaCore.create(project);
+		IClasspathEntry[] ces = null;
+		try {
+			ces = jp.getRawClasspath();
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		if (ces == null || ces.length == 0)
+			return f;
+
+		for (IClasspathEntry ce : ces) {
+			for (int ek : entryKinds) {
+				if (ce.getEntryKind() == ek) {
+					System.err.println(ce);
+					f.add(ce);
+				}
+			}
+		}
+
+		return f;
 	}
 }

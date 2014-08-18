@@ -1,6 +1,6 @@
 package $!{implPackage};
 
-#if($!{servicePackage} != $!{implPackage})import $!{servicePackage};#end
+#if($!{servicePackage} != $!{implPackage})import $!{servicePackage}.$!{serviceName};#end
 
 public class $!{implName} implements $!{serviceName} {
 	

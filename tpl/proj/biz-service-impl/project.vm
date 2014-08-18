@@ -1,0 +1,21 @@
+<projectDescription>
+  <name>$!{project}</name>
+  <comment>Alipay $!{project}. Genereated By SDT.</comment>
+  <projects>
+    <project>$!{system}-biz-shared</project>
+    <project>$!{system}-common-dal</project>
+    <project>$!{system}-common-service-facade</project>
+    <project>$!{system}-common-service-integration</project>
+    <project>$!{system}-common-util</project>
+    <project>$!{system}-core-model</project>
+    <project>$!{system}-core-service</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

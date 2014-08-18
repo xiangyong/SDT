@@ -4,3 +4,4 @@ ref=$!{project}/src/main/resources/META-INF/spring/${projectSpring}-ref.xml
 fragment=$!{project}/src/main/resources/OSGI-INF/deployment-fragment.xml
 security=$!{project}/src/main/resources/security/${security}.acf
 pom=$!{project}/pom.xml
+project=$!{project}/.project

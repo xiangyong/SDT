@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -21,26 +22,30 @@ public class NewProjectWizard extends NewWizard {
 	protected boolean performFinish(IProgressMonitor monitor) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		IProject project = SDTPlugin.getProject(data.name);
+
+		// open project
 		try {
 			project.open(IResource.BACKGROUND_REFRESH, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 
+		// add project to working set
+		IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
+		IWorkingSet ws = wsm.getWorkingSet(data.system);
+
+		if (ws == null) {
+			ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
+			wsm.addWorkingSet(ws);
+		} else if (!ws.isEditable()) {
+
+		}
+		wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
+
+		// super performFinish
 		boolean f = super.performFinish(monitor);
 
-		{
-			IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
-			IWorkingSet ws = wsm.getWorkingSet(data.system);
-
-			if (ws == null) {
-				ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
-				wsm.addWorkingSet(ws);
-			} else if (!ws.isEditable()) {
-
-			}
-			wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
-		}
+		JavaCore.create(project);
 
 		return f;
 	}

@@ -12,21 +12,10 @@ import java.util.Properties;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.internal.resources.ProjectDescription;
-import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.IAccessRule;
-import org.eclipse.jdt.core.IClasspathAttribute;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.NullChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -53,15 +42,13 @@ public class NewProjectState implements NewWizardState {
 
 		String projectSimple = this.name.substring(this.name.lastIndexOf("-") + 1);
 		context.put("projectSimple", projectSimple);
+		context.put("projectBundleWebName", projectSimple);
 		context.put("security", "security-" + projectSimple);
 		context.put("projectBundleName", NameUtil.cap(this.name.replaceAll("-", " ")));
 
 		String defaultPackage = "com.alipay." + this.name.replaceAll("-", ".");
 		context.put("projectSymbolicName", defaultPackage);
 		context.put("projectSpring", this.name.substring(this.name.indexOf("-") + 1));
-		context.put("projectBundleWebName", this.name.substring(this.name.lastIndexOf("-") + 1));
-
-		// TODO createProject();
 
 		Properties ps = new Properties();
 		try {
@@ -71,13 +58,35 @@ public class NewProjectState implements NewWizardState {
 			e.printStackTrace();
 		}
 
-		if (ps.size() == 0)
+		if (ps.isEmpty())
 			return new Change[] { new NullChange() };
 
-		// TODO createProject();
-		createProjectX();
+		createProjectLight();
 
 		Collection<Change> f = new ArrayList<Change>();
+
+		{
+			String fromSystem = null;
+			if (this.type.equals("web-home")) {
+				fromSystem = system + "-web-home";
+			} else if (this.type.equals("core-service")) {
+				fromSystem = system + "-core-model";
+			} else if (this.type.equals("biz-service-impl")) {
+				fromSystem = system + "-biz-shared";
+			}
+			if (fromSystem != null) {
+				IFile fromFile = SDTPlugin.getFile("/" + fromSystem + "/.classpath");
+				String txt = SDTPlugin.readFile(fromFile);
+				StringBuffer b = new StringBuffer(txt);
+				int p = txt.indexOf("</classpath>");
+				b.insert(p, "  <classpathentry kind=\"src\" path=\"/" + fromSystem + "\"/>\n");
+
+				IFile file = SDTPlugin.getFile("/" + this.name + "/.classpath");
+				TextFileChange change = SDTPlugin.createNewFileChange(file, b.toString());
+
+				f.add(change);
+			}
+		}
 		for (Map.Entry entry : ps.entrySet()) {
 			String key = entry.getKey().toString();
 			IFile file = SDTPlugin.getFile(entry.getValue().toString());
@@ -85,17 +94,19 @@ public class NewProjectState implements NewWizardState {
 			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
 			f.add(change);
 		}
-
 		{
 			CreatePackageChange change = new CreatePackageChange("/" + this.name + "/" + SDTPlugin.D_JAVA,
 					defaultPackage);
 			f.add(change);
 		}
-
+		{
+			CreateDirChange change = new CreateDirChange("/" + this.name + "/target/classes");
+			f.add(change);
+		}
 		return f.toArray(new Change[0]);
 	}
 
-	private void createProjectX() {
+	private void createProjectLight() {
 		IProject project = SDTPlugin.getProject(this.name);
 		if (project != null && project.exists()) {
 			return;
@@ -106,95 +117,10 @@ public class NewProjectState implements NewWizardState {
 			URI uri = new File(this.dir).toURI();
 			desc.setLocationURI(uri);
 			project.create(desc, null);
-
-			// TODO
-			String tplProjectName = getTemplateProjectName();
-			IProject tProject = SDTPlugin.getProject(tplProjectName);
-			IProjectDescription tDesc = tProject.getDescription();
-			System.err.println("###### START ######");
-			System.err.println("###### getBuildSpec ...");
-			for (ICommand f : tDesc.getBuildSpec()) {
-				System.err.println(f);
-			}
-
-			System.err.println("###### getDynamicReferences ...");
-			for (IProject f : tDesc.getDynamicReferences()) {
-				System.err.println(f);
-			}
-
-			System.err.println("###### getNatureIds ...");
-			for (String f : tDesc.getNatureIds()) {
-				System.err.println(f);
-			}
-
-			System.err.println("###### getReferencedProjects ...");
-			for (IProject f : tDesc.getReferencedProjects()) {
-				System.err.println(f);
-			}
-
-			System.err.println("###### END ######");
 		} catch (CoreException e1) {
 			e1.printStackTrace();
 		}
 
-	}
-
-	private void createProject() {
-		IProject project = SDTPlugin.getProject(this.name);
-
-		String tplProjectName = getTemplateProjectName();
-		IProject tProject = SDTPlugin.getProject(tplProjectName);
-
-		try {
-			IProjectDescription desc = tProject.getDescription();
-			URI uri = new File(this.dir).toURI();
-			desc.setLocationURI(uri);
-			project.create(desc, null);
-			project.open(IResource.BACKGROUND_REFRESH, null);
-
-			tProject.getFile(".classpath").copy(project.getFile(".classpath").getFullPath(), true, null);
-			IJavaProject jp = JavaCore.create(project);
-			if (this.name.contains("-web-")) {
-				IClasspathEntry[] jpEntries = jp.getRawClasspath();
-
-				IClasspathEntry home = new ClasspathEntry( //
-						IPackageFragmentRoot.K_SOURCE,// contentKind
-						ClasspathEntry.CPE_PROJECT, // entryKind
-						new Path("/" + NameUtil.firstString(this.name, '-') + "-web-home"), // path
-						new IPath[0], // inclusionPatterns
-						new IPath[0], // exclusionPatterns
-						null, // sourceAttachmentPath
-						null, // sourceAttachmentRootPath
-						null, // specificOutputLocation
-						false, // isExported
-						new IAccessRule[0], // accessRules
-						true,// combineAccessRules
-						new IClasspathAttribute[0] // extraAttributes
-				);
-				IClasspathEntry[] entries = new IClasspathEntry[jpEntries.length + 1];
-				for (int i = 0; i < jpEntries.length; i++) {
-					entries[i] = jpEntries[i];
-				}
-				entries[jpEntries.length] = home;
-
-				jp.setRawClasspath(entries, null);
-			}
-
-			project.getFolder("src").create(true, true, null);
-			project.getFolder("src/main").create(true, true, null);
-			project.getFolder("src/main/java").create(true, true, null);
-			project.getFolder("src/main/resources").create(true, true, null);
-			project.getFolder("target").create(true, true, null);
-			project.getFolder("target/classes").create(true, true, null);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public String getTemplateProjectName() {
-		return this.system + "-" + this.type;
 	}
 
 	public NewProjectState() {
