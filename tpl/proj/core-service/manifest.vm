@@ -5,5 +5,5 @@ Bundle-SymbolicName: $!{projectSymbolicName};singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Vendor: Alipay
 Eclipse-LazyStart: false
-Require-Bundle: com.alipay.publicexprod.core.model
+Require-Bundle: com.alipay.$!{system}.core.model
 Resource-Filter: $!{projectSpring}.xml
