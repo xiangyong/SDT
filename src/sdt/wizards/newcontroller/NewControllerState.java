@@ -14,6 +14,7 @@ public class NewControllerState implements NewWizardState {
 	public String fFile;
 	public String fPackage;
 	public String fName;
+	public String fClassName;
 
 	public NewControllerState() {
 		Velocity.init();
@@ -24,11 +25,12 @@ public class NewControllerState implements NewWizardState {
 		VelocityContext context = new VelocityContext();
 		context.put("package", fPackage);
 		context.put("name", fName);
+		context.put("className", fClassName);
 
 		int i = 0, l = 1;
 		Change[] f = new Change[l];
 
-		IFile file = SDTPlugin.getTargetFile(this.fFile);
+		IFile file = SDTPlugin.getFile(this.fFile);
 		String txt = SDTPlugin.getTpl(context, "tpl/controller/controller.vm");
 		TextFileChange change = null;
 		change = SDTPlugin.createNewFileChange(file, txt);

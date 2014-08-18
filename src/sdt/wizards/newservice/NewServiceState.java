@@ -46,7 +46,7 @@ public class NewServiceState implements NewWizardState {
 
 		// xml
 		{
-			IFile file = SDTPlugin.getTargetFile(this.xmlFile);
+			IFile file = SDTPlugin.getFile(this.xmlFile);
 			String txt = SDTPlugin.getTpl(context, "tpl/service/xml.vm");
 			TextFileChange change = null;
 			if (this.createXml) {
@@ -58,14 +58,14 @@ public class NewServiceState implements NewWizardState {
 		}
 		// service
 		{
-			IFile file = SDTPlugin.getTargetFile(this.serviceFile);
+			IFile file = SDTPlugin.getFile(this.serviceFile);
 			String txt = SDTPlugin.getTpl(context, "tpl/service/service.vm");
 			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
 			f[i++] = change;
 		}
 		// impl
 		{
-			IFile file = SDTPlugin.getTargetFile(this.implFile);
+			IFile file = SDTPlugin.getFile(this.implFile);
 			String txt = SDTPlugin.getTpl(context, "tpl/service/impl.vm");
 			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
 			f[i++] = change;

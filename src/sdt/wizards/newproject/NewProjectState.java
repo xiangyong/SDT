@@ -4,33 +4,35 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.eclipse.core.internal.resources.ProjectDescription;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
-import org.eclipse.jdt.internal.corext.refactoring.changes.CreatePackageChange;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.NullChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 
 import sdt.NameUtil;
 import sdt.SDTPlugin;
+import sdt.wizards.CreateDirChange;
 import sdt.wizards.NewWizardState;
 
 @SuppressWarnings("restriction")
@@ -57,7 +59,7 @@ public class NewProjectState implements NewWizardState {
 		context.put("projectSpring", this.name.substring(this.name.indexOf("-") + 1));
 		context.put("projectBundleWebName", this.name.substring(this.name.lastIndexOf("-") + 1));
 
-		createProject();
+		// createProject();
 
 		Properties ps = new Properties();
 		try {
@@ -67,50 +69,42 @@ public class NewProjectState implements NewWizardState {
 			e.printStackTrace();
 		}
 
-		int i = 0, l = ps.size();
-		if (l == 0)
+		if (ps.size() == 0)
 			return new Change[] { new NullChange() };
 
-		Change[] f = new Change[l + 1 + 1];
+		// TODO createProject();
+		createProjectX();
+
+		Collection<Change> f = new ArrayList<Change>();
 		for (Map.Entry entry : ps.entrySet()) {
 			String key = entry.getKey().toString();
-			IFile file = SDTPlugin.getTargetFile(entry.getValue().toString());
+			IFile file = SDTPlugin.getFile(entry.getValue().toString());
 			String txt = SDTPlugin.getTpl(context, "tpl/proj/" + this.type + "/" + key + ".vm");
 			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-			f[i++] = change;
+			f.add(change);
 		}
-
-		// {
-		// String tName = getTemplateProjectName();
-		// IFile tPom = SDTPlugin.getTargetFile(tName + "/pom.xml");
-		// String tPomTxt = SDTPlugin.readFile(tPom);
-		// String txt = tPomTxt.replaceAll(tName, this.name);
-		//
-		// IFile file = SDTPlugin.getTargetFile(this.name + "/pom.xml");
-		// TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-		// f[i++] = change;
-		// }
 
 		{
-			IProject project = SDTPlugin.getProject(this.name);
-			IJavaProject jp = JavaCore.create(project);
-			try {
-				final IPackageFragmentRoot root = jp.findPackageFragmentRoot(new Path("/" + this.name + "/"
-						+ SDTPlugin.D_JAVA));
-				final IPackageFragment pkg = root.createPackageFragment(defaultPackage, true, null);
-				CreatePackageChange change = new CreatePackageChange(pkg) {
-					public String getName() {
-						return pkg.getElementName() + " - " + root.getPath().makeRelative();
-					}
-				};
-				f[i++] = change;
-			} catch (JavaModelException e) {
-				e.printStackTrace();
-			}
-
+			CreateDirChange change = new CreateDirChange(SDTPlugin.getFolder("/" + this.name + "/"
+					+ SDTPlugin.D_JAVA + "/" + defaultPackage.replaceAll("[.]", "/")));
+			f.add(change);
 		}
 
-		return f;
+		return f.toArray(new Change[0]);
+	}
+
+	private void createProjectX() {
+		IProject project = SDTPlugin.getProject(this.name);
+		try {
+			IProjectDescription desc = new ProjectDescription();
+			desc.setName(this.name);
+			URI uri = new File(this.dir).toURI();
+			desc.setLocationURI(uri);
+			project.create(desc, null);
+		} catch (CoreException e1) {
+			e1.printStackTrace();
+		}
+
 	}
 
 	private void createProject() {

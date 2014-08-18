@@ -53,7 +53,7 @@ public class NewSofaDalState implements NewWizardState {
 		Change[] f = new Change[l];
 		for (Map.Entry entry : ps.entrySet()) {
 			String key = entry.getKey().toString();
-			IFile file = SDTPlugin.getTargetFile(entry.getValue().toString());
+			IFile file = SDTPlugin.getFile(entry.getValue().toString());
 			String txt = SDTPlugin.getTpl(context, "tpl/dal/" + key + ".vm");
 			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
 			f[i++] = change;

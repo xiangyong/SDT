@@ -329,7 +329,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		}
 
 		for (Map.Entry entry : ps.entrySet()) {
-			IFile file = SDTPlugin.getTargetFile(entry.getValue().toString());
+			IFile file = SDTPlugin.getFile(entry.getValue().toString());
 			if (file != null && file.exists()) {
 				status = new StatusInfo(IStatus.ERROR, "\"" + file.getName() + "\" is already exists");
 				return;

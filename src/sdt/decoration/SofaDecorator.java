@@ -49,7 +49,7 @@ public class SofaDecorator extends PackageExplorerProblemsDecorator implements I
 				return SDTPlugin.getImageDescriptor("icons/node/blue.png").createImage();
 			}
 
-			IFile file = SDTPlugin.getTargetFile(name + "/pom.xml");
+			IFile file = SDTPlugin.getFile(name + "/pom.xml");
 			if (!file.exists())
 				return null;
 

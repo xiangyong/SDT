@@ -175,16 +175,17 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 	}
 
 	public void refreshData() {
-		String name = this.nameField.getText();
+		String className = this.nameField.getText();
 		if (this.surfixField.getSelection(CONTROLLER)) {
-			name = name + CONTROLLER;
+			className = className + CONTROLLER;
 		}
 
 		this.data.fFile = getPackageFragmentRoot(this.projectField).getPackageFragment(this.packageField.getText())
 				.getPath().toString()
-				+ "/" + name + ".java";
+				+ "/" + className + ".java";
 		this.data.fPackage = this.packageField.getText();
-		this.data.fName = name;
+		this.data.fName = this.nameField.getText();
+		this.data.fClassName = className;
 
 	}
 }
