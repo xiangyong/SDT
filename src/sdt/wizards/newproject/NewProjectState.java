@@ -13,12 +13,17 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.corext.refactoring.changes.CreatePackageChange;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.NullChange;
@@ -75,16 +80,16 @@ public class NewProjectState implements NewWizardState {
 			f[i++] = change;
 		}
 
-		{
-			String tName = getTemplateProjectName();
-			IFile tPom = SDTPlugin.getTargetFile(tName + "/pom.xml");
-			String tPomTxt = SDTPlugin.readFile(tPom);
-			String txt = tPomTxt.replaceAll(tName, this.name);
-
-			IFile file = SDTPlugin.getTargetFile(this.name + "/pom.xml");
-			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-			f[i++] = change;
-		}
+		// {
+		// String tName = getTemplateProjectName();
+		// IFile tPom = SDTPlugin.getTargetFile(tName + "/pom.xml");
+		// String tPomTxt = SDTPlugin.readFile(tPom);
+		// String txt = tPomTxt.replaceAll(tName, this.name);
+		//
+		// IFile file = SDTPlugin.getTargetFile(this.name + "/pom.xml");
+		// TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
+		// f[i++] = change;
+		// }
 
 		{
 			IProject project = SDTPlugin.getProject(this.name);
@@ -122,7 +127,33 @@ public class NewProjectState implements NewWizardState {
 			project.open(IResource.BACKGROUND_REFRESH, null);
 
 			tProject.getFile(".classpath").copy(project.getFile(".classpath").getFullPath(), true, null);
-			JavaCore.create(project);
+			IJavaProject jp = JavaCore.create(project);
+			if (this.name.contains("-web-")) {
+				IClasspathEntry[] jpEntries = jp.getRawClasspath();
+
+				IClasspathEntry home = new ClasspathEntry( //
+						IPackageFragmentRoot.K_SOURCE,// contentKind
+						ClasspathEntry.CPE_PROJECT, // entryKind
+						new Path("/" + NameUtil.firstString(this.name, '-') + "-web-home"), // path
+						new IPath[0], // inclusionPatterns
+						new IPath[0], // exclusionPatterns
+						null, // sourceAttachmentPath
+						null, // sourceAttachmentRootPath
+						null, // specificOutputLocation
+						false, // isExported
+						new IAccessRule[0], // accessRules
+						true,// combineAccessRules
+						new IClasspathAttribute[0] // extraAttributes
+				);
+				IClasspathEntry[] entries = new IClasspathEntry[jpEntries.length + 1];
+				for (int i = 0; i < jpEntries.length; i++) {
+					entries[i] = jpEntries[i];
+				}
+				entries[jpEntries.length] = home;
+
+				jp.setRawClasspath(entries, null);
+			}
+
 			project.getFolder("src").create(true, true, null);
 			project.getFolder("src/main").create(true, true, null);
 			project.getFolder("src/main/java").create(true, true, null);

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
+		<groupId>com.alipay.$!{system}</groupId>
+		<artifactId>$!{system}-parent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../../../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.alipay.$!{system}</groupId>
+	<artifactId>$!{project}</artifactId>
+	<version>1.0.0</version>
+
+	<name>Alipay $!{project}</name>
+	<description>Alipay $!{project}</description>
+	<url>http://home.alipay.net</url>
+
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<!-- project depends -->
+		<dependency>
+			<groupId>com.alipay.$!{system}</groupId>
+			<artifactId>$!{system}-web-home</artifactId>
+		</dependency>
+		<!-- lib depends -->
+	</dependencies>
+
+</project>
