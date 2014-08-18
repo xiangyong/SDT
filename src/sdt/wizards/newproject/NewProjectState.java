@@ -12,6 +12,7 @@ import java.util.Properties;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.internal.resources.ProjectDescription;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -32,8 +33,9 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 
 import sdt.NameUtil;
 import sdt.SDTPlugin;
-import sdt.wizards.CreateDirChange;
 import sdt.wizards.NewWizardState;
+import sdt.wizards.change.CreateDirChange;
+import sdt.wizards.change.CreatePackageChange;
 
 @SuppressWarnings("restriction")
 public class NewProjectState implements NewWizardState {
@@ -59,7 +61,7 @@ public class NewProjectState implements NewWizardState {
 		context.put("projectSpring", this.name.substring(this.name.indexOf("-") + 1));
 		context.put("projectBundleWebName", this.name.substring(this.name.lastIndexOf("-") + 1));
 
-		// createProject();
+		// TODO createProject();
 
 		Properties ps = new Properties();
 		try {
@@ -85,8 +87,8 @@ public class NewProjectState implements NewWizardState {
 		}
 
 		{
-			CreateDirChange change = new CreateDirChange(SDTPlugin.getFolder("/" + this.name + "/"
-					+ SDTPlugin.D_JAVA + "/" + defaultPackage.replaceAll("[.]", "/")));
+			CreatePackageChange change = new CreatePackageChange("/" + this.name + "/" + SDTPlugin.D_JAVA,
+					defaultPackage);
 			f.add(change);
 		}
 
@@ -95,12 +97,42 @@ public class NewProjectState implements NewWizardState {
 
 	private void createProjectX() {
 		IProject project = SDTPlugin.getProject(this.name);
+		if (project != null && project.exists()) {
+			return;
+		}
 		try {
 			IProjectDescription desc = new ProjectDescription();
 			desc.setName(this.name);
 			URI uri = new File(this.dir).toURI();
 			desc.setLocationURI(uri);
 			project.create(desc, null);
+
+			// TODO
+			String tplProjectName = getTemplateProjectName();
+			IProject tProject = SDTPlugin.getProject(tplProjectName);
+			IProjectDescription tDesc = tProject.getDescription();
+			System.err.println("###### START ######");
+			System.err.println("###### getBuildSpec ...");
+			for (ICommand f : tDesc.getBuildSpec()) {
+				System.err.println(f);
+			}
+
+			System.err.println("###### getDynamicReferences ...");
+			for (IProject f : tDesc.getDynamicReferences()) {
+				System.err.println(f);
+			}
+
+			System.err.println("###### getNatureIds ...");
+			for (String f : tDesc.getNatureIds()) {
+				System.err.println(f);
+			}
+
+			System.err.println("###### getReferencedProjects ...");
+			for (IProject f : tDesc.getReferencedProjects()) {
+				System.err.println(f);
+			}
+
+			System.err.println("###### END ######");
 		} catch (CoreException e1) {
 			e1.printStackTrace();
 		}

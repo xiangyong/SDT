@@ -34,6 +34,7 @@ public class NewWizard extends Wizard implements INewWizard {
 		if (success.get()) {
 			// IFile file = SDTPlugin.getTargetFile(data.xmlFile);
 			// SDTPlugin.openResource(file);
+			doAfterSuccess();
 			return true;
 		}
 
@@ -46,7 +47,9 @@ public class NewWizard extends Wizard implements INewWizard {
 		if (previewPage.hasChanges()) {
 			monitor.beginTask("Creating template...", 1);
 			try {
+				doBefore();
 				previewPage.getChange().perform(monitor);
+				doAfter();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
@@ -56,6 +59,15 @@ public class NewWizard extends Wizard implements INewWizard {
 		}
 
 		return true;
+	}
+
+	protected void doBefore() {
+	}
+
+	protected void doAfter() {		
+	}
+
+	protected void doAfterSuccess() {
 	}
 
 	@Override

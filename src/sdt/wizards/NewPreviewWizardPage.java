@@ -15,7 +15,7 @@ public class NewPreviewWizardPage extends PreviewWizardPage {
 
 	public void setVisible(boolean visible) {
 		if (visible) {
-			CompositeChange root = new CompositeChange("Create template of dal", this.data.computeChanges());
+			CompositeChange root = new CompositeChange("Create template", this.data.computeChanges());
 			setChange(root);
 		}
 		super.setVisible(visible);

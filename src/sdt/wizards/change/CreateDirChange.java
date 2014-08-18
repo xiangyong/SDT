@@ -1,4 +1,4 @@
-package sdt.wizards;
+package sdt.wizards.change;
 
 import java.io.File;
 
@@ -11,7 +11,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.resource.DeleteResourceChange;
 
 public class CreateDirChange extends Change {
-	private IFolder folder;
+	protected IFolder folder;
 
 	public CreateDirChange(IFolder folder) {
 		this.folder = folder;
@@ -38,7 +38,6 @@ public class CreateDirChange extends Change {
 
 	@Override
 	public Change perform(IProgressMonitor pm) throws CoreException {
-		System.err.println(folder.getLocationURI().getRawPath());
 		new File(folder.getLocationURI().getPath()).mkdirs();
 		return new DeleteResourceChange(folder.getFullPath(), true);
 	}
