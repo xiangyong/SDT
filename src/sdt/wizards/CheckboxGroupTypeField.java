@@ -62,6 +62,17 @@ public class CheckboxGroupTypeField extends DialogField {
 		return gd;
 	}
 
+	public boolean getSelection(String f) {
+		int l = checkbox.length;
+		for (int i = 0; i < l; i++) {
+			if (checkbox[i].getText().equals(f)) {
+				return checkbox[i].getSelection();
+			}
+		}
+		return false;
+
+	}
+
 	public int getValue() {
 		int f = 0;
 		int l = checkbox.length;
@@ -71,6 +82,15 @@ public class CheckboxGroupTypeField extends DialogField {
 			}
 		}
 		return f;
+	}
+
+	public void setValue(String f) {
+		int l = checkbox.length;
+		for (int i = 0; i < l; i++) {
+			if (checkbox[i].getText().equals(f)) {
+				checkbox[i].setSelection(true);
+			}
+		}
 	}
 
 }

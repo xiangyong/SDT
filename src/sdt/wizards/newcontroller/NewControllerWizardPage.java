@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import sdt.wizards.CheckboxGroupTypeField;
 import sdt.wizards.NewWizardPage;
 
 @SuppressWarnings("restriction")
@@ -32,6 +33,8 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 	private StringButtonDialogField packageField;
 	private JavaPackageCompletionProcessor packageCompletionProcessor;
 	private StringDialogField nameField;
+	private CheckboxGroupTypeField surfixField;
+	private static final String CONTROLLER = "Controller";
 
 	public NewControllerWizardPage(NewControllerState data) {
 		super("NewServiceWizard");
@@ -54,6 +57,11 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		nameField = new StringDialogField();
 		nameField.setDialogFieldListener(this);
 		nameField.setLabelText("&" + i++ + " Name:");
+
+		surfixField = new CheckboxGroupTypeField();
+		surfixField.setDialogFieldListener(this);
+		surfixField.setLabels(CONTROLLER);
+		surfixField.setLabelText("&" + i++ + "Name Surfix :");
 
 	}
 
@@ -79,6 +87,9 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		TextFieldNavigationHandler.install(text);
 
 		createStringDialogField(composite, nColumns, this.nameField);
+
+		surfixField.doFillIntoGrid(composite, nColumns);
+		surfixField.setValue(CONTROLLER);
 
 		updateStatus();
 
@@ -164,12 +175,16 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 	}
 
 	public void refreshData() {
+		String name = this.nameField.getText();
+		if (this.surfixField.getSelection(CONTROLLER)) {
+			name = name + CONTROLLER;
+		}
 
 		this.data.fFile = getPackageFragmentRoot(this.projectField).getPackageFragment(this.packageField.getText())
 				.getPath().toString()
-				+ "/" + this.nameField.getText() + ".java";
+				+ "/" + name + ".java";
 		this.data.fPackage = this.packageField.getText();
-		this.data.fName = this.nameField.getText();
+		this.data.fName = name;
 
 	}
 }

@@ -1,3 +1,1 @@
-/$!{projectSimple}/*.*>ROLE_MOBILECORE_ADMIN|MMNG_ADMIN
-
-CONVERT_URL_TO_ORIGINAL
+/$!{projectSimple}/**/*.*>$ROLE_NOT_LOGIN
