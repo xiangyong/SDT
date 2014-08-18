@@ -61,7 +61,7 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		surfixField = new CheckboxGroupTypeField();
 		surfixField.setDialogFieldListener(this);
 		surfixField.setLabels(CONTROLLER);
-		surfixField.setLabelText("&" + i++ + "Name Surfix :");
+		surfixField.setLabelText("&" + i++ + " Name Surfix :");
 
 	}
 
