@@ -37,9 +37,8 @@ public class NewProjectWizard extends NewWizard {
 		if (ws == null) {
 			ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
 			wsm.addWorkingSet(ws);
-		} else if (!ws.isEditable()) {
-
 		}
+		
 		wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
 
 		// super performFinish

@@ -56,11 +56,11 @@ public class SofaDecorator extends PackageExplorerProblemsDecorator implements I
 			if (name.contains("-assembly-")) {
 				return SDTPlugin.getImageDescriptor("icons/node/red.png").createImage();
 			} else if (name.contains("-biz-")) {
-				return SDTPlugin.getImageDescriptor("icons/node/orange.png").createImage();
-			} else if (name.contains("-common-")) {
 				return SDTPlugin.getImageDescriptor("icons/node/green.png").createImage();
-			} else if (name.contains("-core-")) {
+			} else if (name.contains("-common-")) {
 				return SDTPlugin.getImageDescriptor("icons/node/orange.png").createImage();
+			} else if (name.contains("-core-")) {
+				return SDTPlugin.getImageDescriptor("icons/node/green.png").createImage();
 			} else if (name.endsWith("-test") || name.endsWith("-tester")) {
 				return SDTPlugin.getImageDescriptor("icons/node/red.png").createImage();
 			} else if (name.contains("-web-")) {
