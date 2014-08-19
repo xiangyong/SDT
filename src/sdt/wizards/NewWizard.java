@@ -47,9 +47,9 @@ public class NewWizard extends Wizard implements INewWizard {
 		if (previewPage.hasChanges()) {
 			monitor.beginTask("Creating template...", 1);
 			try {
-				doBefore();
+				doBefore(monitor);
 				previewPage.getChange().perform(monitor);
-				doAfter();
+				doAfter(monitor);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
@@ -61,10 +61,10 @@ public class NewWizard extends Wizard implements INewWizard {
 		return true;
 	}
 
-	protected void doBefore() {
+	protected void doBefore(IProgressMonitor monitor) {
 	}
 
-	protected void doAfter() {		
+	protected void doAfter(IProgressMonitor monitor) {
 	}
 
 	protected void doAfterSuccess() {

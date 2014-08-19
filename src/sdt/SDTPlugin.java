@@ -342,6 +342,9 @@ public class SDTPlugin extends AbstractUIPlugin {
 		IClasspathEntry[] f = new IClasspathEntry[l + 1];
 		for (int i = 0; i < l; i++) {
 			f[i] = entries[i];
+			if (f[i].getPath().equals(from.getPath())) {
+				return;
+			}
 		}
 		IClasspathEntry ce = new ClasspathEntry( //
 				IPackageFragmentRoot.K_SOURCE,// contentKind

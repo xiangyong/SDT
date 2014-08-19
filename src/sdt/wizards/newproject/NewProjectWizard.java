@@ -10,14 +10,10 @@ import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PlatformUI;
 
 import sdt.SDTPlugin;
 import sdt.wizards.NewPreviewWizardPage;
@@ -29,30 +25,31 @@ public class NewProjectWizard extends NewWizard {
 
 	private NewProjectWizardPage wizardPage;
 
-	protected boolean performFinish(IProgressMonitor monitor) {
+	protected void doBefore(IProgressMonitor monitor) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		IProject project = SDTPlugin.getProject(data.name);
 
+		//		IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
+		//		IWorkingSet ws = wsm.getWorkingSet(data.system);
+		//		if (ws == null) {
+		//			ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
+		//			wsm.addWorkingSet(ws);
+		//		}
+		//		wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
+
 		// open project
 		try {
-			project.open(IResource.BACKGROUND_REFRESH, null);
+			project.open(IResource.BACKGROUND_REFRESH, monitor);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 
-		// add project to working set
-		IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
-		IWorkingSet ws = wsm.getWorkingSet(data.system);
+	}
 
-		if (ws == null) {
-			ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
-			wsm.addWorkingSet(ws);
-		}
+	protected void doAfter(IProgressMonitor monitor) {
 
-		wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
-
-		boolean f = super.performFinish(monitor);
-
+		NewProjectState data = (NewProjectState) this.previewPage.data;
+		IProject project = SDTPlugin.getProject(data.name);
 		IJavaProject jp = JavaCore.create(project);
 
 		// init context
@@ -69,12 +66,13 @@ public class NewProjectWizard extends NewWizard {
 		IProject testProject = SDTPlugin.getProject(data.system + "-test");
 		SDTPlugin.addProject(jp, JavaCore.create(testProject));
 
-		return f;
 	}
 
 	private void addToMainPom(VelocityContext context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "pom.xml");
+		if (!pom.exists())
+			return;
 
 		// read
 		String txt = null;
@@ -130,6 +128,8 @@ public class NewProjectWizard extends NewWizard {
 
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "assembly/ace/pom.xml");
+		if (!pom.exists())
+			return;
 
 		// read
 		String txt = null;
@@ -164,7 +164,8 @@ public class NewProjectWizard extends NewWizard {
 	private void addToTestPom(VelocityContext context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "app/test/pom.xml");
-
+		if (!pom.exists())
+			return;
 		// read
 		String txt = null;
 		try {
@@ -211,11 +212,7 @@ public class NewProjectWizard extends NewWizard {
 			}
 		}
 
-		File f = new File(parent.getAbsolutePath() + "/" + pom);
-		if (!f.exists())
-			return null;
-
-		return f;
+		return new File(parent.getAbsolutePath() + "/" + pom);
 	}
 
 	@Override
