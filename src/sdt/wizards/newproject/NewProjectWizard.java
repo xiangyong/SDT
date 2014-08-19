@@ -67,8 +67,6 @@ public class NewProjectWizard extends NewWizard {
 
 		// # add to test project
 		IProject testProject = SDTPlugin.getProject(data.system + "-test");
-		System.err.println(testProject);
-		System.err.println(testProject.exists());
 		SDTPlugin.addProject(jp, JavaCore.create(testProject));
 
 		return f;
