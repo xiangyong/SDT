@@ -49,7 +49,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import sdt.core.F;
+import sdt.core._;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -142,7 +142,7 @@ public class SDTPlugin extends AbstractUIPlugin {
 			}
 			reader.close();
 
-			return F.f(f.toString(), ctx);
+			return _.f(f.toString(), ctx);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

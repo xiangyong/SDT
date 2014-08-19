@@ -8,7 +8,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-public class F {
+public class _ {
 	@SuppressWarnings("unchecked")
 	public static String f(String txt, Map ctx) {
 		String[] ss = txt.split("\n");
