@@ -1,7 +1,6 @@
 package sdt.wizards.newproject;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -13,6 +12,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkingSet;
@@ -53,29 +53,30 @@ public class NewProjectWizard extends NewWizard {
 
 		boolean f = super.performFinish(monitor);
 
-		JavaCore.create(project);
+		IJavaProject jp = JavaCore.create(project);
 
-		addToMainPom();
-		addToAcePom();
+		// init context
+		Velocity.init();
+		VelocityContext context = new VelocityContext();
+		context.put("system", data.system);
+		context.put("project", data.name);
 
-		// # add to test pom
-		// find proj
-		// -z 
-		//   find "</dependencies>"
-		//   insert @>"</dependencies>" proj
+		addToMainPom(context);
+		addToAcePom(context);
+		addToTestPom(context);
 
 		// # add to test project
-		// .project
-		// .classpath
-
-		// super performFinish
+		IProject testProject = SDTPlugin.getProject(data.system + "-test");
+		System.err.println(testProject);
+		System.err.println(testProject.exists());
+		SDTPlugin.addProject(jp, JavaCore.create(testProject));
 
 		return f;
 	}
 
-	private void addToMainPom() {
+	private void addToMainPom(VelocityContext context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
-		File pom = getMainPom(data.name);
+		File pom = getPom(data.name, "pom.xml");
 
 		// read
 		String txt = null;
@@ -88,12 +89,6 @@ public class NewProjectWizard extends NewWizard {
 			return;
 
 		StringBuffer buff = new StringBuffer(txt);
-
-		// init context
-		Velocity.init();
-		VelocityContext context = new VelocityContext();
-		context.put("system", data.system);
-		context.put("project", data.name);
 
 		// dependency
 		{
@@ -133,39 +128,10 @@ public class NewProjectWizard extends NewWizard {
 		buff.insert(j, value);
 	}
 
-	private File getMainPom(String name) {
-		IProject project = SDTPlugin.getProject(name);
-		URI uri = project.getRawLocationURI();
-		File file = new File(uri);
-		if (!file.exists())
-			return null;
-
-		int l = name.endsWith("-assembly-templage") ? 2 : 3;
-		File parent = file;
-		for (int i = 0; i < l; i++) {
-			if (parent.getParentFile().exists()) {
-				parent = parent.getParentFile();
-			} else {
-				return null;
-			}
-		}
-
-		File[] files = parent.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File f, String name) {
-				return name.equals("pom.xml");
-			}
-		});
-		if (files.length == 0)
-			return null;
-
-		return files[0];
-	}
-
-	private void addToAcePom() {
+	private void addToAcePom(VelocityContext context) {
 
 		NewProjectState data = (NewProjectState) this.previewPage.data;
-		File pom = getAcePom(data.name);
+		File pom = getPom(data.name, "assembly/ace/pom.xml");
 
 		// read
 		String txt = null;
@@ -178,12 +144,6 @@ public class NewProjectWizard extends NewWizard {
 			return;
 
 		StringBuffer buff = new StringBuffer(txt);
-
-		// init context
-		Velocity.init();
-		VelocityContext context = new VelocityContext();
-		context.put("system", data.system);
-		context.put("project", data.name);
 
 		// artifactItem
 		{
@@ -203,16 +163,49 @@ public class NewProjectWizard extends NewWizard {
 		}
 	}
 
-	private File getAcePom(String name) {
+	private void addToTestPom(VelocityContext context) {
+		NewProjectState data = (NewProjectState) this.previewPage.data;
+		File pom = getPom(data.name, "app/test/pom.xml");
+
+		// read
+		String txt = null;
+		try {
+			txt = Files.toString(pom, Charset.forName("GBK"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (txt == null || txt.contains(data.name))
+			return;
+
+		StringBuffer buff = new StringBuffer(txt);
+
+		// artifactItem
+		{
+			context.put("type", "test");
+			String key1 = data.name;
+			String key2 = data.system + "-" + data.type;
+			String key3 = "</dependency>";
+			String content = SDTPlugin.getTpl(context, "tpl/proj/dependency.vm");
+			insertString(buff, content, key1, key2, key3);
+		}
+
+		// write
+		try {
+			Files.write(buff.toString().getBytes(), pom);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private File getPom(String name, String pom) {
 		IProject project = SDTPlugin.getProject(name);
 		URI uri = project.getRawLocationURI();
 		File file = new File(uri);
 		if (!file.exists())
 			return null;
 
-		int l = name.endsWith("-assembly-templage") ? 2 : 3;
 		File parent = file;
-		for (int i = 0; i < l; i++) {
+		for (int i = 0; i < 3; i++) {
 			if (parent.getParentFile().exists()) {
 				parent = parent.getParentFile();
 			} else {
@@ -220,11 +213,11 @@ public class NewProjectWizard extends NewWizard {
 			}
 		}
 
-		File pom = new File(parent.getAbsolutePath() + "/assembly/ace/pom.xml");
-		if (!pom.exists())
+		File f = new File(parent.getAbsolutePath() + "/" + pom);
+		if (!f.exists())
 			return null;
 
-		return pom;
+		return f;
 	}
 
 	@Override

@@ -14,20 +14,24 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -47,6 +51,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class SDTPlugin extends AbstractUIPlugin {
 
 	public static final String D_RES = "src/main/resources";
@@ -319,19 +324,45 @@ public class SDTPlugin extends AbstractUIPlugin {
 
 	}
 
-	public static void addFileToProject(IContainer container, Path path, InputStream contentStream,
-			IProgressMonitor monitor) throws CoreException {
-		final IFile file = container.getFile(path);
-
-		if (file.exists()) {
-			file.setContents(contentStream, true, true, monitor);
-		} else {
-			file.create(contentStream, true, monitor);
-		}
-	}
-
 	public static IProject getProject(String name) {
 		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+	}
+
+	public static void addProject(IJavaProject from, IJavaProject to) {
+		IClasspathEntry[] entries = null;
+		try {
+			entries = to.getRawClasspath();
+		} catch (JavaModelException e1) {
+			e1.printStackTrace();
+		}
+		if (entries == null)
+			return;
+
+		int l = entries.length;
+		IClasspathEntry[] f = new IClasspathEntry[l + 1];
+		for (int i = 0; i < l; i++) {
+			f[i] = entries[i];
+		}
+		IClasspathEntry ce = new ClasspathEntry( //
+				IPackageFragmentRoot.K_SOURCE,// contentKind
+				ClasspathEntry.CPE_PROJECT, // entryKind
+				from.getPath(), // path
+				new IPath[0], // inclusionPatterns
+				new IPath[0], // exclusionPatterns
+				null, // sourceAttachmentPath
+				null, // sourceAttachmentRootPath
+				null, // specificOutputLocation
+				false, // isExported
+				new IAccessRule[0], // accessRules
+				true,// combineAccessRules
+				new IClasspathAttribute[0] // extraAttributes
+		);
+		f[l] = ce;
+		try {
+			to.setRawClasspath(f, null);
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void printDesc(String name) {

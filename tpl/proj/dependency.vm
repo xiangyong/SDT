@@ -8,7 +8,7 @@
 #elseif($!type=="module")
 
     <module>$!{module}</module>
-#elseif($!type=="project")
+#elseif($!type=="test")
 
 		<dependency>
 			<groupId>com.alipay.$!{system}</groupId>
