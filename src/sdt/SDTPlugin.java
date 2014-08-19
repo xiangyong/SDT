@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -47,6 +48,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import sdt.core.F;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -121,6 +124,40 @@ public class SDTPlugin extends AbstractUIPlugin {
 
 	public URL getInstallURL() {
 		return getDefault().getBundle().getEntry("/"); //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("unchecked")
+	public static String getTpl(Map ctx, String path) {
+		BufferedReader reader = null;
+		StringBuffer f = new StringBuffer();
+		try {
+			URL url = new URL("platform:/plugin/" + SDTPlugin.PLUGIN_ID + "/" + path);
+			InputStream inputStream = url.openConnection().getInputStream();
+			reader = new BufferedReader(new InputStreamReader(inputStream));
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				f.append(line);
+				f.append("\n");
+			}
+			reader.close();
+
+			return F.f(f.toString(), ctx);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (reader != null) {
+					reader.close();
+					reader = null;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+
+			}
+		}
+		return null;
 	}
 
 	@SuppressWarnings("deprecation")

@@ -2,57 +2,86 @@
 <!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
     "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 <sqlMap>
-	<resultMap id="RM.$!{table.className}" class="$!{packageRoot}.dataobject.$!{table.className}DO">
-#foreach($!{column} in $!{table.columns})
-		<result property="${column.javaName}" column="$!{column.dbName}" javaType="$!{column.javaType}" jdbcType="$!{column.dbType}"  />
-#end
+	<resultMap id="RM.{table.className}" class="{packageRoot}.dataobject.{table.className}DO">
+# for(i in table.columns) {
+#   var column = table.columns[i];
+		<result property="{column.javaName}" column="{column.dbName}" javaType="{column.javaType}" jdbcType="{column.dbType}"  />
+# }
     </resultMap>
     
-    <sql id="$!{table.className}.columns">#foreach($!{column} in $!{table.columns})#if($!{velocityCount}>1),#end$!{column.dbName}#end</sql>
+    <sql id="{table.className}.columns">
+# var columns = "";
+# for(i in table.columns) {
+#   var column = table.columns[i];
+#   if(i>0) { columns+=","; }
+#   columns+=column.dbName;
+# }
+	{columns}
+	</sql>
 	
-	<insert id="$!{systemName}.$!{table.className}.insert">	
-		INSERT INTO $!{table.tableName} (
-			<include refid="$!{table.className}.columns"/>
+	<insert id="{systemName}.{table.className}.insert">	
+		INSERT INTO {table.tableName} (
+			<include refid="{table.className}.columns"/>
 	    ) VALUES (
-	       	#foreach($!{column} in $!{table.columns})#if($!{velocityCount}>1),#end #$!{column.javaName}# #end
-	    
-	    )	
-#foreach($!{column} in $!{table.columns})
-#if($!{column.ai})
-		<selectKey resultClass="long" type="post" keyProperty="$!{column.javaName}" >
+# var columnValues = "";
+# for(i in table.columns) {
+#   var column = table.columns[i];
+#   if(i>0) {columnValues+=",";}
+#   columnValues+="#"+column.javaName+"#";
+# }
+			{columnValues}
+	    )
+# for(i in table.columns) {
+#   var column = table.columns[i];
+# if(column.ai) {
+		<selectKey resultClass="long" type="post" keyProperty="{column.javaName}" >
             select last_insert_id()
     	</selectKey>
-#end
-#end
+# }}
 	</insert>
 	
-	<delete id="$!{systemName}.$!{table.className}.delete">
-		DELETE FROM $!{table.tableName} 
-#set($isStart=false)
-#foreach($!{column} in $!{table.columns})
-#if($!{column.pk})
-		#if($!{isStart})   AND #else WHERE #end
-$!{column.dbName} = #$!{column.javaName}#
-#set($isStart=true)
-#end		 	   
-#end
+	<delete id="{systemName}.{table.className}.delete">
+		DELETE FROM {table.tableName} 
+# var isStart = false;
+# for(i in table.columns) {
+#   var column = table.columns[i];
+#   if(column.pk) {
+#     if(!isStart) {
+#        isStart=true;
+		 WHERE {column.dbName} = #{column.javaName}#
+#     } else {
+		   AND {column.dbName} = #{column.javaName}#
+#     }
+#   }	 	   
+# }
     </delete>
 	
-	<update id="$!{systemName}.$!{table.className}.update">
-		UPDATE ${table.tableName} SET #foreach($!{column} in $!{table.columns})#if($!{velocityCount}>1),#end$!{column.dbName} = #$!{column.javaName}# #end
-#set($isStart=false)
-#foreach($!{column} in $!{table.columns})
-#if($!{column.pk})
-#if($!{isStart}) AND #{else}WHERE #end$!{column.dbName} = #$!{column.javaName}#
-#set($isStart=true)
-#end
-#end
+	<update id="{systemName}.{table.className}.update">
+# var setColumns = "";
+# for(i in table.columns) {
+#   var column = table.columns[i];
+#   if(i>0) { setColumns+=","; }
+#   setColumns+=column.dbName+" = #"+column.javaName+"#";
+# }
+		UPDATE {table.tableName} SET {setColumns}
+# var isStart = false;
+# for(i in table.columns) {
+#   var column = table.columns[i];
+#   if(column.pk) {
+#     if(!isStart) {
+#        isStart=true;
+		 WHERE {column.dbName} = #{column.javaName}#
+#     } else {
+		   AND {column.dbName} = #{column.javaName}#
+#     }
+#   }	 	   
+# }
 	</update>
 	
-	<select id="$!{systemName}.$!{table.className}.queryCount" resultClass="long" >
-    	SELECT /*$!{systemName}.$!{table.className}.queryCount*/
+	<select id="{systemName}.{table.className}.queryCount" resultClass="long" >
+    	SELECT /*{systemName}.{table.className}.queryCount*/
     		   count(1)
-		  FROM $!{table.tableName}
+		  FROM {table.tableName}
 	     WHERE 1=1
 		<!--
 		<isNotNull prepend="AND" property="id"> 
@@ -63,10 +92,10 @@ $!{column.dbName} = #$!{column.javaName}#
 		-->
 	</select>
 	
-	<select id="$!{systemName}.$!{table.className}.query" resultMap="RM.$!{table.className}" >
-    	SELECT /*$!{systemName}.$!{table.className}.query*/
-    		   <include refid="$!{table.className}.columns"/>
-		  FROM $!{table.tableName}
+	<select id="{systemName}.{table.className}.query" resultMap="RM.{table.className}" >
+    	SELECT /*{systemName}.{table.className}.query*/
+    		   <include refid="{table.className}.columns"/>
+		  FROM {table.tableName}
 	     WHERE 1=1
 		<!--
 		<isNotNull prepend="AND" property="id"> 

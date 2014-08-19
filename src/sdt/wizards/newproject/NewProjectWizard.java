@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 
+import org.apache.commons.lang.CharSetUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IProject;

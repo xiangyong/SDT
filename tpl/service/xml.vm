@@ -1,4 +1,5 @@
-#if(${createXml})<?xml version="1.0" encoding="GBK"?>
+# if(createXml){
+<?xml version="1.0" encoding="GBK"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,23 +12,24 @@
          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
          http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
 	default-autowire="byName">
-#end
-	<bean id="$!{objectName}" class="$!{implPackage}.$!{implName}"/>
-#if($!{serviceType}==0)
-	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}"/>
-#elseif($!{serviceType}==1)
-	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
+# }
+	<bean id="{objectName}" class="{implPackage}.{implName}"/>
+# if(serviceType==0){
+	<sofa:service ref="{objectName}" interface="{servicePackage}.{serviceName}"/>
+# } else if(serviceType==1) {
+	<sofa:service ref="{objectName}" interface="{servicePackage}.{serviceName}">
 		<sofa:binding.ws />
 	</sofa:service>
-#elseif($!{serviceType}==2)
-	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
+# } else if(serviceType==2) {
+	<sofa:service ref="{objectName}" interface="{servicePackage}.{serviceName}">
 		<sofa:binding.tr />
 	</sofa:service>
-#elseif($!{serviceType}==3)
-	<sofa:service ref="$!{objectName}" interface="$!{servicePackage}.$!{serviceName}">
+# } else if(serviceType==3) {
+	<sofa:service ref="{objectName}" interface="{servicePackage}.{serviceName}">
 		<sofa:binding.ws />
 		<sofa:binding.tr />
 	</sofa:service>
-#end
-
-#if(${createXml})</beans>#end
+# }
+# if(createXml){
+</beans>
+# }

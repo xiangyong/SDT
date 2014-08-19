@@ -1,7 +1,9 @@
-package $!{implPackage};
+package {implPackage};
 
-#if($!{servicePackage} != $!{implPackage})import $!{servicePackage}.$!{serviceName};#end
+#if(servicePackage==implPackage){
+import {servicePackage}.{serviceName};
 
-public class $!{implName} implements $!{serviceName} {
+#}
+public class {implName} implements {serviceName} {
 	
 }

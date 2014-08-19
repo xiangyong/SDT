@@ -1,11 +1,14 @@
 package sdt.wizards.newcontroller;
 
-import org.apache.velocity.VelocityContext;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 
+import sdt.NameUtil;
 import sdt.SDTPlugin;
 import sdt.wizards.NewWizardState;
 
@@ -22,9 +25,11 @@ public class NewControllerState implements NewWizardState {
 
 	@Override
 	public Change[] computeChanges() {
-		VelocityContext context = new VelocityContext();
-		context.put("package", fPackage);
+		//		VelocityContext context = new VelocityContext();
+		Map<String, String> context = new HashMap<String, String>();
+		context.put("packageName", fPackage);
 		context.put("name", fName);
+		context.put("fName", NameUtil.aaaBbbCcc(fName));
 		context.put("className", fClassName);
 
 		int i = 0, l = 1;
@@ -32,8 +37,7 @@ public class NewControllerState implements NewWizardState {
 
 		IFile file = SDTPlugin.getFile(this.fFile);
 		String txt = SDTPlugin.getTpl(context, "tpl/controller/controller.vm");
-		TextFileChange change = null;
-		change = SDTPlugin.createNewFileChange(file, txt);
+		TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
 		f[i++] = change;
 
 		return f;

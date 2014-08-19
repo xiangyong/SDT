@@ -1,23 +1,26 @@
-package $!{packageRoot}.dataobject;
+package {packageRoot}.dataobject;
 
-#foreach($!{import} in $!{table.imports})
-import $!{import};
-#end
+# for(i in table.getImports()) {
+import {table.getImports()[i]};
 
-public class $!{table.className}DO {
+# }
+public class {table.className}DO {
 
-#foreach($!{column} in $!{table.columns})
-	private $!{column.javaTypeShort} $!{column.javaName};
-#end
+# for(i in table.columns) {
+#   var column = table.columns[i];
+	private {column.javaTypeShort} {column.javaName};
+# }
 
-#foreach($!{column} in $!{table.columns})
-	public void $!{column.setMethod}($!{column.javaTypeShort} $!{column.javaName}){
-		this.$!{column.javaName} = $!{column.javaName};
+# for(i in table.columns) {
+#   var column = table.columns[i];
+	public void {column.setMethod}({column.javaTypeShort} {column.javaName}){
+		this.{column.javaName} = {column.javaName};
 	}
 	
-	public $!{column.javaTypeShort} $!{column.getMethod}(){
-		return this.$!{column.javaName};
+	public {column.javaTypeShort} {column.getMethod}(){
+		return this.{column.javaName};
 	}
 	
-#end
+# }
+
 }

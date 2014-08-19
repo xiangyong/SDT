@@ -63,6 +63,12 @@ public final class NameUtil {
 		return buff.toString();
 	}
 
+	public static String aaaBbbCcc(String s) {
+		char c = s.charAt(0);
+		char cl = Character.toLowerCase(c);
+		return s.replaceFirst(String.valueOf(c), String.valueOf(cl));
+	}
+
 	/**
 	 * "biz" -> "Biz"<br>
 	 * "biz service impl" -> "Biz Service Impl"

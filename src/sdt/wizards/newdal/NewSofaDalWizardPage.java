@@ -398,7 +398,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 				columns.add(column);
 			}
 
-			this.data.fTable.columns = columns;
+			this.data.fTable.columns = columns.toArray(new Column[0]);
 
 		} catch (SQLException e) {
 

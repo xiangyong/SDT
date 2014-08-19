@@ -1,6 +1,8 @@
 package sdt.wizards.newservice;
 
-import org.apache.velocity.VelocityContext;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -28,9 +30,10 @@ public class NewServiceState implements NewWizardState {
 		Velocity.init();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Change[] computeChanges() {
-		VelocityContext context = new VelocityContext();
+		Map context = new HashMap();
 		context.put("servicePackage", servicePackage);
 		context.put("serviceName", serviceName);
 		context.put("implPackage", implPackage);

@@ -1,4 +1,4 @@
-package $!{package};
+package {packageName};
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -8,22 +8,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.alibaba.common.lang.StringUtil;
 
 @Controller
-public class $!{className} {
+public class {className} {
 
-    public static final String VIEW = "$!{name}/view.vm";
-    public static final String LIST = "$!{name}/list.vm";
+    public static final String VIEW = "{fName}Detail.vm";
+    public static final String LIST = "{fName}List.vm";
     public static final String OK   = "ok";
     public static final String STAT = "stat";
 
     /**
-     * view is for add and edit<br>
-     * add: <b>POST</b> {@link add(ModelMap, String)}<br>
-     * edit: <b>POST</b> {@link modify(ModelMap, String)}
-     * @param modelMap {@link ModelMap}
+     * view is for add and edit
+     * @param modelMap
      * @param id
      * @return EDIT
      */
-    @RequestMapping(value = "/$!{name}/view.htm", method = RequestMethod.GET)
+    @RequestMapping(value = "/{fName}Detail.htm", method = RequestMethod.GET)
     public String view(ModelMap modelMap, String id) {
         if (!StringUtil.isEmpty(id)) {
             modelMap.addAttribute("opcode", "modify");
@@ -35,10 +33,10 @@ public class $!{className} {
 
     /**
      * add
-     * @param modelMap {@link ModelMap}
+     * @param modelMap
      * @param param
      */
-    @RequestMapping(value = "/$!{name}/add.json", method = RequestMethod.POST)
+    @RequestMapping(value = "/add{name}.json", method = RequestMethod.POST)
     public void add(ModelMap modelMap, String param) {
         Object result = null;
         modelMap.addAttribute("result", result);
@@ -47,10 +45,10 @@ public class $!{className} {
 
     /**
      * delete
-     * @param modelMap {@link ModelMap}
+     * @param modelMap
      * @param id
      */
-    @RequestMapping(value = "/$!{name}/delete.json", method = RequestMethod.POST)
+    @RequestMapping(value = "/delete{name}.json", method = RequestMethod.POST)
     public void delete(ModelMap modelMap, String id) {
         Object result = null;
         modelMap.addAttribute("result", result);
@@ -59,10 +57,10 @@ public class $!{className} {
 
     /**
      * edit
-     * @param modelMap {@link ModelMap}
+     * @param modelMap
      * @param param
      */
-    @RequestMapping(value = "/$!{name}/edit.json", method = RequestMethod.POST)
+    @RequestMapping(value = "/edit{name}.json", method = RequestMethod.POST)
     public void edit(ModelMap modelMap, String param) {
         Object result = null;
         modelMap.addAttribute("result", result);
@@ -71,12 +69,11 @@ public class $!{className} {
 
     /**
      * list all
-     * edit status {@link editStatus(ModelMap, Long, String)}
-     * @param modelMap {@link ModelMap}
-     * @param query 
+     * @param modelMap
+     * @param query
      * @return LIST
      */
-    @RequestMapping(value = "/$!{name}/list.htm", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{fName}List.htm", method = { RequestMethod.GET, RequestMethod.POST })
     public String list(ModelMap modelMap, String query) {
         Object result = null;
         modelMap.addAttribute("result", result);
@@ -86,11 +83,11 @@ public class $!{className} {
 
     /**
      * edit status
-     * @param modelMap  {@link ModelMap}
-     * @param id        ID
+     * @param modelMap
+     * @param id
      * @param status
      */
-    @RequestMapping(value = "/$!{name}/editStatus.json", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/edit{name}Status.json", method = { RequestMethod.GET, RequestMethod.POST })
     public void editStatus(ModelMap modelMap, Long id, String status) {
         Object result = null;
         modelMap.addAttribute("result", result);

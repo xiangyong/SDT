@@ -1,5 +1,5 @@
-package $!{servicePackage};
+package {servicePackage};
 
-public interface $!{serviceName} {
+public interface {serviceName} {
 	
 }

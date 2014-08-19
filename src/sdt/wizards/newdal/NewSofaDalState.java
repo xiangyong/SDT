@@ -2,13 +2,13 @@ package sdt.wizards.newdal;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -32,7 +32,7 @@ public class NewSofaDalState implements NewWizardState {
 	@SuppressWarnings("unchecked")
 	public Change[] computeChanges() {
 
-		VelocityContext context = new VelocityContext();
+		Map context = new HashMap();
 		context.put("projectName", fProject);
 		context.put("systemName", NameUtil.firstString(fProject, '-'));
 
@@ -65,7 +65,7 @@ public class NewSofaDalState implements NewWizardState {
 	public static class Table {
 		public String name;
 		public String schema;
-		public List<Column> columns;
+		public Column[] columns;
 
 		public String toString() {
 			return name + "@" + schema;
@@ -87,11 +87,7 @@ public class NewSofaDalState implements NewWizardState {
 			return NameUtil.aaa_bbb(this.name);
 		}
 
-		public List<Column> getColumns() {
-			return this.columns;
-		}
-
-		public Set<String> getImports() {
+		public String[] getImports() {
 			Set<String> f = new TreeSet<String>();
 			for (Column column : this.columns) {
 				String javaType = column.getJavaType();
@@ -100,7 +96,7 @@ public class NewSofaDalState implements NewWizardState {
 					continue;
 				f.add(javaType);
 			}
-			return f;
+			return f.toArray(new String[0]);
 		}
 
 		public static class Column {
@@ -180,8 +176,8 @@ public class NewSofaDalState implements NewWizardState {
 			public boolean isPk() {
 				return this.pk;
 			}
-			
-			public boolean isAi(){
+
+			public boolean isAi() {
 				return this.ai;
 			}
 		}
