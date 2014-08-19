@@ -56,14 +56,7 @@ public class NewProjectWizard extends NewWizard {
 		JavaCore.create(project);
 
 		addToMainPom();
-
-		// # add to ace pom
-		// find proj
-		// -z 
-		//   find tpl
-		//   -n
-		//     find @tpl "</artifactItem>"
-		//     insert @>"</artifactItem>" proj
+		addToAcePom();
 
 		// # add to test pom
 		// find proj
@@ -167,6 +160,71 @@ public class NewProjectWizard extends NewWizard {
 			return null;
 
 		return files[0];
+	}
+
+	private void addToAcePom() {
+
+		NewProjectState data = (NewProjectState) this.previewPage.data;
+		File pom = getAcePom(data.name);
+
+		// read
+		String txt = null;
+		try {
+			txt = Files.toString(pom, Charset.forName("GBK"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (txt == null || txt.contains(data.name))
+			return;
+
+		StringBuffer buff = new StringBuffer(txt);
+
+		// init context
+		Velocity.init();
+		VelocityContext context = new VelocityContext();
+		context.put("system", data.system);
+		context.put("project", data.name);
+
+		// artifactItem
+		{
+			context.put("type", "ace");
+			String key1 = data.name;
+			String key2 = data.system + "-" + data.type;
+			String key3 = "</artifactItem>";
+			String content = SDTPlugin.getTpl(context, "tpl/proj/dependency.vm");
+			insertString(buff, content, key1, key2, key3);
+		}
+
+		// write
+		try {
+			Files.write(buff.toString().getBytes(), pom);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private File getAcePom(String name) {
+		IProject project = SDTPlugin.getProject(name);
+		URI uri = project.getRawLocationURI();
+		File file = new File(uri);
+		if (!file.exists())
+			return null;
+
+		int l = name.endsWith("-assembly-templage") ? 2 : 3;
+		File parent = file;
+		for (int i = 0; i < l; i++) {
+			if (parent.getParentFile().exists()) {
+				parent = parent.getParentFile();
+			} else {
+				return null;
+			}
+		}
+
+		File pom = new File(parent.getAbsolutePath() + "/assembly/ace/pom.xml");
+		if (!pom.exists())
+			return null;
+
+		return pom;
 	}
 
 	@Override
