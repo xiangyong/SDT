@@ -105,19 +105,20 @@ public class NewProjectWizard extends NewWizard {
 		// dependency
 		{
 			context.put("type", "parent");
-			String content = "\n" + SDTPlugin.getTpl(context, "tpl/proj/dependency.vm");
 			String key1 = data.name;
 			String key2 = data.system + "-" + data.type;
 			String key3 = "</dependency>";
+			String content = SDTPlugin.getTpl(context, "tpl/proj/dependency.vm");
 			insertString(buff, content, key1, key2, key3);
 		}
 		// module
 		{
 			context.put("type", "module");
-			String content = "\n" + SDTPlugin.getTpl(context, "tpl/proj/dependency.vm");
 			String key1 = "app/" + data.name.substring(data.name.indexOf("-") + 1).replaceFirst("-", "/");
 			String key2 = "app/" + data.type.replaceFirst("-", "/");
 			String key3 = "</module>";
+			context.put("module", key1);
+			String content = SDTPlugin.getTpl(context, "tpl/proj/dependency.vm");
 			insertString(buff, content, key1, key2, key3);
 		}
 
@@ -135,7 +136,7 @@ public class NewProjectWizard extends NewWizard {
 			return;
 
 		int i = buff.indexOf(key2);
-		int j = buff.indexOf(key3, i) + key3.length();
+		int j = buff.indexOf(key3, i) + key3.length() + 1;
 		buff.insert(j, value);
 	}
 
