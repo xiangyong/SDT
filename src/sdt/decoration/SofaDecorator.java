@@ -69,11 +69,6 @@ public class SofaDecorator extends PackageExplorerProblemsDecorator implements I
 				return SDTPlugin.getImageDescriptor("icons/node/orange.png").createImage();
 			}
 
-		} else if (element instanceof IFile) {
-			IFile file = (IFile) element;
-			if (file.getFileExtension().equals("acf")) {
-				return SDTPlugin.getImageDescriptor("icons/SecurityRole.png").createImage();
-			}
 		}
 		return null;
 	}

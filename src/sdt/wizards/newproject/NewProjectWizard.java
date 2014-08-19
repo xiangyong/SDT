@@ -10,10 +10,14 @@ import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.IWorkingSetManager;
+import org.eclipse.ui.PlatformUI;
 
 import sdt.SDTPlugin;
 import sdt.wizards.NewPreviewWizardPage;
@@ -29,13 +33,13 @@ public class NewProjectWizard extends NewWizard {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		IProject project = SDTPlugin.getProject(data.name);
 
-		//		IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
-		//		IWorkingSet ws = wsm.getWorkingSet(data.system);
-		//		if (ws == null) {
-		//			ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
-		//			wsm.addWorkingSet(ws);
-		//		}
-		//		wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
+		IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
+		IWorkingSet ws = wsm.getWorkingSet(data.system);
+		if (ws == null) {
+			ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
+			wsm.addWorkingSet(ws);
+		}
+		wsm.addToWorkingSets(project, new IWorkingSet[] { ws });
 
 		// open project
 		try {
@@ -66,6 +70,20 @@ public class NewProjectWizard extends NewWizard {
 		IProject testProject = SDTPlugin.getProject(data.system + "-test");
 		SDTPlugin.addProject(jp, JavaCore.create(testProject));
 
+	}
+
+	protected void doException(IProgressMonitor monitor) {
+		try {
+			NewProjectState data = (NewProjectState) this.previewPage.data;
+			if (data.name != null) {
+				IProject p = SDTPlugin.getProject(data.name);
+				if (p != null && p.exists()) {
+					p.delete(true, true, monitor);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void addToMainPom(VelocityContext context) {

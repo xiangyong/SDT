@@ -27,18 +27,12 @@ public class NewWizard extends Wizard implements INewWizard {
 					success.set(ok);
 				}
 			});
+
+			return success.get();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
-		if (success.get()) {
-			// IFile file = SDTPlugin.getTargetFile(data.xmlFile);
-			// SDTPlugin.openResource(file);
-			doAfterSuccess();
-			return true;
-		}
-
-		return false;
 	}
 
 	@SuppressWarnings("restriction")
@@ -52,6 +46,7 @@ public class NewWizard extends Wizard implements INewWizard {
 				doAfter(monitor);
 			} catch (Exception e) {
 				e.printStackTrace();
+				doException(monitor);
 				return false;
 			} finally {
 				monitor.done();
@@ -67,7 +62,10 @@ public class NewWizard extends Wizard implements INewWizard {
 	protected void doAfter(IProgressMonitor monitor) {
 	}
 
-	protected void doAfterSuccess() {
+	protected void doException(IProgressMonitor monitor) {
+	}
+
+	protected void doFinally() {
 	}
 
 	@Override
