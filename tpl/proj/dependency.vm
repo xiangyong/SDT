@@ -1,0 +1,19 @@
+#if($!type=="parent")
+			<dependency>
+				<groupId>com.alipay.$!{system}</groupId>
+				<artifactId>$!{project}</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+#elseif($!type=="module")
+    <module>app/web/home</module>
+#elseif($!type=="project")
+		<dependency>
+			<groupId>com.alipay.$!{system}</groupId>
+			<artifactId>$!{project}</artifactId>
+		</dependency>
+#elseif($!type=="ace")
+								<artifactItem>
+									<groupId>com.alipay.$!{system}</groupId>
+									<artifactId>$!{project}</artifactId>
+								</artifactItem>
+#end
