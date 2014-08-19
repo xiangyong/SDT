@@ -5,7 +5,7 @@
 				<version>1.0.0</version>
 			</dependency>
 #elseif($!type=="module")
-    <module>app/web/home</module>
+    <module>$!{project}</module>
 #elseif($!type=="project")
 		<dependency>
 			<groupId>com.alipay.$!{system}</groupId>
