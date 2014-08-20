@@ -6,4 +6,15 @@ Bundle-Vendor: Alipay
 Require-Bundle: com.alipay.${system}.web.home
 Bundle-Web-Name: ${projectBundleWebName}
 Spring-Loader: com.alipay.sofa.web.mvc.runtime
-Resource-Filter: {projectSpring}.xml
+Resource-Filter: {projectSpring}.xml,
+ uri-brokers.xml,
+ merge-smvc-scheme-default.xml,
+ smvc-scheme-default.xml,
+ smvc-scheme-json.xml,
+ smvc-scheme-tiles.xml,
+ smvc-scheme-flow.xml,
+ smvc-scheme-security.xml,
+ smvc-scheme-pdf.xml,
+ smvc-scheme-zip.xml,
+ smvc-scheme-resource.xml,
+ smvc-scheme-pull.xml
