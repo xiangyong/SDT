@@ -30,7 +30,6 @@ public class _ {
 			}
 		}
 		js.append(";_");
-		//		System.err.println(js.toString());
 
 		ScriptEngineManager sem = new ScriptEngineManager();
 		ScriptEngine se = sem.getEngineByName("js");
@@ -40,6 +39,7 @@ public class _ {
 			se.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 			return se.eval(js.toString()).toString();
 		} catch (ScriptException e) {
+			System.err.println(js.toString());
 			e.printStackTrace();
 		}
 
