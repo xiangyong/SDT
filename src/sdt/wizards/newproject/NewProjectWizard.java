@@ -1,9 +1,7 @@
 package sdt.wizards.newproject;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,8 +20,6 @@ import org.eclipse.ui.PlatformUI;
 import sdt.SDTPlugin;
 import sdt.wizards.NewPreviewWizardPage;
 import sdt.wizards.NewWizard;
-
-import com.google.common.io.Files;
 
 public class NewProjectWizard extends NewWizard {
 
@@ -94,11 +90,8 @@ public class NewProjectWizard extends NewWizard {
 
 		// read
 		String txt = null;
-		try {
-			txt = Files.toString(pom, Charset.forName("GBK"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		txt = SDTPlugin.readFromFile(pom);
+
 		if (txt == null || txt.contains(data.name))
 			return;
 
@@ -125,11 +118,7 @@ public class NewProjectWizard extends NewWizard {
 		}
 
 		// write
-		try {
-			Files.write(buff.toString().getBytes(), pom);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		SDTPlugin.writeToFile(pom, buff.toString());
 
 	}
 
@@ -150,13 +139,8 @@ public class NewProjectWizard extends NewWizard {
 			return;
 
 		// read
-		String txt = null;
-		try {
-			txt = Files.toString(pom, Charset.forName("GBK"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (txt == null || txt.contains(data.name))
+		String txt = SDTPlugin.readFromFile(pom);
+		if (txt.contains(data.name))
 			return;
 
 		StringBuffer buff = new StringBuffer(txt);
@@ -172,11 +156,8 @@ public class NewProjectWizard extends NewWizard {
 		}
 
 		// write
-		try {
-			Files.write(buff.toString().getBytes(), pom);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		SDTPlugin.writeToFile(pom, buff.toString());
+
 	}
 
 	private void addToTestPom(Map<String, String> context) {
@@ -185,13 +166,8 @@ public class NewProjectWizard extends NewWizard {
 		if (!pom.exists())
 			return;
 		// read
-		String txt = null;
-		try {
-			txt = Files.toString(pom, Charset.forName("GBK"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (txt == null || txt.contains(data.name))
+		String txt = SDTPlugin.readFromFile(pom);
+		if (txt.contains(data.name))
 			return;
 
 		StringBuffer buff = new StringBuffer(txt);
@@ -207,11 +183,8 @@ public class NewProjectWizard extends NewWizard {
 		}
 
 		// write
-		try {
-			Files.write(buff.toString().getBytes(), pom);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		SDTPlugin.writeToFile(pom, buff.toString());
+
 	}
 
 	private File getPom(String name, String pom) {

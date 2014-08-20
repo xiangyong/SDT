@@ -1,6 +1,9 @@
 package sdt;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -455,5 +458,51 @@ public class SDTPlugin extends AbstractUIPlugin {
 		}
 
 		return f;
+	}
+
+	public static String readFromFile(File file) {
+		StringBuffer f = new StringBuffer();
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(file));
+			String line;
+			while ((line = br.readLine()) != null) {
+				f.append(line).append("\n");
+			}
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null) {
+					br.close();
+					br = null;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return f.toString();
+	}
+
+	public static void writeToFile(File file, String content) {
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(file);
+			fw.write(content);
+			fw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (fw != null) {
+					fw.close();
+					fw = null;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
 	}
 }
