@@ -20,28 +20,28 @@
       <wizard
             category="SofaPlugin"
             class="sdt.wizards.newservice.NewServiceWizard"
-            icon="icons/node/green.png"
+            icon="icons/WebService.png"
             id="SDT.NewServiceWizard"
             name="Sofa Service">
       </wizard>
       <wizard
             category="SofaPlugin"
             class="sdt.wizards.newdal.NewSofaDalWizard"
-            icon="icons/node/orange.png"
+            icon="icons/persistenceEntity.png"
             id="SDT.NewDalWizard"
             name="Sofa Dal">
       </wizard>
       <wizard
             category="SofaPlugin"
             class="sdt.wizards.newproject.NewProjectWizard"
-            icon="icons/node/group.png"
+            icon="icons/resourcesRoot.png"
             id="SDT.NewProjectWizard"
             name="Sofa Project">
       </wizard>
       <wizard
             category="SofaPlugin"
             class="sdt.wizards.newcontroller.NewControllerWizard"
-            icon="icons/node/blue.png"
+            icon="icons/webRoot.png"
             id="SDT.NewControllerWizard"
             name="Sofa Controller">
       </wizard>
