@@ -1,6 +1,7 @@
 package sdt.wizards.newproject;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +55,10 @@ public class NewProjectWizard extends NewWizard {
 		IProject project = SDTPlugin.getProject(data.name);
 		IJavaProject jp = JavaCore.create(project);
 
+		if (data.type.equalsIgnoreCase("web-home")) {
+			addHtdocs(monitor);
+		}
+
 		// init context
 		Map context = new HashMap();
 		context.put("system", data.system);
@@ -83,10 +88,72 @@ public class NewProjectWizard extends NewWizard {
 		}
 	}
 
+	private void addHtdocs(IProgressMonitor monitor) {
+		NewProjectState data = (NewProjectState) this.previewPage.data;
+		File parent = getParent(data.name);
+		if (parent == null || !parent.exists())
+			return;
+
+		File templates = new File(parent.getAbsolutePath() + "/htdocs/templates");
+		if (!templates.exists())
+			return;
+
+		boolean f = false;
+		String module = data.name.substring(data.name.lastIndexOf("-") + 1);
+		File layoutDir = new File(templates.getAbsolutePath() + "/" + module + "/layout");
+		if (!layoutDir.exists()) {
+			layoutDir.mkdirs();
+			f = true;
+		}
+
+		File screenDir = new File(templates.getAbsolutePath() + "/" + module + "/screen");
+		if (!screenDir.exists()) {
+			screenDir.mkdirs();
+			f = true;
+		}
+
+		File titleDir = new File(templates.getAbsolutePath() + "/" + module + "/title");
+		if (!titleDir.exists()) {
+			titleDir.mkdirs();
+			f = true;
+		}
+
+		File macros = new File(templates.getAbsolutePath() + "/" + module + "/macros.vm");
+
+		try {
+			if (!macros.exists()) {
+				macros.createNewFile();
+				f = true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		File dft = new File(templates.getAbsolutePath() + "/" + module + "/layout/default.vm");
+		try {
+			if (!dft.exists()) {
+				dft.createNewFile();
+				f = true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (f) {
+			IProject p = SDTPlugin.getProject(data.system + "-htdocs");
+			try {
+				p.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 	private void addToMainPom(Map<String, String> context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "pom.xml");
-		if (!pom.exists())
+		if (pom == null || !pom.exists())
 			return;
 
 		// read
@@ -136,7 +203,7 @@ public class NewProjectWizard extends NewWizard {
 
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "assembly/ace/pom.xml");
-		if (!pom.exists())
+		if (pom == null || !pom.exists())
 			return;
 
 		// read
@@ -164,7 +231,7 @@ public class NewProjectWizard extends NewWizard {
 	private void addToTestPom(Map<String, String> context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "app/test/pom.xml");
-		if (!pom.exists())
+		if (pom == null || !pom.exists())
 			return;
 		// read
 		String txt = _.readFromFile(pom);
@@ -189,6 +256,14 @@ public class NewProjectWizard extends NewWizard {
 	}
 
 	private File getPom(String name, String pom) {
+		File parent = getParent(name);
+		if (parent == null)
+			return null;
+
+		return new File(parent.getAbsolutePath() + "/" + pom);
+	}
+
+	private File getParent(String name) {
 		IProject project = SDTPlugin.getProject(name);
 		URI uri = project.getRawLocationURI();
 		File file = new File(uri);
@@ -204,7 +279,7 @@ public class NewProjectWizard extends NewWizard {
 			}
 		}
 
-		return new File(parent.getAbsolutePath() + "/" + pom);
+		return parent;
 	}
 
 	@Override

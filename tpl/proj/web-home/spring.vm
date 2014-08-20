@@ -30,7 +30,7 @@
 		p:cacheSeconds="60"/>
 		
 
-<!-- The registry of executable flow definitions,it needs to add your own flow-definition.-->
+	<!-- The registry of executable flow definitions,it needs to add your own flow-definition.-->
 	<webflow:flow-registry id="flowRegistry" parent="parentFlowRegistry"
 		flow-builder-services="flowBuilderServices">
 	</webflow:flow-registry>
