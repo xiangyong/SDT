@@ -53,10 +53,10 @@ public class _ {
 
 			if (c == '{') {
 				int j = i + 1;
-				if (j < l && Character.isJavaIdentifierStart(f.charAt(j))) {
+				int k = i - 1;
+				if (j < l && Character.isJavaIdentifierStart(f.charAt(j)) && (k >= 0 && f.charAt(k) != '$')) {
 					start = i;
 				}
-
 			}
 
 			if (start > -1 && c == '}') {
