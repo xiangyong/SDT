@@ -46,15 +46,6 @@
             name="Sofa Controller">
       </wizard>
    </extension>
-   <extension
-         point="org.eclipse.ui.decorators">
-      <decorator
-            id="SDT.decorator1"
-            label="Sofa Decorator"
-            class="sdt.decoration.SofaDecorator"
-            state="true">
-      </decorator>
-   </extension>
 
 
 

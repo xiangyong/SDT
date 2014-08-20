@@ -1,9 +1,6 @@
 package sdt;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -60,64 +56,28 @@ public class SDTPlugin extends AbstractUIPlugin {
 	public static final String D_RES = "src/main/resources";
 	public static final String D_META_INF = D_RES + "/META-INF";
 	public static final String D_SPRING = D_META_INF + "/spring";
-
 	public static final String D_JAVA = "src/main/java";
-
-	public static final String F_MANIFEST_MF = D_META_INF + "/MANIFEST.MF";
-
-	// The plug-in ID
 	public static final String PLUGIN_ID = "SDT";
 
-	// The shared instance
 	private static SDTPlugin plugin;
 
-	/**
-	 * The constructor
-	 */
 	public SDTPlugin() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
-	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
-	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
 	}
 
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
 	public static SDTPlugin getDefault() {
 		return plugin;
 	}
 
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
@@ -273,34 +233,6 @@ public class SDTPlugin extends AbstractUIPlugin {
 		return ResourcesPlugin.getWorkspace().getRoot().getFolder(new Path(path));
 	}
 
-	public static void addNature(IProject project, String natureId) {
-		try {
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-
-			for (int i = 0; i < natures.length; ++i) {
-				if (natureId.equals(natures[i])) {
-					// Remove the nature
-					// String[] newNatures = new String[natures.length - 1];
-					// System.arraycopy(natures, 0, newNatures, 0, i);
-					// System.arraycopy(natures, i + 1, newNatures, i,
-					// natures.length - i - 1);
-					// description.setNatureIds(newNatures);
-					// project.setDescription(description, null);
-					return;
-				}
-			}
-
-			// Add the nature
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = natureId;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-		}
-	}
-
 	public static void openResource(final IFile resource) {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window == null) {
@@ -373,59 +305,6 @@ public class SDTPlugin extends AbstractUIPlugin {
 		}
 	}
 
-	public static void printDesc(String name) {
-
-		// TODO
-		IProject project = getProject(name);
-		IProjectDescription desc = null;
-		try {
-			desc = project.getDescription();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		if (desc == null)
-			return;
-
-		System.err.println("###### START ###### " + name);
-		System.err.println("###### PROJECT ######");
-		System.err.println("getBuildSpec ...");
-		for (ICommand f : desc.getBuildSpec()) {
-			System.err.println(f);
-		}
-
-		System.err.println("getDynamicReferences ...");
-		for (IProject f : desc.getDynamicReferences()) {
-			System.err.println(f);
-		}
-
-		System.err.println("getNatureIds ...");
-		for (String f : desc.getNatureIds()) {
-			System.err.println(f);
-		}
-
-		System.err.println("getReferencedProjects ...");
-		for (IProject f : desc.getReferencedProjects()) {
-			System.err.println(f);
-		}
-
-		System.err.println("###### JAVA PROJECT ######");
-		IJavaProject jp = JavaCore.create(project);
-		IClasspathEntry[] ces = null;
-		try {
-			ces = jp.getRawClasspath();
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-		}
-		if (ces == null || ces.length == 0)
-			return;
-
-		for (IClasspathEntry ce : ces) {
-			System.err.println(ce);
-		}
-		System.err.println("###### END ######");
-
-	}
-
 	public static Collection<IClasspathEntry> getClasspathEntry(String name, int... entryKinds) {
 		List<IClasspathEntry> f = new ArrayList<IClasspathEntry>();
 		IProject project = getProject(name);
@@ -460,49 +339,4 @@ public class SDTPlugin extends AbstractUIPlugin {
 		return f;
 	}
 
-	public static String readFromFile(File file) {
-		StringBuffer f = new StringBuffer();
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(file));
-			String line;
-			while ((line = br.readLine()) != null) {
-				f.append(line).append("\n");
-			}
-			br.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (br != null) {
-					br.close();
-					br = null;
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return f.toString();
-	}
-
-	public static void writeToFile(File file, String content) {
-		FileWriter fw = null;
-		try {
-			fw = new FileWriter(file);
-			fw.write(content);
-			fw.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (fw != null) {
-					fw.close();
-					fw = null;
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
 }

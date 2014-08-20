@@ -184,7 +184,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 	public Connection getConnection() {
 
-		String driver = "com.mysql.jdbc.Driver";
+		String driverName = "com.mysql.jdbc.Driver";
 		String server = this.serverField.getText();
 		String port = this.portField.getText();
 		String username = this.usernameField.getText();
@@ -192,7 +192,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 		Connection conn = null;
 		try {
-			Class.forName(driver);
+			Class.forName(driverName);
 			conn = DriverManager.getConnection("jdbc:mysql://" + server + ":" + port, username, password);
 			if (conn == null || conn.isClosed()) {
 				this.status.setError("连接已关闭");
