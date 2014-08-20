@@ -6,7 +6,9 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.internal.resources.ProjectDescription;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -23,6 +25,7 @@ import sdt.core._;
 import sdt.wizards.NewPreviewWizardPage;
 import sdt.wizards.NewWizard;
 
+@SuppressWarnings("restriction")
 public class NewProjectWizard extends NewWizard {
 
 	private NewProjectWizardPage wizardPage;
@@ -139,10 +142,33 @@ public class NewProjectWizard extends NewWizard {
 			e.printStackTrace();
 		}
 
-		if (f) {
-			IProject p = SDTPlugin.getProject(data.system + "-htdocs");
+		IProject p = SDTPlugin.getProject(data.system + "-htdocs");
+		if (p == null || !p.exists()) {
+
+			IProjectDescription desc = new ProjectDescription();
+			desc.setName(data.system + "-htdocs");
+			File htdocs = new File(parent.getAbsolutePath() + "/htdocs");
+			desc.setLocationURI(htdocs.toURI());
 			try {
-				p.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				p.create(desc, monitor);
+
+				IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
+				IWorkingSet ws = wsm.getWorkingSet(data.system);
+				if (ws == null) {
+					ws = wsm.createWorkingSet(data.system, new IAdaptable[0]);
+					wsm.addWorkingSet(ws);
+				}
+				wsm.addToWorkingSets(p, new IWorkingSet[] { ws });
+
+				p.open(IResource.BACKGROUND_REFRESH, monitor);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			try {
+				if (f)
+					p.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
