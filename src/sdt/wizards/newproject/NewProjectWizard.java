@@ -18,6 +18,7 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 
 import sdt.SDTPlugin;
+import sdt.core._;
 import sdt.wizards.NewPreviewWizardPage;
 import sdt.wizards.NewWizard;
 
@@ -90,7 +91,7 @@ public class NewProjectWizard extends NewWizard {
 
 		// read
 		String txt = null;
-		txt = SDTPlugin.readFromFile(pom);
+		txt = _.readFromFile(pom);
 
 		if (txt == null || txt.contains(data.name))
 			return;
@@ -118,7 +119,7 @@ public class NewProjectWizard extends NewWizard {
 		}
 
 		// write
-		SDTPlugin.writeToFile(pom, buff.toString());
+		_.writeToFile(pom, buff.toString());
 
 	}
 
@@ -139,7 +140,7 @@ public class NewProjectWizard extends NewWizard {
 			return;
 
 		// read
-		String txt = SDTPlugin.readFromFile(pom);
+		String txt = _.readFromFile(pom);
 		if (txt.contains(data.name))
 			return;
 
@@ -156,7 +157,7 @@ public class NewProjectWizard extends NewWizard {
 		}
 
 		// write
-		SDTPlugin.writeToFile(pom, buff.toString());
+		_.writeToFile(pom, buff.toString());
 
 	}
 
@@ -166,7 +167,7 @@ public class NewProjectWizard extends NewWizard {
 		if (!pom.exists())
 			return;
 		// read
-		String txt = SDTPlugin.readFromFile(pom);
+		String txt = _.readFromFile(pom);
 		if (txt.contains(data.name))
 			return;
 
@@ -183,7 +184,7 @@ public class NewProjectWizard extends NewWizard {
 		}
 
 		// write
-		SDTPlugin.writeToFile(pom, buff.toString());
+		_.writeToFile(pom, buff.toString());
 
 	}
 
