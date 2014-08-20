@@ -46,6 +46,14 @@
             name="Sofa Controller">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="sdt.preference.PreferencePage"
+            id="SDT.PreferencePage"
+            name="Sofa">
+      </page>
+   </extension>
 
 
 

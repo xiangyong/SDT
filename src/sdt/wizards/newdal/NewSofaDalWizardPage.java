@@ -2,7 +2,6 @@ package sdt.wizards.newdal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -20,7 +19,6 @@ import java.util.Properties;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.jdt.internal.ui.dialogs.TextFieldNavigationHandler;
@@ -43,6 +41,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import sdt.NameUtil;
 import sdt.SDTPlugin;
+import sdt.preference.PreferencePage;
 import sdt.wizards.NewWizardPage;
 import sdt.wizards.RadioGroupTypeField;
 import sdt.wizards.newdal.NewSofaDalState.Table;
@@ -191,18 +190,10 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 		Connection conn = null;
 		try {
-			File pluginFile = new File(FileLocator.toFileURL(SDTPlugin.getDefault().getBundle().getEntry("/"))
-					.toURI());
-			File[] files = pluginFile.getParentFile().listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File file, String name) {
-					return name.equals("mysql-connector.jar");
-				}
-			});
-			if (files.length == 0) {
+
+			String jar = SDTPlugin.getPreference(PreferencePage.MYSQL_CONNECTOR);
+			if (jar == null || jar.isEmpty())
 				return null;
-			}
-			File driverJar = files[0];
 
 			String driverName = "com.mysql.jdbc.Driver";
 			String server = this.serverField.getText();
@@ -210,7 +201,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			String username = this.usernameField.getText();
 			String password = this.passwordField.getText();
 
-			URLClassLoader classloader = new URLClassLoader(new URL[] { driverJar.toURI().toURL() });
+			URLClassLoader classloader = new URLClassLoader(new URL[] { new File(jar).toURI().toURL() });
 			Class<?> clazz = classloader.loadClass(driverName);
 			Driver driver = (Driver) clazz.newInstance();
 			Properties ps = new Properties();

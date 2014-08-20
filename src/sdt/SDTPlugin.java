@@ -57,6 +57,7 @@ public class SDTPlugin extends AbstractUIPlugin {
 	public static final String D_META_INF = D_RES + "/META-INF";
 	public static final String D_SPRING = D_META_INF + "/spring";
 	public static final String D_JAVA = "src/main/java";
+
 	public static final String PLUGIN_ID = "SDT";
 
 	private static SDTPlugin plugin;
@@ -337,6 +338,10 @@ public class SDTPlugin extends AbstractUIPlugin {
 		}
 
 		return f;
+	}
+
+	public static String getPreference(String name) {
+		return getDefault().getPreferenceStore().getString(name);
 	}
 
 }
