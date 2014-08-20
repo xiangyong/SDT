@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <fragment>
-    <extension target="application#MODULE">
+    <extension target="jboss-app#MODULE">
 		<module>
     		<java>${bundle.fileName}</java>
 		</module>
