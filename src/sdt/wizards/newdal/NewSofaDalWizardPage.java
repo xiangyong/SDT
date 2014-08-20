@@ -1,9 +1,13 @@
 package sdt.wizards.newdal;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,6 +20,7 @@ import java.util.Properties;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.jdt.internal.ui.dialogs.TextFieldNavigationHandler;
@@ -184,16 +189,36 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 	public Connection getConnection() {
 
-		String driverName = "com.mysql.jdbc.Driver";
-		String server = this.serverField.getText();
-		String port = this.portField.getText();
-		String username = this.usernameField.getText();
-		String password = this.passwordField.getText();
-
 		Connection conn = null;
 		try {
-			Class.forName(driverName);
-			conn = DriverManager.getConnection("jdbc:mysql://" + server + ":" + port, username, password);
+			File pluginFile = new File(FileLocator.toFileURL(SDTPlugin.getDefault().getBundle().getEntry("/"))
+					.toURI());
+			File[] files = pluginFile.getParentFile().listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File file, String name) {
+					return name.equals("mysql-connector.jar");
+				}
+			});
+			if (files.length == 0) {
+				return null;
+			}
+			File driverJar = files[0];
+
+			String driverName = "com.mysql.jdbc.Driver";
+			String server = this.serverField.getText();
+			String port = this.portField.getText();
+			String username = this.usernameField.getText();
+			String password = this.passwordField.getText();
+
+			URLClassLoader classloader = new URLClassLoader(new URL[] { driverJar.toURI().toURL() });
+			Class<?> clazz = classloader.loadClass(driverName);
+			Driver driver = (Driver) clazz.newInstance();
+			Properties ps = new Properties();
+			ps.put("user", username);
+			ps.put("password", password);
+
+			conn = driver.connect("jdbc:mysql://" + server + ":" + port, ps);
+
 			if (conn == null || conn.isClosed()) {
 				this.status.setError("连接已关闭");
 				this.doStatusUpdate();

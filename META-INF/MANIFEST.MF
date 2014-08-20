@@ -21,5 +21,4 @@ Import-Package: org.eclipse.core.filesystem,
  org.eclipse.ltk.core.refactoring,
  org.eclipse.ltk.internal.ui.refactoring,
  org.eclipse.ui.views.contentoutline
-Bundle-ClassPath: .,
- lib_mysql/mysql-connector-java-5.1.9.jar
+Bundle-ClassPath: .
