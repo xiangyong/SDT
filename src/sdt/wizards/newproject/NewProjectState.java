@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.internal.resources.ProjectDescription;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -36,7 +35,7 @@ public class NewProjectState implements NewWizardState {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Change[] computeChanges() {
-		VelocityContext context = new VelocityContext();
+		Map context = new HashMap();
 		context.put("system", this.system);
 		context.put("project", this.name);
 
@@ -121,10 +120,6 @@ public class NewProjectState implements NewWizardState {
 			e1.printStackTrace();
 		}
 
-	}
-
-	public NewProjectState() {
-		Velocity.init();
 	}
 
 	public String toString() {

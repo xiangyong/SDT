@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.lang.CharSetUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -51,6 +50,7 @@ public class NewProjectWizard extends NewWizard {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void doAfter(IProgressMonitor monitor) {
 
 		NewProjectState data = (NewProjectState) this.previewPage.data;
@@ -58,8 +58,7 @@ public class NewProjectWizard extends NewWizard {
 		IJavaProject jp = JavaCore.create(project);
 
 		// init context
-		Velocity.init();
-		VelocityContext context = new VelocityContext();
+		Map context = new HashMap();
 		context.put("system", data.system);
 		context.put("project", data.name);
 
@@ -87,7 +86,7 @@ public class NewProjectWizard extends NewWizard {
 		}
 	}
 
-	private void addToMainPom(VelocityContext context) {
+	private void addToMainPom(Map<String, String> context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "pom.xml");
 		if (!pom.exists())
@@ -143,7 +142,7 @@ public class NewProjectWizard extends NewWizard {
 		buff.insert(j, value);
 	}
 
-	private void addToAcePom(VelocityContext context) {
+	private void addToAcePom(Map<String, String> context) {
 
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "assembly/ace/pom.xml");
@@ -180,7 +179,7 @@ public class NewProjectWizard extends NewWizard {
 		}
 	}
 
-	private void addToTestPom(VelocityContext context) {
+	private void addToTestPom(Map<String, String> context) {
 		NewProjectState data = (NewProjectState) this.previewPage.data;
 		File pom = getPom(data.name, "app/test/pom.xml");
 		if (!pom.exists())

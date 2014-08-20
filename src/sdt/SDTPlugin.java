@@ -5,15 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -158,38 +155,6 @@ public class SDTPlugin extends AbstractUIPlugin {
 			}
 		}
 		return null;
-	}
-
-	@SuppressWarnings("deprecation")
-	public static String getTpl(VelocityContext context, String path) {
-		InputStream inputStream = null;
-		StringWriter writer = null;
-		try {
-			URL url = new URL("platform:/plugin/" + SDTPlugin.PLUGIN_ID + "/" + path);
-			inputStream = url.openConnection().getInputStream();
-
-			writer = new StringWriter();
-
-			Velocity.evaluate(context, writer, "VelocityTest", inputStream);
-			return writer.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-					inputStream = null;
-				}
-				if (writer != null) {
-					writer.close();
-					writer = null;
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return "";
 	}
 
 	public static TextFileChange createNewFileChange(IFile targetFile, String contents) {

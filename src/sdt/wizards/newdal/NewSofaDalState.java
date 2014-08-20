@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -18,11 +17,6 @@ import sdt.SDTPlugin;
 import sdt.wizards.NewWizardState;
 
 public class NewSofaDalState implements NewWizardState {
-
-	public NewSofaDalState() {
-		Velocity.init();
-
-	}
 
 	public Table fTable;
 	public String fProject;

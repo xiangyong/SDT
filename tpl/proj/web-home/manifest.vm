@@ -1,9 +1,9 @@
-Bundle-Name: Alipay $!{projectBundleName}
-Bundle-SymbolicName: $!{projectSymbolicName}
+Bundle-Name: Alipay {projectBundleName}
+Bundle-SymbolicName: {projectSymbolicName}
 Bundle-Version: 1.0.0
 Bundle-ManifestVersion: 2
 Bundle-Vendor: Alipay
 Require-Bundle: com.alipay.${system}.web.home
 Bundle-Web-Name: ${projectBundleWebName}
 Spring-Loader: com.alipay.sofa.web.mvc.runtime
-Resource-Filter: $!{projectSpring}.xml
+Resource-Filter: {projectSpring}.xml

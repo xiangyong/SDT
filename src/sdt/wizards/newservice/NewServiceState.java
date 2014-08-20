@@ -3,7 +3,6 @@ package sdt.wizards.newservice;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -25,10 +24,6 @@ public class NewServiceState implements NewWizardState {
 	public boolean createXml;
 
 	public int serviceType;
-
-	public NewServiceState() {
-		Velocity.init();
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override

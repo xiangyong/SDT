@@ -8,12 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -313,8 +312,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		}
 
 		String project = this.projectField.getText();
-		Velocity.init();
-		VelocityContext context = new VelocityContext();
+		Map context = new HashMap();
 		context.put("projectName", project);
 		context.put("systemName", NameUtil.firstString(project, '-'));
 		context.put("packageRoot", this.packageField.getText());

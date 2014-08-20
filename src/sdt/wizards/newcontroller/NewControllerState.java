@@ -3,7 +3,6 @@ package sdt.wizards.newcontroller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.velocity.app.Velocity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -19,13 +18,8 @@ public class NewControllerState implements NewWizardState {
 	public String fName;
 	public String fClassName;
 
-	public NewControllerState() {
-		Velocity.init();
-	}
-
 	@Override
 	public Change[] computeChanges() {
-		//		VelocityContext context = new VelocityContext();
 		Map<String, String> context = new HashMap<String, String>();
 		context.put("packageName", fPackage);
 		context.put("name", fName);

@@ -18,14 +18,14 @@
 		The controllers are autodetected POJOs labeled with the @Controller
 		annotation.
 	-->
-	<context:component-scan base-package="$!{projectSymbolicName}" />
+	<context:component-scan base-package="{projectSymbolicName}" />
 	
 	<!--
 		The messageSource which points to the bundle-jar:/message/errors.
 	-->
 	<bean id="messageSource"
 		class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
-		p:basenames="file:${mmng_templates}/$!{projectSimple}/message/errors"
+		p:basenames="file:${mmng_templates}/{projectSimple}/message/errors"
 		p:defaultEncoding="GBK"
 		p:cacheSeconds="60"/>
 		
@@ -46,7 +46,7 @@
 				<property name="locations">
 					<list>
 						<value>classpath:security/security-header.acf</value>
-						<value>bundle-jar:security/$!{security}.acf</value>
+						<value>bundle-jar:security/{security}.acf</value>
 					</list>
 				</property>
 			</bean>

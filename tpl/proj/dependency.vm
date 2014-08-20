@@ -1,23 +1,23 @@
-#if($!type=="parent")
+# if(type=="parent") {
 
 			<dependency>
-				<groupId>com.alipay.$!{system}</groupId>
-				<artifactId>$!{project}</artifactId>
+				<groupId>com.alipay.{system}</groupId>
+				<artifactId>{project}</artifactId>
 				<version>1.0.0</version>
 			</dependency>
-#elseif($!type=="module")
+# } elseif(type=="module") {
 
-    <module>$!{module}</module>
-#elseif($!type=="test")
+    <module>{module}</module>
+# } elseif(type=="test") {
 
 		<dependency>
-			<groupId>com.alipay.$!{system}</groupId>
-			<artifactId>$!{project}</artifactId>
+			<groupId>com.alipay.{system}</groupId>
+			<artifactId>{project}</artifactId>
 		</dependency>
-#elseif($!type=="ace")
+# } elseif(type=="ace") {
 
 								<artifactItem>
-									<groupId>com.alipay.$!{system}</groupId>
-									<artifactId>$!{project}</artifactId>
+									<groupId>com.alipay.{system}</groupId>
+									<artifactId>{project}</artifactId>
 								</artifactItem>
-#end
+# }

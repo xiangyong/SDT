@@ -22,8 +22,5 @@ Import-Package: org.eclipse.core.filesystem,
  org.eclipse.ltk.internal.ui.refactoring,
  org.eclipse.ui.views.contentoutline
 Bundle-ClassPath: .,
- lib_velocity/commons-collections-3.2.1.jar,
- lib_velocity/commons-lang-2.4.jar,
- lib_velocity/velocity-1.7.jar,
  lib_mysql/mysql-connector-java-5.1.9.jar,
  lib/guava-13.0.1.jar
