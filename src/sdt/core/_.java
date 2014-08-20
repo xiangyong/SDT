@@ -25,7 +25,7 @@ public class _ {
 			}
 		}
 		js.append(";_");
-		System.err.println(js.toString());
+		//		System.err.println(js.toString());
 
 		ScriptEngineManager sem = new ScriptEngineManager();
 		ScriptEngine se = sem.getEngineByName("js");
