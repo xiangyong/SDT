@@ -21,7 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import sdt.wizards.CheckboxGroupTypeField;
+import sdt.wizards.GroupTypeField;
 import sdt.wizards.NewWizardPage;
 
 @SuppressWarnings("restriction")
@@ -33,7 +33,7 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 	private StringButtonDialogField packageField;
 	private JavaPackageCompletionProcessor packageCompletionProcessor;
 	private StringDialogField nameField;
-	private CheckboxGroupTypeField surfixField;
+	private GroupTypeField surfixField;
 	private static final String CONTROLLER = "Controller";
 
 	public NewControllerWizardPage(NewControllerState data) {
@@ -48,7 +48,7 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		projectField = createStringButtonDialogField(this, this, "&" + i++ + " Package:", "Browse &W");
 		nameField = createStringDialogField(this, "&" + i++ + " Name:");
 
-		surfixField = new CheckboxGroupTypeField();
+		surfixField = new GroupTypeField(SWT.CHECK);
 		surfixField.setDialogFieldListener(this);
 		surfixField.setLabels(CONTROLLER);
 		surfixField.setLabelText("&" + i++ + " Name Surfix :");

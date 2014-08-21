@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import sdt.SDTPlugin;
-import sdt.wizards.CheckboxGroupTypeField;
+import sdt.wizards.GroupTypeField;
 import sdt.wizards.NewWizardPage;
 import sdt.wizards.ResourceItemLabelProvider;
 
@@ -48,7 +48,7 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 
 	private StringButtonDialogField serviceXmlField;
 
-	private CheckboxGroupTypeField serviceTypeField;
+	private GroupTypeField serviceTypeField;
 
 	public NewServiceWizardPage(NewServiceState data) {
 		super("NewServiceWizard");
@@ -73,7 +73,7 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 		serviceXmlField = createStringButtonDialogField(this, this, "&" + i++ + " Service Xml:", "Browse &G");
 
 		// type
-		serviceTypeField = new CheckboxGroupTypeField();
+		serviceTypeField = new GroupTypeField(SWT.CHECK);
 		serviceTypeField.setDialogFieldListener(this);
 		serviceTypeField.setLabelText("&" + i++ + " Service Type:");
 		serviceTypeField.setLabels("W&S", "T&R");

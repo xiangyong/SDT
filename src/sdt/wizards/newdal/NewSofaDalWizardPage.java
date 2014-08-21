@@ -42,8 +42,8 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import sdt.NameUtil;
 import sdt.SDTPlugin;
 import sdt.preference.PreferencePage;
+import sdt.wizards.GroupTypeField;
 import sdt.wizards.NewWizardPage;
-import sdt.wizards.RadioGroupTypeField;
 import sdt.wizards.newdal.NewSofaDalState.Table;
 import sdt.wizards.newdal.NewSofaDalState.Table.Column;
 
@@ -55,7 +55,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	private NewSofaDalState data;
 	private StatusInfo status;
 
-	private RadioGroupTypeField dalDbTypeField;
+	private GroupTypeField dalDbTypeField;
 	private StringDialogField serverField;
 	private StringDialogField portField;
 	private StringDialogField usernameField;
@@ -74,7 +74,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		packageCompletionProcessor = new JavaPackageCompletionProcessor();
 
 		int i = 1;
-		dalDbTypeField = new RadioGroupTypeField();
+		dalDbTypeField = new GroupTypeField(SWT.RADIO);
 		dalDbTypeField.setDialogFieldListener(this);
 		dalDbTypeField.setLabels("MySQL");
 		dalDbTypeField.setLabelText("&" + i++ + " Database Type:");

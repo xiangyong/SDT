@@ -48,7 +48,7 @@ public class OpenWorkingSet implements IObjectActionDelegate {
 			IProject p = (IProject) o;
 			if (p.getName().contains("-assembly-")) {
 				File projectFile = new File(p.getLocationURI());
-				this.selected = projectFile.getParentFile();
+				this.selected = projectFile.getParentFile().getParent();
 				break;
 			}
 		}

@@ -12,16 +12,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 @SuppressWarnings("restriction")
-public class CheckboxGroupTypeField extends DialogField {
-	Button[] checkbox;
-	String[] checkboxLabels;
+public class GroupTypeField extends DialogField {
+	private Button[] buttons;
+	private String[] labels;
+	private int type;
 
-	public CheckboxGroupTypeField() {
+	public GroupTypeField(int type) {
 		super();
+		this.type = type;
 	}
 
 	public void setLabels(String... labels) {
-		checkboxLabels = labels;
+		this.labels = labels;
 	}
 
 	@Override
@@ -33,25 +35,25 @@ public class CheckboxGroupTypeField extends DialogField {
 		RowLayout checkboxContainerLayout = new RowLayout();
 		checkboxContainer.setLayout(checkboxContainerLayout);
 		checkboxContainer.setLayoutData(gridDataForCheckbox(nColumns - 1));
-		int length = checkboxLabels.length;
-		checkbox = new Button[length];
+		int length = labels.length;
+		buttons = new Button[length];
 
 		for (int i = 0; i < length; i++) {
-			Button button = new Button(checkboxContainer, SWT.CHECK);
-			button.setText(checkboxLabels[i]);
+			Button button = new Button(checkboxContainer, this.type);
+			button.setText(labels[i]);
 			button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					dialogFieldChanged();
 				}
 			});
-			checkbox[i] = button;
+			buttons[i] = button;
 		}
 		return new Control[] { label, checkboxContainer };
 	}
 
 	public int getNumberOfControls() {
-		return 2;
+		return labels.length;
 	}
 
 	protected GridData gridDataForCheckbox(int span) {
@@ -63,10 +65,10 @@ public class CheckboxGroupTypeField extends DialogField {
 	}
 
 	public boolean getSelection(String f) {
-		int l = checkbox.length;
+		int l = buttons.length;
 		for (int i = 0; i < l; i++) {
-			if (checkbox[i].getText().equals(f)) {
-				return checkbox[i].getSelection();
+			if (buttons[i].getText().equals(f)) {
+				return buttons[i].getSelection();
 			}
 		}
 		return false;
@@ -74,22 +76,40 @@ public class CheckboxGroupTypeField extends DialogField {
 	}
 
 	public int getValue() {
+		switch (this.type) {
+		case SWT.CHECK:
+			return getCheckValue();
+		case SWT.RADIO:
+			return getRadioValue();
+		default:
+			return 0;
+		}
+	}
+
+	public int getCheckValue() {
 		int f = 0;
-		int l = checkbox.length;
+		int l = buttons.length;
 		for (int i = 0; i < l; i++) {
-			if (checkbox[i].getSelection()) {
+			if (buttons[i].getSelection()) {
 				f |= (1 << i);
 			}
 		}
 		return f;
 	}
 
-	public void setValue(String f) {
-		int l = checkbox.length;
+	public int getRadioValue() {
+		int l = buttons.length;
 		for (int i = 0; i < l; i++) {
-			if (checkbox[i].getText().equals(f)) {
-				checkbox[i].setSelection(true);
+			if (buttons[i].getSelection()) {
+				return (1 << i);
 			}
+		}
+		return 0;
+	}
+
+	public void setValue(String label) {
+		for (Button b : this.buttons) {
+			b.setSelection(label.equals(b.getText()));
 		}
 	}
 

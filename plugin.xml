@@ -60,11 +60,11 @@
             id="SDT.OpenDir"
             objectClass="org.eclipse.ui.IWorkingSet">
             <action
-                  class="sdt.opendir.OpenDir"
+                  class="sdt.opendir.OpenWorkingSet"
                   enablesFor="1"
                   icon="icons/blue.png"
-                  id="sdt.opendir.OpenDir"
-                  label="Open Dir"
+                  id="sdt.opendir.OpenWorkingSet"
+                  label="Open Working Set"
                   menubarPath="additions"
                   overrideActionId="org.easyexplore.actions.EasyExploreAction">
          </action>
