@@ -54,6 +54,21 @@
             name="Sofa">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="SDT.OpenDir"
+            objectClass="org.eclipse.core.runtime.IAdaptable">
+            <action
+               label="Easy Explore..."
+               icon="icons/group.png"
+               class="sdt.opendir.OpenDir"
+               menubarPath="additions"
+               enablesFor="1"
+               id="sdt.opendir.OpenDir">
+         </action>
+      </objectContribution>
+   </extension>
 
 
 
