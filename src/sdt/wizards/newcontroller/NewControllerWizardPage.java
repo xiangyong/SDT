@@ -44,19 +44,9 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 
 		int i = 1;
 		// service
-		projectField = new StringButtonDialogField(this);
-		projectField.setDialogFieldListener(this);
-		projectField.setLabelText("&" + i++ + " Project:");
-		projectField.setButtonLabel("Browse &Q");
-
-		packageField = new StringButtonDialogField(this);
-		packageField.setDialogFieldListener(this);
-		packageField.setLabelText("&" + i++ + " Package:");
-		packageField.setButtonLabel("Browse &W");
-
-		nameField = new StringDialogField();
-		nameField.setDialogFieldListener(this);
-		nameField.setLabelText("&" + i++ + " Name:");
+		projectField = createStringButtonDialogField(this, this, "&" + i++ + " Project:", "Browse &Q");
+		projectField = createStringButtonDialogField(this, this, "&" + i++ + " Package:", "Browse &W");
+		nameField = createStringDialogField(this, "&" + i++ + " Name:");
 
 		surfixField = new CheckboxGroupTypeField();
 		surfixField.setDialogFieldListener(this);

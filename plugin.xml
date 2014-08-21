@@ -58,7 +58,7 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             id="SDT.OpenDir"
-            objectClass="org.eclipse.core.runtime.IAdaptable">
+            objectClass="org.eclipse.ui.IWorkingSet">
             <action
                   class="sdt.opendir.OpenDir"
                   enablesFor="1"

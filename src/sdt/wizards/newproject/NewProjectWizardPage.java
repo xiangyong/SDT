@@ -38,19 +38,9 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 		this.data = data;
 		int i = 1;
 
-		systemField = new StringButtonDialogField(this);
-		systemField.setDialogFieldListener(this);
-		systemField.setButtonLabel("Browse &Q");
-		systemField.setLabelText("&" + i++ + " System Name:");
-
-		typeField = new StringButtonDialogField(this);
-		typeField.setDialogFieldListener(this);
-		typeField.setButtonLabel("Browse &W");
-		typeField.setLabelText("&" + i++ + " Project Type:");
-
-		nameField = new StringDialogField();
-		nameField.setDialogFieldListener(this);
-		nameField.setLabelText("&" + i++ + " Project Name:");
+		systemField = createStringButtonDialogField(this, this, "&" + i++ + " System Name:", "Browse &E");
+		typeField = createStringButtonDialogField(this, this, "&" + i++ + " Project Type:", "Browse &D");
+		nameField = createStringDialogField(this, "Project Name:");
 
 	}
 
@@ -80,13 +70,11 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 
 	@Override
 	public JavaPackageCompletionProcessor getJavaPackageCompletionProcessor(StringButtonDialogField field) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public StringButtonDialogField getProjFieldByPkgField(StringButtonDialogField field) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -134,8 +122,6 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 		}
 		String system = this.systemField.getText();
 
-		// String[] types = new String[] { "biz-service-impl", "web-home",
-		// "core-service" };
 		List<String> types = new ArrayList<String>();
 		types.add("biz-service-impl");
 		types.add("web-home");

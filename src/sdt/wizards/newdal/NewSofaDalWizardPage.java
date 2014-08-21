@@ -56,7 +56,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	private StatusInfo status;
 
 	private RadioGroupTypeField dalDbTypeField;
-	private StringButtonDialogField connectionField;
 	private StringDialogField serverField;
 	private StringDialogField portField;
 	private StringDialogField usernameField;
@@ -80,42 +79,13 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		dalDbTypeField.setLabels("MySQL");
 		dalDbTypeField.setLabelText("&" + i++ + " Database Type:");
 
-		connectionField = new StringButtonDialogField(this);
-		connectionField.setDialogFieldListener(this);
-		connectionField.setLabelText("&" + i++ + " Connection:");
-		connectionField.setButtonLabel("B&rowse");
-
-		serverField = new StringDialogField();
-		serverField.setDialogFieldListener(this);
-		serverField.setLabelText("&" + i++ + " Server:");
-
-		portField = new StringDialogField();
-		portField.setDialogFieldListener(this);
-		portField.setLabelText("&" + i++ + " Port:");
-
-		usernameField = new StringDialogField();
-		usernameField.setDialogFieldListener(this);
-		usernameField.setLabelText("&" + i++ + " Username:");
-
-		passwordField = new StringDialogField();
-		passwordField.setDialogFieldListener(this);
-		passwordField.setLabelText("&" + i++ + " Password:");
-		// passwordField.setButtonLabel("&Connect");
-
-		tableField = new StringButtonDialogField(this);
-		tableField.setDialogFieldListener(this);
-		tableField.setLabelText("&" + i++ + " Table Name:");
-		tableField.setButtonLabel("Browse &Q");
-
-		projectField = new StringButtonDialogField(this);
-		projectField.setDialogFieldListener(this);
-		projectField.setLabelText("&" + i++ + " Project Name:");
-		projectField.setButtonLabel("Browse &W");
-
-		packageField = new StringButtonDialogField(this);
-		packageField.setDialogFieldListener(this);
-		packageField.setLabelText("&" + i++ + " Package Root:");
-		packageField.setButtonLabel("Browse &E");
+		serverField = createStringDialogField(this, "&" + i++ + " Server:");
+		serverField = createStringDialogField(this, "&" + i++ + " Port:");
+		serverField = createStringDialogField(this, "&" + i++ + " Username:");
+		serverField = createStringDialogField(this, "&" + i++ + " Password:");
+		tableField = createStringButtonDialogField(this, this, "&" + i++ + " Table Name:", "Browse &Q");
+		tableField = createStringButtonDialogField(this, this, "&" + i++ + " Project Name:", "Browse &Q");
+		tableField = createStringButtonDialogField(this, this, "&" + i++ + " Package Name:", "Browse &Q");
 
 	}
 
@@ -135,9 +105,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 		dalDbTypeField.doFillIntoGrid(composite, nColumns);
 
-		// createSeparator(composite, nColumns);
-
-		// createStringButtonDialogField(composite, nColumns, connectionField);
 		createStringDialogField(composite, nColumns, serverField);
 		createStringDialogField(composite, nColumns, portField);
 		createStringDialogField(composite, nColumns, usernameField);
@@ -354,22 +321,10 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	private void doStatusUpdate() {
-		// this.tableField.setEnabled(this.conn != null);
 		if (this.status == null) {
 			return;
 		}
 		updateStatus(this.status);
-		if (this.status.isOK()) {
-			// TODO refreshNewSofaServiceState();
-		}
-	}
-
-	public void setVisible(boolean visible) {
-		super.setVisible(visible);
-		if (visible) {
-			this.connectionField.setFocus();
-		}
-
 	}
 
 	public void refreshData() {

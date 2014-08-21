@@ -59,40 +59,18 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 
 		int i = 1;
 		// service
-		serviceProjField = new StringButtonDialogField(this);
-		serviceProjField.setDialogFieldListener(this);
-		serviceProjField.setLabelText("&" + i++ + " Service Project:");
-		serviceProjField.setButtonLabel("Browse &E");
-
-		servicePackageField = new StringButtonDialogField(this);
-		servicePackageField.setDialogFieldListener(this);
-		servicePackageField.setLabelText("&" + i++ + " Service Package:");
-		servicePackageField.setButtonLabel("Browse &D");
-
-		serviceNameField = new StringDialogField();
-		serviceNameField.setDialogFieldListener(this);
-		serviceNameField.setLabelText("&" + i++ + " Service Name:");
+		serviceProjField = createStringButtonDialogField(this, this, "&" + i++ + " Service Project:", "Browse &E");
+		servicePackageField = createStringButtonDialogField(this, this, "&" + i++ + " Service Package:",
+				"Browse &D");
+		serviceNameField = createStringDialogField(this, "&" + i++ + " Service Name:");
 
 		// service impl
-		implProjField = new StringButtonDialogField(this);
-		implProjField.setDialogFieldListener(this);
-		implProjField.setLabelText("&" + i++ + " Impl Project:");
-		implProjField.setButtonLabel("Browse &Q");
-
-		implPackageField = new StringButtonDialogField(this);
-		implPackageField.setDialogFieldListener(this);
-		implPackageField.setLabelText("&" + i++ + " Impl Package:");
-		implPackageField.setButtonLabel("Browse &A");
-
-		implNameField = new StringDialogField();
-		implNameField.setDialogFieldListener(this);
-		implNameField.setLabelText("&" + i++ + " Impl Name:");
+		implProjField = createStringButtonDialogField(this, this, "&" + i++ + " Impl Project:", "Browse &Q");
+		implPackageField = createStringButtonDialogField(this, this, "&" + i++ + " Impl Package:", "Browse &A");
+		implNameField = createStringDialogField(this, "&" + i++ + " Impl Name:");
 
 		// xml
-		serviceXmlField = new StringButtonDialogField(this);
-		serviceXmlField.setDialogFieldListener(this);
-		serviceXmlField.setLabelText("&" + i++ + " Service Xml:");
-		serviceXmlField.setButtonLabel("Browse &G");
+		serviceXmlField = createStringButtonDialogField(this, this, "&" + i++ + " Service Xml:", "Browse &G");
 
 		// type
 		serviceTypeField = new CheckboxGroupTypeField();
@@ -122,8 +100,9 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 			ControlContentAssistHelper.createTextContentAssistant(text, servicePackageCompletionProcessor);
 			TextFieldNavigationHandler.install(text);
 		}
-
 		createStringDialogField(composite, nColumns, this.serviceNameField);
+		
+		createSeparator(composite, nColumns);
 
 		createStringButtonDialogField(composite, nColumns, this.implProjField);
 		implProjField.getTextControl(composite).setEditable(false);
@@ -135,8 +114,9 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 		}
 		createStringDialogField(composite, nColumns, this.implNameField);
 
+		createSeparator(composite, nColumns);
+		
 		createStringButtonDialogField(composite, nColumns, this.serviceXmlField);
-
 		serviceTypeField.doFillIntoGrid(composite, nColumns);
 
 		updateStatus();
@@ -307,8 +287,7 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 		this.data.implPackage = this.implPackageField.getText();
 		this.data.implName = this.implNameField.getText();
 
-		IFolder f = SDTPlugin.getProject(this.implProjField.getText()).getFolder(
-				SDTPlugin.D_SPRING);
+		IFolder f = SDTPlugin.getProject(this.implProjField.getText()).getFolder(SDTPlugin.D_SPRING);
 		IResource r = f.findMember(this.serviceXmlField.getText());
 		if (r == null || !r.exists()) {
 			this.data.createXml = true;
@@ -318,10 +297,6 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 		}
 
 		this.data.serviceType = this.serviceTypeField.getValue();
-
-		// System.err.println("sf: " + this.data.serviceFile);
-		// System.err.println("if: " + this.data.implFile);
-		// System.err.println("xf: " + this.data.xmlFile);
 
 	}
 }

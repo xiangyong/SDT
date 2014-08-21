@@ -18,6 +18,8 @@ import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.dialogs.TextFieldNavigationHandler;
 import org.eclipse.jdt.internal.ui.refactoring.contentassist.JavaPackageCompletionProcessor;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
+import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
+import org.eclipse.jdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.LayoutUtil;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.Separator;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
@@ -44,18 +46,32 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		// TODO Auto-generated method stub
-
 	}
 
-	public void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field) {
+	protected StringButtonDialogField createStringButtonDialogField(IStringButtonAdapter adapter,
+			IDialogFieldListener listener, String label, String buttonLabel) {
+		StringButtonDialogField f = new StringButtonDialogField(adapter);
+		f.setDialogFieldListener(listener);
+		f.setLabelText(label);
+		f.setButtonLabel(buttonLabel);
+		return f;
+	}
+
+	protected StringDialogField createStringDialogField(IDialogFieldListener listener, String label) {
+		StringDialogField f = new StringDialogField();
+		f.setDialogFieldListener(listener);
+		f.setLabelText(label);
+		return f;
+	}
+
+	protected void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field) {
 		field.doFillIntoGrid(composite, nColumns);
 		Text text = field.getTextControl(null);
 		LayoutUtil.setWidthHint(text, getMaxFieldWidth());
 		LayoutUtil.setHorizontalGrabbing(text);
 	}
 
-	public void createStringDialogField(Composite composite, int nColumns, StringDialogField field) {
+	protected void createStringDialogField(Composite composite, int nColumns, StringDialogField field) {
 		field.doFillIntoGrid(composite, nColumns - 1);
 		DialogField.createEmptySpace(composite);
 
@@ -65,16 +81,16 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 
 	}
 
-	public void createSeparator(Composite composite, int nColumns) {
+	protected void createSeparator(Composite composite, int nColumns) {
 		(new Separator(SWT.SEPARATOR | SWT.HORIZONTAL)).doFillIntoGrid(composite, nColumns,
 				convertHeightInCharsToPixels(1));
 	}
 
-	public int getMaxFieldWidth() {
+	protected int getMaxFieldWidth() {
 		return convertWidthInCharsToPixels(40);
 	}
 
-	final public void chooseProject(StringButtonDialogField field) {
+	final protected void chooseProject(StringButtonDialogField field) {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 
 		List<IProject> filteredPorjects = filterProjects(projects);
