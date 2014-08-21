@@ -60,12 +60,13 @@
             id="SDT.OpenDir"
             objectClass="org.eclipse.core.runtime.IAdaptable">
             <action
-               label="Easy Explore..."
-               icon="icons/group.png"
-               class="sdt.opendir.OpenDir"
-               menubarPath="additions"
-               enablesFor="1"
-               id="sdt.opendir.OpenDir">
+                  class="sdt.opendir.OpenDir"
+                  enablesFor="1"
+                  icon="icons/blue.png"
+                  id="sdt.opendir.OpenDir"
+                  label="Open Dir"
+                  menubarPath="additions"
+                  overrideActionId="org.easyexplore.actions.EasyExploreAction">
          </action>
       </objectContribution>
    </extension>

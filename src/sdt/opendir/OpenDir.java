@@ -29,8 +29,8 @@ public class OpenDir implements IObjectActionDelegate {
 
 	public void run(IAction action) {
 		if (this.selected == null) {
-			MessageDialog.openInformation(new Shell(), "Easy Explorer", "Unable to explore "
-					+ this.selectedClass.getName());
+			MessageDialog.openInformation(new Shell(), "Open DIr", "Unable to explore "
+					+ this.selectedClass.getSimpleName());
 			return;
 		}
 		File directory = null;
