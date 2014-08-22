@@ -84,7 +84,9 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 		key.reverse();
 		pre.reverse();
 
-		if (!key.toString().equals("insert") && !key.toString().equals("queryForList")) {
+		if (!key.toString().equals("insert") && !key.toString().equals("queryForList")
+				&& !key.toString().equals("delete") && !key.toString().equals("update")
+				&& !key.toString().equals("queryForObject")) {
 			return null;
 		}
 
