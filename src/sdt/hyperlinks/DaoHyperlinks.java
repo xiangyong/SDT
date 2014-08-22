@@ -135,6 +135,7 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 		Map<String, String> param = new HashMap<String, String>();
 
 		param.put("fileName", fileName + "-sqlmap-mapping.xml");
+		param.put("key", "id=\"" + name + "\"");
 
 		File file = new File(folder.getLocationURI());
 		findFiles(file, files, param);
@@ -170,8 +171,12 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 			}
 
 		} else if (file.isFile()) {
-			if (file.getName().equals(param.get("fileName"))) {
-				result.add(file);
+			String name = file.getName();
+			if (name.endsWith("sqlmap-mapping.xml")) {
+				String content = _.readFromFile(file);
+				if (content.contains(param.get("key"))) {
+					result.add(file);
+				}
 			}
 		}
 	}
