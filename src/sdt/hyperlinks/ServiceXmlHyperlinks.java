@@ -112,8 +112,6 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 
 		String name = pre.append(pos).toString();
 
-		System.err.println(key + ": " + name);
-
 		// TOOD
 
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -145,16 +143,13 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 				}
 			} else if (key.toString().equals("resource")) {
 				IFile file = proj.getFile(SDTPlugin.D_RES + "/" + name);
-				System.err.println(file);
 				if (file != null && file.exists()) {
 					result.add(new ResourceHyperlink(fregion, file));
 				}
 			} else if (key.toString().equals("ref")) {
-				String doc = document.get();
-				result.addAll(getCurrentPageLink(cache, fregion, doc, name, "id", "name"));
+				result.addAll(getCurrentPageLink(cache, fregion, document, name, "id", "name"));
 			} else if (key.toString().equals("bean")) {
-				String doc = document.get();
-				result.addAll(getCurrentPageLink(cache, fregion, doc, name, "id"));
+				result.addAll(getCurrentPageLink(cache, fregion, document, name, "id"));
 			}
 
 		} catch (JavaModelException e1) {
@@ -168,15 +163,26 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		return result.toArray(new IHyperlink[] {});
 	}
 
-	private Collection<BeanHyperlink> getCurrentPageLink(Set<String> cache, IRegion fregion, String doc,
+	private Collection<BeanHyperlink> getCurrentPageLink(Set<String> cache, IRegion fregion, IDocument document,
 			String name, String... keys) {
 		Collection<BeanHyperlink> f = new ArrayList<BeanHyperlink>();
+		String doc = document.get();
+
 		for (String k : keys) {
 			String toString = k + "=\"" + name + "\"";
 			if (!cache.contains(toString) && doc.contains(toString)) {
 				cache.add(toString);
-				int toOffset = doc.indexOf(toString);
-				f.add(new BeanHyperlink(fregion, toString, toOffset));
+				int toOffset, l = 0;
+				while ((toOffset = doc.indexOf(toString, l)) > 0) {
+					l = toOffset + toString.length();
+					int lineNo = 0;
+					try {
+						lineNo = document.getNumberOfLines(0, l);
+					} catch (BadLocationException e) {
+						e.printStackTrace();
+					}
+					f.add(new BeanHyperlink(fregion, toString, toOffset, lineNo));
+				}
 			}
 		}
 		return f;
@@ -186,11 +192,13 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		private final IRegion fRegion;
 		private final String fString;
 		private final int fOffset;
+		private final int lineNo;
 
-		public BeanHyperlink(IRegion region, String key, int offset) {
+		public BeanHyperlink(IRegion region, String key, int offset, int lineNo) {
 			this.fRegion = region;
 			this.fString = key;
 			this.fOffset = offset;
+			this.lineNo = lineNo;
 		}
 
 		@Override
@@ -215,7 +223,7 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 
 		@Override
 		public String getHyperlinkText() {
-			return fString;
+			return lineNo + ": " + fString;
 		}
 
 		@Override
