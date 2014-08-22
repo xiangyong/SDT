@@ -212,7 +212,7 @@ public class NewServiceWizardPage extends NewWizardPage implements IStringButton
 			}
 		} else if (field == this.servicePackageField) {
 			if (this.implPackageField.getText().isEmpty() && !serviceProjField.getText().endsWith("-facade")) {
-				implPackageField.setText(servicePackageField.getText());
+				implPackageField.setText(servicePackageField.getText()+".impl");
 			}
 		}
 

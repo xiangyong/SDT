@@ -11,19 +11,25 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 //
 // org.eclipse.ui.workbench.texteditor.hyperlinkDetectors
@@ -33,8 +39,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 
 	@Override
-	public IHyperlink[] detectHyperlinks(ITextViewer textViewer,
-			IRegion region, boolean canShowMultipleHyperlinks) {
+	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 
 		IDocument document = textViewer.getDocument();
 		if (document == null)
@@ -60,8 +65,7 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		boolean hasKey = false;
 		for (int i = offsetInLine; i > 0; i--) {
 			char c = line.charAt(i);
-			if (!hasKey && !Character.isLetterOrDigit(c) && c != '.'
-					&& c != '"' && c != '=')
+			if (!hasKey && !Character.isLetterOrDigit(c) && c != '.' && c != '"' && c != '=')
 				return null;
 
 			if (c == '"') {
@@ -82,12 +86,11 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 			}
 		}
 		key.reverse();
-		if (!key.toString().equals("interface")
-				&& !key.toString().equals("class")) {
+		pre.reverse();
+
+		if (!key.toString().equals("interface") && !key.toString().equals("class") && !key.toString().equals("ref")) {
 			return null;
 		}
-
-		pre.reverse();
 
 		StringBuffer pos = new StringBuffer();
 		for (int i = offsetInLine + 1; i < line.length(); i++) {
@@ -105,13 +108,17 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		IRegion fregion = new Region(fstart, fend - fstart);
 
 		String name = pre.append(pos).toString();
-		IWorkbenchPart part = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPart part = page.getActiveEditor();
+
 		IProject proj = null;
+		IEditorInput ei = null;
+		IFile editingFile = null;
 		if (part instanceof MultiPageEditorPart) {
-			IEditorInput ei = ((MultiPageEditorPart) part).getEditorInput();
+			ei = ((MultiPageEditorPart) part).getEditorInput();
 			if (ei instanceof FileEditorInput) {
-				proj = ((FileEditorInput) ei).getFile().getProject();
+				editingFile = ((FileEditorInput) ei).getFile();
+				proj = editingFile.getProject();
 			}
 		}
 
@@ -121,10 +128,21 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		IJavaProject jpro = JavaCore.create(proj);
 		List<IHyperlink> result = new ArrayList<IHyperlink>();
 		try {
-			IType type = jpro.findType(name);
-			if (type != null) {
-				result.add(new XmlIHyperlink(fregion, type));
+			if (key.toString().equals("interface") || key.toString().equals("class")) {
+				IType type = jpro.findType(name);
+				if (type != null) {
+					result.add(new JavaHyperlink(fregion, type));
+				}
+			} else if (key.toString().equals("ref")) {
+				String toString = "id=\"" + name + "\"";
+				String doc = document.get();
+				if (!doc.contains(toString))
+					return null;
+				int toOffset = doc.indexOf(toString);
+				// IRegion toRegion = document.getLineInformationOfOffset(toOffset);
+				result.add(new BeanHyperlink(fregion, toString, toOffset));
 			}
+
 		} catch (JavaModelException e1) {
 			e1.printStackTrace();
 		}
@@ -136,27 +154,67 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		return result.toArray(new IHyperlink[] {});
 	}
 
-	private class XmlIHyperlink implements IHyperlink {
+	private class BeanHyperlink implements IHyperlink {
+		private final IRegion fRegion;
+		private final String fString;
+		private final int fOffset;
+
+		public BeanHyperlink(IRegion region, String key, int offset) {
+			this.fRegion = region;
+			this.fString = key;
+			this.fOffset = offset;
+		}
+
+		@Override
+		public void open() {
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			Object a = page.getActiveEditor().getAdapter(ITextEditor.class);
+			if (!(a instanceof ITextEditor))
+				return;
+			ITextEditor te = (ITextEditor) a;
+			try {
+				te.selectAndReveal(this.fOffset, fString.length());
+				page.activate(te);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public IRegion getHyperlinkRegion() {
+			return fRegion;
+		}
+
+		@Override
+		public String getHyperlinkText() {
+			return fString;
+		}
+
+		@Override
+		public String getTypeLabel() {
+			return null;
+		}
+
+	}
+
+	private class JavaHyperlink implements IHyperlink {
 		private final IRegion fRegion;
 		private final IType fType;
 
-		public XmlIHyperlink(IRegion region, IType type) {
-
+		public JavaHyperlink(IRegion region, IType type) {
 			this.fRegion = region;
 			this.fType = type;
 		}
 
 		@Override
 		public void open() {
-			// TODO class 文件打开
 			if (fType == null)
 				return;
 
-			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
-					fType.getPath());
+			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(fType.getPath());
 			try {
-				IDE.openEditor(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getActivePage(), file);
+				IEditorPart ep = IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+						.getActivePage(), file);
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}
