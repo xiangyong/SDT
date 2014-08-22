@@ -1,7 +1,10 @@
 package sdt.hyperlinks;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -11,16 +14,13 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
@@ -28,7 +28,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 //
@@ -88,7 +87,8 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		key.reverse();
 		pre.reverse();
 
-		if (!key.toString().equals("interface") && !key.toString().equals("class") && !key.toString().equals("ref")) {
+		if (!key.toString().equals("interface") && !key.toString().equals("class") && !key.toString().equals("ref")
+				&& !key.toString().equals("bean")) {
 			return null;
 		}
 
@@ -128,19 +128,18 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		IJavaProject jpro = JavaCore.create(proj);
 		List<IHyperlink> result = new ArrayList<IHyperlink>();
 		try {
+			Set<String> cache = new HashSet<String>();
 			if (key.toString().equals("interface") || key.toString().equals("class")) {
 				IType type = jpro.findType(name);
 				if (type != null) {
 					result.add(new JavaHyperlink(fregion, type));
 				}
 			} else if (key.toString().equals("ref")) {
-				String toString = "id=\"" + name + "\"";
 				String doc = document.get();
-				if (!doc.contains(toString))
-					return null;
-				int toOffset = doc.indexOf(toString);
-				// IRegion toRegion = document.getLineInformationOfOffset(toOffset);
-				result.add(new BeanHyperlink(fregion, toString, toOffset));
+				result.addAll(getCurrentPageLink(cache, fregion, doc, name, "id", "name"));
+			} else if (key.toString().equals("bean")) {
+				String doc = document.get();
+				result.addAll(getCurrentPageLink(cache, fregion, doc, name, "id"));
 			}
 
 		} catch (JavaModelException e1) {
@@ -152,6 +151,20 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 			return null;
 		}
 		return result.toArray(new IHyperlink[] {});
+	}
+
+	private Collection<BeanHyperlink> getCurrentPageLink(Set<String> cache, IRegion fregion, String doc,
+			String name, String... keys) {
+		Collection<BeanHyperlink> f = new ArrayList<BeanHyperlink>();
+		for (String k : keys) {
+			String toString = k + "=\"" + name + "\"";
+			if (!cache.contains(toString) && doc.contains(toString)) {
+				cache.add(toString);
+				int toOffset = doc.indexOf(toString);
+				f.add(new BeanHyperlink(fregion, toString, toOffset));
+			}
+		}
+		return f;
 	}
 
 	private class BeanHyperlink implements IHyperlink {
@@ -213,8 +226,7 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(fType.getPath());
 			try {
-				IEditorPart ep = IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-						.getActivePage(), file);
+				IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file);
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}
