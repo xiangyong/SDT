@@ -153,10 +153,10 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 				return null;
 			}
 			String content = _.readFromFile(xmlFile);
-			int contentPos = content.indexOf(name);
+			int contentPos = content.indexOf(param.get("key"));
 
 			IFile fFile = proj.getFile(xmlFileName.substring(keyPosition));
-			result.add(new ResourceHyperlink(fregion, fFile, contentPos, name));
+			result.add(new ResourceHyperlink(fregion, fFile, contentPos, param.get("key")));
 
 		}
 
