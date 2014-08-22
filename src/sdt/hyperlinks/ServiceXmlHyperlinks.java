@@ -98,7 +98,7 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		StringBuffer pos = new StringBuffer();
 		for (int i = offsetInLine + 1; i < line.length(); i++) {
 			char c = line.charAt(i);
-			if (!Character.isLetterOrDigit(c) && c != '.') {
+			if (!Character.isLetterOrDigit(c) && c != '.' && c != '/' && c != '-') {
 				end = i;
 				break;
 			}
