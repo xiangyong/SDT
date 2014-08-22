@@ -30,6 +30,8 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import sdt.SDTPlugin;
+
 //
 // org.eclipse.ui.workbench.texteditor.hyperlinkDetectors
 // org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets
@@ -64,7 +66,8 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		boolean hasKey = false;
 		for (int i = offsetInLine; i > 0; i--) {
 			char c = line.charAt(i);
-			if (!hasKey && !Character.isLetterOrDigit(c) && c != '.' && c != '"' && c != '=')
+			if (!hasKey && !Character.isLetterOrDigit(c) && c != '.' && c != '"' && c != '=' && c != '/'
+					&& c != '-')
 				return null;
 
 			if (c == '"') {
@@ -76,7 +79,7 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 				continue;
 			}
 			if (hasKey) {
-				if (!Character.isLetterOrDigit(c) && c != '.')
+				if (!Character.isLetterOrDigit(c))
 					break;
 
 				key.append(c);
@@ -88,7 +91,7 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		pre.reverse();
 
 		if (!key.toString().equals("interface") && !key.toString().equals("class") && !key.toString().equals("ref")
-				&& !key.toString().equals("bean")) {
+				&& !key.toString().equals("bean") && !key.toString().equals("resource")) {
 			return null;
 		}
 
@@ -108,6 +111,11 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		IRegion fregion = new Region(fstart, fend - fstart);
 
 		String name = pre.append(pos).toString();
+
+		System.err.println(key + ": " + name);
+
+		// TOOD
+
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IWorkbenchPart part = page.getActiveEditor();
 
@@ -128,11 +136,18 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		IJavaProject jpro = JavaCore.create(proj);
 		List<IHyperlink> result = new ArrayList<IHyperlink>();
 		try {
+
 			Set<String> cache = new HashSet<String>();
 			if (key.toString().equals("interface") || key.toString().equals("class")) {
 				IType type = jpro.findType(name);
 				if (type != null) {
 					result.add(new JavaHyperlink(fregion, type));
+				}
+			} else if (key.toString().equals("resource")) {
+				IFile file = proj.getFile(SDTPlugin.D_RES + "/" + name);
+				System.err.println(file);
+				if (file != null && file.exists()) {
+					result.add(new ResourceHyperlink(fregion, file));
 				}
 			} else if (key.toString().equals("ref")) {
 				String doc = document.get();
@@ -205,9 +220,49 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 
 		@Override
 		public String getTypeLabel() {
-			return null;
+			return "xml";
 		}
 
+	}
+
+	private class ResourceHyperlink implements IHyperlink {
+		private final IRegion fRegion;
+		private final IFile fFile;
+
+		public ResourceHyperlink(IRegion region, IFile fFile) {
+			this.fRegion = region;
+			this.fFile = fFile;
+		}
+
+		@Override
+		public void open() {
+			if (fFile == null)
+				return;
+
+			try {
+				IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), fFile);
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public String getHyperlinkText() {
+			if (fFile == null)
+				return null;
+
+			return fFile.getProject().getName() + "/" + fFile.getName();
+		}
+
+		@Override
+		public IRegion getHyperlinkRegion() {
+			return this.fRegion;
+		}
+
+		@Override
+		public String getTypeLabel() {
+			return "java";
+		}
 	}
 
 	private class JavaHyperlink implements IHyperlink {
@@ -250,7 +305,6 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 		public String getTypeLabel() {
 			return "java";
 		}
-
 	}
 
 }
