@@ -138,7 +138,7 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	@Override
-	public void refreshData() {
+	protected void refreshData() {
 		this.data.system = this.fSystemField.getText();
 		this.data.name = this.fNameField.getText();
 		this.data.type = this.fTypeField.getText();
@@ -154,15 +154,7 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 		}
 	}
 
-	public void updateStatus() {
-		IStatus status = getStatus();
-		super.updateStatus(status);
-		if (status.isOK()) {
-			refreshData();
-		}
-	}
-
-	public IStatus getStatus() {
+	protected IStatus getStatus() {
 		if (this.fSystemField.getText().isEmpty()) {
 			return new StatusInfo(IStatus.ERROR, getLabel(this.fSystemField) + " is Empty");
 		}

@@ -52,6 +52,13 @@
             id="SDT.NewControllerWizard"
             name="Sofa Controller">
       </wizard>
+      <wizard
+            category="SofaPlugin"
+            class="sdt.wizards.newclient.NewClientWizard"
+            icon="icons/orange.png"
+            id="SDT.NewClientWizard"
+            name="Sofa Client">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

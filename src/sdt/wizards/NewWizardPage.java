@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -317,8 +318,16 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	protected void chooseOther(StringButtonDialogField field) {
 	}
 
+	protected void updateStatus() {
+		IStatus f = getStatus();
+		updateStatus(f);
+		if (f.isOK()) {
+			refreshData();
+		}
+	}
+
 	abstract protected void refreshData();
 
-	abstract protected void updateStatus();
+	abstract protected IStatus getStatus();
 
 }

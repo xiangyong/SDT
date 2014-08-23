@@ -3,14 +3,14 @@ package sdt.wizards.newclient;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
-import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringDialogField;
 
+import sdt.SDTPlugin;
 import sdt.wizards.NewWizardPage;
 
 @SuppressWarnings("restriction")
-public class NewClientWizardPage extends NewWizardPage implements IDialogFieldListener {
+public class NewClientWizardPage extends NewWizardPage {
 
 	@SuppressWarnings("unused")
 	private NewClientState data;
@@ -33,8 +33,8 @@ public class NewClientWizardPage extends NewWizardPage implements IDialogFieldLi
 		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &E", this.PACKAGE, null,
 				null, true, fProjectField);
 		fNameField = createStringDialogField(this, "&" + i++ + " Name:", null);
-		fXmlField = createStringButtonDialogField("&" + i++ + " Xml:", "Browse &R", this.FILE, ".xml$", null, true,
-				null);
+		fXmlField = createStringButtonDialogField("&" + i++ + " Xml:", "Browse &R", this.FILE, ".xml$",
+				SDTPlugin.D_SPRING, true, fProjectField);
 
 	}
 
@@ -44,13 +44,7 @@ public class NewClientWizardPage extends NewWizardPage implements IDialogFieldLi
 		updateStatus();
 	}
 
-	protected void updateStatus() {
-		IStatus status = getStatus(fProjectField, fFacadeField, fPackageField, fNameField, fXmlField);
-		updateStatus(status);
-
-	}
-
-	private IStatus getStatus(StringDialogField... fields) {
+	protected IStatus getStatus() {
 		return new StatusInfo();
 	}
 

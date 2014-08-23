@@ -85,17 +85,9 @@ public class NewServiceWizardPage extends NewWizardPage {
 		updateStatus();
 	}
 
-	protected void updateStatus() {
-		IStatus f = getStatus(this.fServiceProjField, this.fServicePackageField, this.fServiceNameField,
-				this.fImplProjField, this.fImplPackageField, this.fImplNameField, this.fServiceXmlField);
-		updateStatus(f);
-		if (f.isOK()) {
-			refreshData();
-		}
-	}
-
-	private IStatus getStatus(StringDialogField... fields) {
-		for (StringDialogField field : fields) {
+	protected IStatus getStatus() {
+		for (StringDialogField field : new StringDialogField[] { fServiceProjField, fServicePackageField,
+				fServiceNameField, fImplProjField, fImplPackageField, fImplNameField, fServiceXmlField }) {
 			if (field.getText().isEmpty()) {
 				String m = "\"" + field.getLabelControl(null).getText() + "\" is Emply";
 				if (field instanceof StringButtonDialogField) {
@@ -137,7 +129,7 @@ public class NewServiceWizardPage extends NewWizardPage {
 		return new StatusInfo();
 	}
 
-	public void refreshData() {
+	protected void refreshData() {
 
 		this.data.serviceFile = SDTPlugin.getPackageFragment(fServiceProjField.getText(), fServicePackageField
 				.getText())

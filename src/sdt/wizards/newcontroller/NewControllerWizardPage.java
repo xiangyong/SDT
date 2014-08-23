@@ -47,16 +47,8 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		updateStatus();
 	}
 
-	protected void updateStatus() {
-		IStatus f = getStatus(this.fProjectField, this.fPackageField, this.fNameField);
-		updateStatus(f);
-		if (f.isOK()) {
-			refreshData();
-		}
-	}
-
-	private IStatus getStatus(StringDialogField... fields) {
-		for (StringDialogField field : fields) {
+	protected IStatus getStatus() {
+		for (StringDialogField field : new StringDialogField[] { fPackageField, fPackageField, fNameField }) {
 			if (field.getText().isEmpty()) {
 				String m = "\"" + field.getLabelControl(null).getText() + "\" is Emply";
 				if (field instanceof StringButtonDialogField) {

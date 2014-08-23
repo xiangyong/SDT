@@ -189,7 +189,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	@SuppressWarnings("unchecked")
-	public IStatus getStatus(StringDialogField... fields) {
+	protected IStatus getStatus() {
 		if (this.status != null || this.status.isError()) {
 			return this.status;
 		}
@@ -227,15 +227,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		}
 
 		return new StatusInfo(IStatus.OK, "");
-	}
-
-	// TODO
-	protected void updateStatus() {
-		IStatus f = getStatus(fTableField, fProjectField, fPackageField);
-		updateStatus(f);
-		if (f.isOK()) {
-			refreshData();
-		}
 	}
 
 	public void refreshData() {
