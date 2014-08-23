@@ -10,8 +10,6 @@ import org.eclipse.jdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringDialogField;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
 
 import sdt.SDTPlugin;
 import sdt.wizards.GroupTypeField;
@@ -35,33 +33,11 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		int i = 1;
 		// service
 		fProjectField = createStringButtonDialogField("&" + i++ + " Project:", "Browse &Q", this.PROJECT, "-web-",
-				null, null);
+				null, false, null);
 		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &W", this.PACKAGE, null,
-				null, fProjectField);
-		fNameField = createStringDialogField(this, "&" + i++ + " Name:");
-		fSurfixField = createGroupTypeField("&" + i++ + " Name Surfix :", SWT.CHECK, CONTROLLER);
-
-	}
-
-	@Override
-	public void createControl(Composite parent) {
-		initializeDialogUnits(parent);
-
-		Composite composite = new Composite(parent, SWT.NULL);
-		setControl(composite);
-
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-
-		int nColumns = 4;
-		layout.numColumns = nColumns;
-
-		createStringButtonDialogField(composite, nColumns, this.fProjectField, false);
-		createStringButtonDialogField(composite, nColumns, this.fPackageField, true);
-		createStringDialogField(composite, nColumns, this.fNameField);
-		createGroupTypeDialogField(composite, nColumns, fSurfixField, CONTROLLER);
-
-		updateStatus();
+				null, true, fProjectField);
+		fNameField = createStringDialogField(this, "&" + i++ + " Name:", null);
+		fSurfixField = createGroupTypeField("&" + i++ + " Name Surfix :", SWT.CHECK, CONTROLLER, CONTROLLER);
 
 	}
 

@@ -29,8 +29,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import sdt.NameUtil;
@@ -47,6 +45,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	private NewSofaDalState data;
 	private StatusInfo status;
 
+	@SuppressWarnings("unused")
 	private GroupTypeField fDalDbTypeField;
 	private StringDialogField fServerField;
 	private StringDialogField fPortField;
@@ -62,64 +61,21 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		this.status = new StatusInfo();
 
 		int i = 1;
-		fDalDbTypeField = createGroupTypeField("Database:", SWT.RADIO, "MySQL");
+		fDalDbTypeField = createGroupTypeField("Database:", SWT.RADIO, "MySQL", "MySQL");
 
-		fServerField = createStringDialogField(this, "&" + i++ + " Server:");
-		fPortField = createStringDialogField(this, "&" + i++ + " Port:");
-		fUsernameField = createStringDialogField(this, "&" + i++ + " Username:");
-		fPasswordField = createStringDialogField(this, "&" + i++ + " Password:");
-
+		fServerField = createStringDialogField(this, "&" + i++ + " Server:", "localhost");
+		fPortField = createStringDialogField(this, "&" + i++ + " Port:", "3306");
+		fUsernameField = createStringDialogField(this, "&" + i++ + " Username:", "root");
+		fPasswordField = createStringDialogField(this, "&" + i++ + " Password:", null);
+		createSeparator();
 		fTableField = createStringButtonDialogField("&" + i++ + " Table:", "Browse &Q", this.OTHER, null, null,
-				null);
+				true, null);
+		createSeparator();
 		fProjectField = createStringButtonDialogField("&" + i++ + " Project:", "Browse &W", this.PROJECT,
-				"-common-dal$", null, null);
+				"-common-dal$", null, false, null);
 		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &E", this.PACKAGE, null,
-				null, fProjectField);
+				null, true, fProjectField);
 
-	}
-
-	// TODO createControl
-	@Override
-	public void createControl(Composite parent) {
-		initializeDialogUnits(parent);
-
-		Composite composite = new Composite(parent, SWT.NULL);
-		setControl(composite);
-
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-
-		int nColumns = 4;
-		layout.numColumns = nColumns;
-
-		fDalDbTypeField.doFillIntoGrid(composite, nColumns);
-
-		createStringDialogField(composite, nColumns, fServerField);
-		createStringDialogField(composite, nColumns, fPortField);
-		createStringDialogField(composite, nColumns, fUsernameField);
-		createStringDialogField(composite, nColumns, fPasswordField);
-
-		createSeparator(composite, nColumns);
-
-		createStringButtonDialogField(composite, nColumns, fTableField, true);
-
-		createSeparator(composite, nColumns);
-
-		createStringButtonDialogField(composite, nColumns, fProjectField, false);
-
-		createStringButtonDialogField(composite, nColumns, fPackageField, false);
-
-		handleFieldChanged();
-
-		initPage();
-	}
-
-	private void initPage() {
-		this.fDalDbTypeField.setValue("MySQL");
-		this.fServerField.setText("localhost");
-		this.fPortField.setText("3306");
-		this.fUsernameField.setText("root");
-		// this.passwordField.setText("ali88");
 	}
 
 	public Connection getConnection() {

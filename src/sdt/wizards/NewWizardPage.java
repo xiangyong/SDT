@@ -1,6 +1,7 @@
 package sdt.wizards;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.eclipse.jdt.ui.JavaElementLabelProvider;
 import org.eclipse.jdt.ui.wizards.NewElementWizardPage;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
@@ -47,7 +49,10 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	protected final Map<StringButtonDialogField, StringButtonDialogField> fFieldAndParendField = new HashMap<StringButtonDialogField, StringButtonDialogField>();
 	protected final Map<StringButtonDialogField, String> fFieldAndFilter = new HashMap<StringButtonDialogField, String>();
 	protected final Map<StringButtonDialogField, String> fFieldAndRoot = new HashMap<StringButtonDialogField, String>();
+	protected final Map<DialogField, Boolean> fFieldAndEditable = new HashMap<DialogField, Boolean>();
+	protected final Map<DialogField, String> fFieldAndDefault = new HashMap<DialogField, String>();
 
+	private final Collection<DialogField> fFields = new ArrayList<DialogField>();
 	public IWorkspaceRoot wsroot;
 
 	public NewWizardPage(String name) {
@@ -57,6 +62,27 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 
 	@Override
 	public void createControl(Composite parent) {
+		initializeDialogUnits(parent);
+
+		Composite composite = new Composite(parent, SWT.NULL);
+		setControl(composite);
+		GridLayout layout = new GridLayout();
+		composite.setLayout(layout);
+		int nColumns = 4;
+		layout.numColumns = nColumns;
+
+		for (DialogField field : fFields) {
+			if (field instanceof Separator) {
+				createSeparator(composite, nColumns, (Separator) field);
+			} else if (field instanceof GroupTypeField) {
+				createGroupTypeDialogField(composite, nColumns, (GroupTypeField) field, fFieldAndDefault.get(field));
+			} else if (field instanceof StringButtonDialogField) {
+				createStringButtonDialogField(composite, nColumns, (StringButtonDialogField) field,
+						fFieldAndEditable.get(field));
+			} else if (field instanceof StringDialogField) {
+				createStringDialogField(composite, nColumns, (StringDialogField) field);
+			}
+		}
 	}
 
 	protected StringButtonDialogField createStringButtonDialogField( //
@@ -65,6 +91,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 			short type, //
 			String filter, //
 			String filterRoot, //
+			boolean editable, //
 			StringButtonDialogField parentField //
 
 	) {
@@ -83,28 +110,46 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		if (filterRoot != null)
 			fFieldAndRoot.put(f, filterRoot);
 
+		fFieldAndEditable.put(f, editable);
+
+		fFields.add(f);
 		return f;
 	}
 
-	protected GroupTypeField createGroupTypeField(String label, int type, String... labels) {
+	protected GroupTypeField createGroupTypeField(String label, int type, String defaultValue, String... labels) {
 		GroupTypeField f = new GroupTypeField(type);
 		f.setDialogFieldListener(this);
 		f.setLabels(labels);
 		f.setLabelText(label);
+		if (defaultValue != null)
+			fFieldAndDefault.put(f, defaultValue);
+
+		fFields.add(f);
 		return f;
 	}
 
-	protected StringDialogField createStringDialogField(IDialogFieldListener listener, String label) {
+	protected StringDialogField createStringDialogField(IDialogFieldListener listener, String label,
+			String defaultValue) {
 		StringDialogField f = new StringDialogField();
 		f.setDialogFieldListener(listener);
 		f.setLabelText(label);
+		if (defaultValue != null)
+			fFieldAndDefault.put(f, defaultValue);
+
+		fFields.add(f);
 		return f;
 	}
 
+	protected void createSeparator() {
+		Separator f = new Separator(SWT.SEPARATOR | SWT.HORIZONTAL);
+		fFields.add(f);
+	}
+
+	// TODO
 	protected void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field,
 			boolean editable) {
 		field.doFillIntoGrid(composite, nColumns);
-		Text text = field.getTextControl(null);
+		Text text = field.getTextControl(composite);
 		text.setEditable(editable);
 		LayoutUtil.setWidthHint(text, getMaxFieldWidth());
 		LayoutUtil.setHorizontalGrabbing(text);
@@ -114,21 +159,20 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		field.doFillIntoGrid(composite, nColumns - 1);
 		DialogField.createEmptySpace(composite);
 
-		Text text = field.getTextControl(null);
+		Text text = field.getTextControl(composite);
 		LayoutUtil.setWidthHint(text, getMaxFieldWidth());
 		TextFieldNavigationHandler.install(text);
 	}
 
 	protected void createGroupTypeDialogField(Composite composite, int nColumns, GroupTypeField field, String label) {
-		field.doFillIntoGrid(composite, nColumns - 1);
+		field.doFillIntoGrid(composite, nColumns);
 		if (label != null) {
 			field.setValue(label);
 		}
 	}
 
-	protected void createSeparator(Composite composite, int nColumns) {
-		(new Separator(SWT.SEPARATOR | SWT.HORIZONTAL)).doFillIntoGrid(composite, nColumns,
-				convertHeightInCharsToPixels(1));
+	protected void createSeparator(Composite composite, int nColumns, Separator field) {
+		field.doFillIntoGrid(composite, nColumns, convertHeightInCharsToPixels(1));
 	}
 
 	protected int getMaxFieldWidth() {

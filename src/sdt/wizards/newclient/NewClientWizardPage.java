@@ -6,9 +6,6 @@ import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringDialogField;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
 
 import sdt.wizards.NewWizardPage;
 
@@ -30,37 +27,14 @@ public class NewClientWizardPage extends NewWizardPage implements IDialogFieldLi
 
 		int i = 1;
 		fProjectField = createStringButtonDialogField("&" + i++ + " Project:", "Browse &Q", this.PROJECT,
-				"service-integration$", null, null);
+				"service-integration$", null, false, null);
 		fFacadeField = createStringButtonDialogField("&" + i++ + " Facade:", "Browse &W", this.CLASS,
-				"service-integration$", null, null);
+				"service-integration$", null, false, null);
 		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &E", this.PACKAGE,
-				"service-integration$", null, fProjectField);
-		fNameField = createStringDialogField(this, "&" + i++ + " Name:");
+				"service-integration$", null, true, fProjectField);
+		fNameField = createStringDialogField(this, "&" + i++ + " Name:", null);
 		fXmlField = createStringButtonDialogField("&" + i++ + " Xml:", "Browse &R", this.FILE,
-				"service-integration$", null, null);
-
-	}
-
-	@Override
-	public void createControl(Composite parent) {
-		initializeDialogUnits(parent);
-
-		Composite composite = new Composite(parent, SWT.NULL);
-		setControl(composite);
-
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-
-		int nColumns = 4;
-		layout.numColumns = nColumns;
-
-		createStringButtonDialogField(composite, nColumns, this.fProjectField, false);
-		createStringButtonDialogField(composite, nColumns, this.fFacadeField, true);
-		createStringButtonDialogField(composite, nColumns, this.fPackageField, true);
-		createStringDialogField(composite, nColumns, this.fNameField);
-		createStringButtonDialogField(composite, nColumns, this.fXmlField, true);
-
-		updateStatus();
+				"service-integration$", null, true, null);
 
 	}
 

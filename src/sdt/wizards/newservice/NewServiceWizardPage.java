@@ -10,8 +10,6 @@ import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringButtonDialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringDialogField;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
 
 import sdt.SDTPlugin;
 import sdt.wizards.GroupTypeField;
@@ -42,57 +40,26 @@ public class NewServiceWizardPage extends NewWizardPage {
 		// service
 
 		fServiceProjField = createStringButtonDialogField("&" + i++ + " Service Project:", "Browse &E",
-				this.PROJECT, null, null, null);
+				this.PROJECT, null, null, false, null);
 		fServicePackageField = createStringButtonDialogField("&" + i++ + " Service Package:", "Browse &D",
-				this.PACKAGE, null, null, fServiceProjField);
-		fServiceNameField = createStringDialogField(this, "&" + i++ + " Service Name:");
+				this.PACKAGE, null, null, true, fServiceProjField);
+		fServiceNameField = createStringDialogField(this, "&" + i++ + " Service Name:", null);
 
 		// service impl
+		createSeparator();
 		fImplProjField = createStringButtonDialogField("&" + i++ + " Impl Project:", "Browse &Q", this.PROJECT,
-				null, null, null);
+				null, null, false, null);
 		fImplPackageField = createStringButtonDialogField("&" + i++ + " Impl Package:", "Browse &A", this.PACKAGE,
-				null, null, fImplProjField);
-		fImplNameField = createStringDialogField(this, "&" + i++ + " Impl Name:");
+				null, null, true, fImplProjField);
+		fImplNameField = createStringDialogField(this, "&" + i++ + " Impl Name:", null);
 
 		// xml
+		createSeparator();
 		fServiceXmlField = createStringButtonDialogField("&" + i++ + " Service Xml:", "Browse &G", this.FILE,
-				".xml$", SDTPlugin.D_SPRING, fImplProjField);
+				".xml$", SDTPlugin.D_SPRING, true, fImplProjField);
 
 		// type
-		fServiceTypeField = createGroupTypeField("&" + i++ + " Service Type:", SWT.CHECK, "W&S", "T&R");
-
-	}
-
-	@Override
-	public void createControl(Composite parent) {
-		initializeDialogUnits(parent);
-
-		Composite composite = new Composite(parent, SWT.NULL);
-		setControl(composite);
-
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-
-		int nColumns = 4;
-		layout.numColumns = nColumns;
-
-		createStringButtonDialogField(composite, nColumns, fServiceProjField, false);
-		createStringButtonDialogField(composite, nColumns, fServicePackageField, true);
-		createStringDialogField(composite, nColumns, fServiceNameField);
-
-		createSeparator(composite, nColumns);
-
-		createStringButtonDialogField(composite, nColumns, fImplProjField, false);
-		createStringButtonDialogField(composite, nColumns, fImplPackageField, true);
-		createStringDialogField(composite, nColumns, fImplNameField);
-
-		createSeparator(composite, nColumns);
-
-		createStringButtonDialogField(composite, nColumns, fServiceXmlField, true);
-
-		createGroupTypeDialogField(composite, nColumns, fServiceTypeField, null);
-
-		updateStatus();
+		fServiceTypeField = createGroupTypeField("&" + i++ + " Service Type:", SWT.CHECK, null, "W&S", "T&R");
 
 	}
 
