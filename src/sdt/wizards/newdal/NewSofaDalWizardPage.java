@@ -102,15 +102,12 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 			conn = driver.connect("jdbc:mysql://" + server + ":" + port, ps);
 
-			if (conn == null || conn.isClosed()) {
-				this.status.setError("连接已关闭");
-				this.doStatusUpdate();
+			if (conn == null || conn.isClosed())
 				return null;
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.status.setError(e.getMessage());
-			this.doStatusUpdate();
+			this.status.setError("获取数据库连接失败");
+			updateStatus();
 			closeDB(conn, null, null);
 		}
 		return conn;
@@ -188,25 +185,23 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 				this.fPackageField.setText("com.alipay." + system + ".common.dal");
 			}
 		}
-		handleFieldChanged();
-		doStatusUpdate();
+		updateStatus();
 	}
 
 	@SuppressWarnings("unchecked")
-	public void handleFieldChanged() {
+	public IStatus getStatus(StringDialogField... fields) {
+		if (this.status != null || this.status.isError()) {
+			return this.status;
+		}
 
 		if (this.fTableField.getText().isEmpty()) {
-			status = new StatusInfo(IStatus.ERROR, "请选择 Table");
-			return;
+			return new StatusInfo(IStatus.ERROR, "请选择 Table");
 		} else if (this.fProjectField.getText().isEmpty()) {
-			status = new StatusInfo(IStatus.ERROR, "请选择 Project");
-			return;
+			return new StatusInfo(IStatus.ERROR, "请选择 Project");
 		} else if (this.fPackageField.getText().isEmpty()) {
-			status = new StatusInfo(IStatus.ERROR, "请选择 Package");
-			return;
+			return new StatusInfo(IStatus.ERROR, "请选择 Package");
 		} else if (this.fPackageField.getText().endsWith(".")) {
-			status = new StatusInfo(IStatus.WARNING, "Package 不合法");
-			return;
+			return new StatusInfo(IStatus.WARNING, "Package 不合法");
 		}
 
 		String project = this.fProjectField.getText();
@@ -227,20 +222,20 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		for (Map.Entry entry : ps.entrySet()) {
 			IFile file = SDTPlugin.getFile(entry.getValue().toString());
 			if (file != null && file.exists()) {
-				status = new StatusInfo(IStatus.ERROR, "\"" + file.getName() + "\" is already exists");
-				return;
+				return new StatusInfo(IStatus.ERROR, "\"" + file.getName() + "\" is already exists");
 			}
 		}
 
-		status = new StatusInfo(IStatus.OK, "");
+		return new StatusInfo(IStatus.OK, "");
 	}
 
 	// TODO
-	private void doStatusUpdate() {
-		if (this.status == null) {
-			return;
+	protected void updateStatus() {
+		IStatus f = getStatus(fTableField, fProjectField, fPackageField);
+		updateStatus(f);
+		if (f.isOK()) {
+			refreshData();
 		}
-		updateStatus(this.status);
 	}
 
 	public void refreshData() {
@@ -286,8 +281,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			this.data.fTable.columns = columns.toArray(new Column[0]);
 
 		} catch (SQLException e) {
-
-			System.err.println("refreshData 连接出错");
 			e.printStackTrace();
 		} finally {
 			closeDB(conn, statement, rs);

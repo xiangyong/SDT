@@ -28,13 +28,13 @@ public class NewClientWizardPage extends NewWizardPage implements IDialogFieldLi
 		int i = 1;
 		fProjectField = createStringButtonDialogField("&" + i++ + " Project:", "Browse &Q", this.PROJECT,
 				"service-integration$", null, false, null);
-		fFacadeField = createStringButtonDialogField("&" + i++ + " Facade:", "Browse &W", this.CLASS,
-				"service-integration$", null, false, null);
-		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &E", this.PACKAGE,
-				"service-integration$", null, true, fProjectField);
+		fFacadeField = createStringButtonDialogField("&" + i++ + " Facade:", "Browse &W", this.CLASS, null, null,
+				false, null);
+		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &E", this.PACKAGE, null,
+				null, true, fProjectField);
 		fNameField = createStringDialogField(this, "&" + i++ + " Name:", null);
-		fXmlField = createStringButtonDialogField("&" + i++ + " Xml:", "Browse &R", this.FILE,
-				"service-integration$", null, true, null);
+		fXmlField = createStringButtonDialogField("&" + i++ + " Xml:", "Browse &R", this.FILE, ".xml$", null, true,
+				null);
 
 	}
 
@@ -44,9 +44,9 @@ public class NewClientWizardPage extends NewWizardPage implements IDialogFieldLi
 		updateStatus();
 	}
 
-	private void updateStatus() {
+	protected void updateStatus() {
 		IStatus status = getStatus(fProjectField, fFacadeField, fPackageField, fNameField, fXmlField);
-		super.updateStatus(status);
+		updateStatus(status);
 
 	}
 

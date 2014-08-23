@@ -85,15 +85,13 @@ public class NewServiceWizardPage extends NewWizardPage {
 		updateStatus();
 	}
 
-	private void updateStatus() {
-
+	protected void updateStatus() {
 		IStatus f = getStatus(this.fServiceProjField, this.fServicePackageField, this.fServiceNameField,
 				this.fImplProjField, this.fImplPackageField, this.fImplNameField, this.fServiceXmlField);
-		super.updateStatus(f);
+		updateStatus(f);
 		if (f.isOK()) {
 			refreshData();
 		}
-
 	}
 
 	private IStatus getStatus(StringDialogField... fields) {

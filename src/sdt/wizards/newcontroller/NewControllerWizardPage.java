@@ -47,14 +47,12 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		updateStatus();
 	}
 
-	private void updateStatus() {
-
+	protected void updateStatus() {
 		IStatus f = getStatus(this.fProjectField, this.fPackageField, this.fNameField);
-		super.updateStatus(f);
+		updateStatus(f);
 		if (f.isOK()) {
 			refreshData();
 		}
-
 	}
 
 	private IStatus getStatus(StringDialogField... fields) {

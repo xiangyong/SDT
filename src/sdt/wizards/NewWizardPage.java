@@ -83,6 +83,8 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 				createStringDialogField(composite, nColumns, (StringDialogField) field);
 			}
 		}
+
+		updateStatus();
 	}
 
 	protected StringButtonDialogField createStringButtonDialogField( //
@@ -146,7 +148,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	}
 
 	// TODO
-	protected void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field,
+	private void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field,
 			boolean editable) {
 		field.doFillIntoGrid(composite, nColumns);
 		Text text = field.getTextControl(composite);
@@ -155,27 +157,31 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		LayoutUtil.setHorizontalGrabbing(text);
 	}
 
-	protected void createStringDialogField(Composite composite, int nColumns, StringDialogField field) {
+	private void createStringDialogField(Composite composite, int nColumns, StringDialogField field) {
 		field.doFillIntoGrid(composite, nColumns - 1);
 		DialogField.createEmptySpace(composite);
 
 		Text text = field.getTextControl(composite);
 		LayoutUtil.setWidthHint(text, getMaxFieldWidth());
 		TextFieldNavigationHandler.install(text);
+		String value = fFieldAndDefault.get(field);
+		if (value != null) {
+			text.setText(value);
+		}
 	}
 
-	protected void createGroupTypeDialogField(Composite composite, int nColumns, GroupTypeField field, String label) {
+	private void createGroupTypeDialogField(Composite composite, int nColumns, GroupTypeField field, String label) {
 		field.doFillIntoGrid(composite, nColumns);
 		if (label != null) {
 			field.setValue(label);
 		}
 	}
 
-	protected void createSeparator(Composite composite, int nColumns, Separator field) {
+	private void createSeparator(Composite composite, int nColumns, Separator field) {
 		field.doFillIntoGrid(composite, nColumns, convertHeightInCharsToPixels(1));
 	}
 
-	protected int getMaxFieldWidth() {
+	private int getMaxFieldWidth() {
 		return convertWidthInCharsToPixels(40);
 	}
 
@@ -200,7 +206,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		}
 	}
 
-	final protected void chooseProject(StringButtonDialogField field) {
+	private void chooseProject(StringButtonDialogField field) {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 
 		List<IProject> filteredPorjects = filterProjects(projects, fFieldAndFilter.get(field));
@@ -219,7 +225,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		}
 	}
 
-	protected List<IProject> filterProjects(IProject[] projects, String filter) {
+	private List<IProject> filterProjects(IProject[] projects, String filter) {
 		List<IProject> f = new ArrayList<IProject>();
 		for (IProject project : projects) {
 			IFolder folder = project.getFolder(SDTPlugin.D_RES);
@@ -252,7 +258,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		return f;
 	}
 
-	final public void choosePackage(StringButtonDialogField packageField) {
+	private void choosePackage(StringButtonDialogField packageField) {
 		IPackageFragmentRoot root = SDTPlugin.getPackageFragmentRoot(fFieldAndParendField.get(packageField)
 				.getText());
 		IJavaElement[] packages = null;
@@ -311,5 +317,8 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	protected void chooseOther(StringButtonDialogField field) {
 	}
 
-	public abstract void refreshData();
+	abstract protected void refreshData();
+
+	abstract protected void updateStatus();
+
 }
