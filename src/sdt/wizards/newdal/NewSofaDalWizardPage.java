@@ -17,13 +17,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
-import org.eclipse.jdt.internal.ui.dialogs.TextFieldNavigationHandler;
-import org.eclipse.jdt.internal.ui.refactoring.contentassist.ControlContentAssistHelper;
-import org.eclipse.jdt.internal.ui.refactoring.contentassist.JavaPackageCompletionProcessor;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
@@ -36,7 +31,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import sdt.NameUtil;
@@ -50,42 +44,37 @@ import sdt.wizards.newdal.NewSofaDalState.Table.Column;
 @SuppressWarnings("restriction")
 public class NewSofaDalWizardPage extends NewWizardPage implements IStringButtonAdapter, IDialogFieldListener {
 
-	@SuppressWarnings("unused")
-	private IStructuredSelection selection;
 	private NewSofaDalState data;
 	private StatusInfo status;
 
-	private GroupTypeField dalDbTypeField;
-	private StringDialogField serverField;
-	private StringDialogField portField;
-	private StringDialogField usernameField;
-	private StringDialogField passwordField;
-	private StringButtonDialogField tableField;
-	private StringButtonDialogField projectField;
-	private StringButtonDialogField packageField;
-	private JavaPackageCompletionProcessor packageCompletionProcessor;
+	private GroupTypeField fDalDbTypeField;
+	private StringDialogField fServerField;
+	private StringDialogField fPortField;
+	private StringDialogField fUsernameField;
+	private StringDialogField fPasswordField;
+	private StringButtonDialogField fTableField;
+	private StringButtonDialogField fProjectField;
+	private StringButtonDialogField fPackageField;
 
 	public NewSofaDalWizardPage(IStructuredSelection selection, NewSofaDalState data) {
-		super("New Sofa Dal");
-		this.selection = selection;
+		super("New Dal");
 		this.data = data;
 		this.status = new StatusInfo();
-		wsroot = ResourcesPlugin.getWorkspace().getRoot();
-		packageCompletionProcessor = new JavaPackageCompletionProcessor();
 
 		int i = 1;
-		dalDbTypeField = new GroupTypeField(SWT.RADIO);
-		dalDbTypeField.setDialogFieldListener(this);
-		dalDbTypeField.setLabels("MySQL");
-		dalDbTypeField.setLabelText("&" + i++ + " Database Type:");
+		fDalDbTypeField = createGroupTypeField("Database:", SWT.RADIO, "MySQL");
 
-		serverField = createStringDialogField(this, "&" + i++ + " Server:");
-		serverField = createStringDialogField(this, "&" + i++ + " Port:");
-		serverField = createStringDialogField(this, "&" + i++ + " Username:");
-		serverField = createStringDialogField(this, "&" + i++ + " Password:");
-		tableField = createStringButtonDialogField(this, this, "&" + i++ + " Table Name:", "Browse &Q");
-		tableField = createStringButtonDialogField(this, this, "&" + i++ + " Project Name:", "Browse &Q");
-		tableField = createStringButtonDialogField(this, this, "&" + i++ + " Package Name:", "Browse &Q");
+		fServerField = createStringDialogField(this, "&" + i++ + " Server:");
+		fPortField = createStringDialogField(this, "&" + i++ + " Port:");
+		fUsernameField = createStringDialogField(this, "&" + i++ + " Username:");
+		fPasswordField = createStringDialogField(this, "&" + i++ + " Password:");
+
+		fTableField = createStringButtonDialogField("&" + i++ + " Table:", "Browse &Q", this.OTHER, null, null,
+				null);
+		fProjectField = createStringButtonDialogField("&" + i++ + " Project:", "Browse &W", this.PROJECT,
+				"-common-dal$", null, null);
+		fPackageField = createStringButtonDialogField("&" + i++ + " Package:", "Browse &E", this.PACKAGE, null,
+				null, fProjectField);
 
 	}
 
@@ -103,25 +92,22 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		int nColumns = 4;
 		layout.numColumns = nColumns;
 
-		dalDbTypeField.doFillIntoGrid(composite, nColumns);
+		fDalDbTypeField.doFillIntoGrid(composite, nColumns);
 
-		createStringDialogField(composite, nColumns, serverField);
-		createStringDialogField(composite, nColumns, portField);
-		createStringDialogField(composite, nColumns, usernameField);
-		createStringDialogField(composite, nColumns, passwordField);
-
-		createSeparator(composite, nColumns);
-
-		createStringButtonDialogField(composite, nColumns, tableField);
+		createStringDialogField(composite, nColumns, fServerField);
+		createStringDialogField(composite, nColumns, fPortField);
+		createStringDialogField(composite, nColumns, fUsernameField);
+		createStringDialogField(composite, nColumns, fPasswordField);
 
 		createSeparator(composite, nColumns);
 
-		createStringButtonDialogField(composite, nColumns, projectField);
+		createStringButtonDialogField(composite, nColumns, fTableField, true);
 
-		createStringButtonDialogField(composite, nColumns, packageField);
-		Text text = packageField.getTextControl(null);
-		ControlContentAssistHelper.createTextContentAssistant(text, packageCompletionProcessor);
-		TextFieldNavigationHandler.install(text);
+		createSeparator(composite, nColumns);
+
+		createStringButtonDialogField(composite, nColumns, fProjectField, false);
+
+		createStringButtonDialogField(composite, nColumns, fPackageField, false);
 
 		handleFieldChanged();
 
@@ -129,28 +115,11 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	private void initPage() {
-		this.dalDbTypeField.setValue("MySQL");
-		this.serverField.setText("localhost");
-		this.portField.setText("3306");
-		this.usernameField.setText("root");
+		this.fDalDbTypeField.setValue("MySQL");
+		this.fServerField.setText("localhost");
+		this.fPortField.setText("3306");
+		this.fUsernameField.setText("root");
 		// this.passwordField.setText("ali88");
-	}
-
-	// TODO IStringButtonAdapter#changeControlPressed
-	@Override
-	public void changeControlPressed(DialogField field) {
-
-		if (field == this.tableField) {
-			Table table = chooseTable();
-			if (table != null) {
-				this.tableField.setText(table.toStr());
-				this.data.fTable = table;
-			}
-		} else if (field == this.projectField) {
-			chooseProject(this.projectField);
-		} else if (field == this.packageField) {
-			choosePackage(this.packageField);
-		}
 	}
 
 	public Connection getConnection() {
@@ -163,10 +132,10 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 				return null;
 
 			String driverName = "com.mysql.jdbc.Driver";
-			String server = this.serverField.getText();
-			String port = this.portField.getText();
-			String username = this.usernameField.getText();
-			String password = this.passwordField.getText();
+			String server = this.fServerField.getText();
+			String port = this.fPortField.getText();
+			String username = this.fUsernameField.getText();
+			String password = this.fPasswordField.getText();
 
 			URLClassLoader classloader = new URLClassLoader(new URL[] { new File(jar).toURI().toURL() });
 			Class<?> clazz = classloader.loadClass(driverName);
@@ -211,14 +180,14 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		}
 	}
 
-	public Table chooseTable() {
+	protected void chooseOther(StringButtonDialogField tableField) {
 		List<Table> tables = new ArrayList<Table>();
 		Statement statement = null;
 		ResultSet rs = null;
 		Connection conn = getConnection();
-		if (conn == null) {
-			return null;
-		}
+		if (conn == null)
+			return;
+
 		try {
 			statement = conn.createStatement();
 			String sql = "select f.TABLE_NAME, f.TABLE_SCHEMA" + " from information_schema.tables f"
@@ -236,7 +205,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			}
 		} catch (SQLException e) {
 			System.err.println("chooseTable 连接出错");
-			return null;
 		} finally {
 			closeDB(conn, statement, rs);
 		}
@@ -249,28 +217,19 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		dialog.setElements(tables.toArray());
 		dialog.setHelpAvailable(false);
 		if (dialog.open() == Window.OK) {
-			return (Table) dialog.getFirstResult();
+			Table table = (Table) dialog.getFirstResult();
+			this.fTableField.setText(table.toStr());
+			this.data.fTable = table;
 		}
-
-		return null;
-	}
-
-	protected List<IProject> filterProjects(IProject[] projects) {
-		List<IProject> f = new ArrayList<IProject>();
-		for (IProject p : super.filterProjects(projects)) {
-			if (p.getName().endsWith("common-dal"))
-				f.add(p);
-		}
-		return f;
 	}
 
 	// TODO IDialogFieldListener#dialogFieldChanged
 	@Override
 	public void dialogFieldChanged(DialogField field) {
-		if (field == this.projectField) {
-			if (this.packageField.getText().isEmpty()) {
-				String system = NameUtil.firstString(this.projectField.getText(), '-');
-				this.packageField.setText("com.alipay." + system + ".common.dal");
+		if (field == this.fProjectField) {
+			if (this.fPackageField.getText().isEmpty()) {
+				String system = NameUtil.firstString(this.fProjectField.getText(), '-');
+				this.fPackageField.setText("com.alipay." + system + ".common.dal");
 			}
 		}
 		handleFieldChanged();
@@ -280,26 +239,26 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	@SuppressWarnings("unchecked")
 	public void handleFieldChanged() {
 
-		if (this.tableField.getText().isEmpty()) {
+		if (this.fTableField.getText().isEmpty()) {
 			status = new StatusInfo(IStatus.ERROR, "请选择 Table");
 			return;
-		} else if (this.projectField.getText().isEmpty()) {
+		} else if (this.fProjectField.getText().isEmpty()) {
 			status = new StatusInfo(IStatus.ERROR, "请选择 Project");
 			return;
-		} else if (this.packageField.getText().isEmpty()) {
+		} else if (this.fPackageField.getText().isEmpty()) {
 			status = new StatusInfo(IStatus.ERROR, "请选择 Package");
 			return;
-		} else if (this.packageField.getText().endsWith(".")) {
+		} else if (this.fPackageField.getText().endsWith(".")) {
 			status = new StatusInfo(IStatus.WARNING, "Package 不合法");
 			return;
 		}
 
-		String project = this.projectField.getText();
+		String project = this.fProjectField.getText();
 		Map context = new HashMap();
 		context.put("projectName", project);
 		context.put("systemName", NameUtil.firstString(project, '-'));
-		context.put("packageRoot", this.packageField.getText());
-		context.put("packageRootDir", this.packageField.getText().replaceAll("[.]", "/"));
+		context.put("packageRoot", this.fPackageField.getText());
+		context.put("packageRootDir", this.fPackageField.getText().replaceAll("[.]", "/"));
 		context.put("table", this.data.fTable);
 		Properties ps = new Properties();
 		try {
@@ -320,6 +279,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		status = new StatusInfo(IStatus.OK, "");
 	}
 
+	// TODO
 	private void doStatusUpdate() {
 		if (this.status == null) {
 			return;
@@ -328,8 +288,8 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	public void refreshData() {
-		this.data.fProject = this.projectField.getText();
-		this.data.fPackage = this.packageField.getText();
+		this.data.fProject = this.fProjectField.getText();
+		this.data.fPackage = this.fPackageField.getText();
 
 		if (this.data == null || this.data.fTable == null) {
 			return;
@@ -376,31 +336,15 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		} finally {
 			closeDB(conn, statement, rs);
 		}
-
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
 		// TODO Auto-generated method stub
-		if (this.data == null || this.tableField.getText().isEmpty() || this.projectField.getText().isEmpty()) {
+		if (this.data == null || this.fTableField.getText().isEmpty() || this.fProjectField.getText().isEmpty()) {
 			return null;
 		}
 		return super.getNextPage();
 	}
 
-	public JavaPackageCompletionProcessor getJavaPackageCompletionProcessor(StringButtonDialogField field) {
-		if (field == this.projectField) {
-			return this.packageCompletionProcessor;
-		}
-
-		return null;
-	}
-
-	public StringButtonDialogField getProjFieldByPkgField(StringButtonDialogField field) {
-		if (field == this.packageField) {
-			return this.projectField;
-		} else {
-			return null;
-		}
-	}
 }

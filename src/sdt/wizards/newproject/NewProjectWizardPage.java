@@ -8,7 +8,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
-import org.eclipse.jdt.internal.ui.refactoring.contentassist.JavaPackageCompletionProcessor;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
@@ -29,18 +28,19 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 
 	private NewProjectState data;
 
-	private StringButtonDialogField typeField;
-	private StringButtonDialogField systemField;
-	private StringDialogField nameField;
+	private StringButtonDialogField fTypeField;
+	private StringButtonDialogField fSystemField;
+	private StringDialogField fNameField;
 
 	public NewProjectWizardPage(NewProjectState data) {
-		super("NewProjectWizard");
+		super("New Project");
 		this.data = data;
 		int i = 1;
 
-		systemField = createStringButtonDialogField(this, this, "&" + i++ + " System Name:", "Browse &E");
-		typeField = createStringButtonDialogField(this, this, "&" + i++ + " Project Type:", "Browse &D");
-		nameField = createStringDialogField(this, "Project Name:");
+		fSystemField = createStringButtonDialogField("&" + i++ + " System:", "Browse &Q", this.OTHER, null, null,
+				null);
+		fTypeField = createStringButtonDialogField("&" + i++ + " Type:", "Browse &W", this.OTHER, null, null, null);
+		fNameField = createStringDialogField(this, "Project Name:");
 
 	}
 
@@ -58,31 +58,17 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 		layout.numColumns = nColumns;
 
 		// TODO
-		createStringButtonDialogField(composite, nColumns, this.systemField);
-		this.systemField.getTextControl(composite).setEditable(false);
-
-		createStringButtonDialogField(composite, nColumns, this.typeField);
-		this.typeField.getTextControl(composite).setEditable(false);
-
-		createStringDialogField(composite, nColumns, this.nameField);
+		createStringButtonDialogField(composite, nColumns, this.fSystemField, false);
+		createStringButtonDialogField(composite, nColumns, this.fTypeField, false);
+		createStringDialogField(composite, nColumns, this.fNameField);
 
 	}
 
 	@Override
-	public JavaPackageCompletionProcessor getJavaPackageCompletionProcessor(StringButtonDialogField field) {
-		return null;
-	}
-
-	@Override
-	public StringButtonDialogField getProjFieldByPkgField(StringButtonDialogField field) {
-		return null;
-	}
-
-	@Override
-	public void changeControlPressed(DialogField field) {
-		if (field == this.typeField) {
+	public void chooseOther(StringButtonDialogField field) {
+		if (field == this.fTypeField) {
 			chooseType();
-		} else if (field == this.systemField) {
+		} else if (field == this.fSystemField) {
 			chooseSystem();
 		}
 	}
@@ -112,15 +98,15 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 		dialog.setHelpAvailable(false);
 
 		if (dialog.open() == Window.OK) {
-			this.systemField.setText(dialog.getFirstResult().toString());
+			this.fSystemField.setText(dialog.getFirstResult().toString());
 		}
 	}
 
 	private void chooseType() {
-		if (this.systemField.getText().isEmpty()) {
+		if (this.fSystemField.getText().isEmpty()) {
 			return;
 		}
-		String system = this.systemField.getText();
+		String system = this.fSystemField.getText();
 
 		List<String> types = new ArrayList<String>();
 		types.add("biz-service-impl");
@@ -151,22 +137,22 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 		dialog.setHelpAvailable(false);
 
 		if (dialog.open() == Window.OK) {
-			this.typeField.setText(dialog.getFirstResult().toString());
+			this.fTypeField.setText(dialog.getFirstResult().toString());
 		}
 	}
 
 	@Override
 	public void dialogFieldChanged(DialogField field) {
-		if (field == this.systemField || field == this.typeField) {
-			String name = this.nameField.getText();
-			if ((name.isEmpty() || name.endsWith("-")) && !this.systemField.getText().isEmpty()
-					&& !this.typeField.getText().isEmpty()) {
-				String type = this.typeField.getText();
+		if (field == this.fSystemField || field == this.fTypeField) {
+			String name = this.fNameField.getText();
+			if ((name.isEmpty() || name.endsWith("-")) && !this.fSystemField.getText().isEmpty()
+					&& !this.fTypeField.getText().isEmpty()) {
+				String type = this.fTypeField.getText();
 				type = type.substring(0, type.indexOf("-"));
-				String nameAuto = this.systemField.getText() + "-" + type + "-";
-				this.nameField.setText(nameAuto);
-				this.nameField.setFocus();
-				this.nameField.getTextControl(null).setSelection(nameAuto.length());
+				String nameAuto = this.fSystemField.getText() + "-" + type + "-";
+				this.fNameField.setText(nameAuto);
+				this.fNameField.setFocus();
+				this.fNameField.getTextControl(null).setSelection(nameAuto.length());
 			}
 		}
 
@@ -175,14 +161,14 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 
 	@Override
 	public void refreshData() {
-		this.data.system = this.systemField.getText();
-		this.data.name = this.nameField.getText();
-		this.data.type = this.typeField.getText();
+		this.data.system = this.fSystemField.getText();
+		this.data.name = this.fNameField.getText();
+		this.data.type = this.fTypeField.getText();
 
-		IProject p = SDTPlugin.getProject(this.systemField.getText() + "-" + this.typeField.getText());
+		IProject p = SDTPlugin.getProject(this.fSystemField.getText() + "-" + this.fTypeField.getText());
 
 		try {
-			String name = this.nameField.getText();
+			String name = this.fNameField.getText();
 			this.data.dir = new File(p.getDescription().getLocationURI()).getParentFile() + File.separator
 					+ name.substring(name.lastIndexOf("-") + 1);
 		} catch (CoreException e) {
@@ -199,29 +185,29 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	public IStatus getStatus() {
-		if (this.systemField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.systemField) + " is Empty");
+		if (this.fSystemField.getText().isEmpty()) {
+			return new StatusInfo(IStatus.ERROR, getLabel(this.fSystemField) + " is Empty");
 		}
-		if (this.typeField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.typeField) + " is Empty");
+		if (this.fTypeField.getText().isEmpty()) {
+			return new StatusInfo(IStatus.ERROR, getLabel(this.fTypeField) + " is Empty");
 		}
-		if (this.nameField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.nameField) + " is Empty");
+		if (this.fNameField.getText().isEmpty()) {
+			return new StatusInfo(IStatus.ERROR, getLabel(this.fNameField) + " is Empty");
 		}
-		if (this.nameField.getText().endsWith("-")) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.nameField) + " is Invalid");
+		if (this.fNameField.getText().endsWith("-")) {
+			return new StatusInfo(IStatus.ERROR, getLabel(this.fNameField) + " is Invalid");
 		}
 		{
-			IProject p = SDTPlugin.getProject(this.nameField.getText());
+			IProject p = SDTPlugin.getProject(this.fNameField.getText());
 			if (p.exists()) {
-				return new StatusInfo(IStatus.ERROR, getLabel(this.nameField) + " is Already Exist");
+				return new StatusInfo(IStatus.ERROR, getLabel(this.fNameField) + " is Already Exist");
 			}
 		}
 		{
-			IProject p = SDTPlugin.getProject(this.systemField.getText() + "-" + this.typeField.getText());
+			IProject p = SDTPlugin.getProject(this.fSystemField.getText() + "-" + this.fTypeField.getText());
 			try {
 				String pl = new File(p.getDescription().getLocationURI()).getParentFile() + File.separator
-						+ this.nameField.getText();
+						+ this.fNameField.getText();
 				if (new File(pl).exists()) {
 					return new StatusInfo(IStatus.ERROR, pl + " is Already Exist");
 				}

@@ -1,22 +1,21 @@
 package sdt.wizards;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.dialogs.TextFieldNavigationHandler;
-import org.eclipse.jdt.internal.ui.refactoring.contentassist.JavaPackageCompletionProcessor;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IStringButtonAdapter;
@@ -35,7 +34,19 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import sdt.SDTPlugin;
 
 @SuppressWarnings("restriction")
-public abstract class NewWizardPage extends NewElementWizardPage {
+public abstract class NewWizardPage extends NewElementWizardPage implements IStringButtonAdapter,
+		IDialogFieldListener {
+
+	protected final short PROJECT = 1; // MAX 1 << 14
+	protected final short PACKAGE = 2;
+	protected final short CLASS = 4;
+	protected final short FILE = 8;
+	protected final short OTHER = 16;
+
+	protected final Map<StringButtonDialogField, Short> fFieldAndType = new HashMap<StringButtonDialogField, Short>();
+	protected final Map<StringButtonDialogField, StringButtonDialogField> fFieldAndParendField = new HashMap<StringButtonDialogField, StringButtonDialogField>();
+	protected final Map<StringButtonDialogField, String> fFieldAndFilter = new HashMap<StringButtonDialogField, String>();
+	protected final Map<StringButtonDialogField, String> fFieldAndRoot = new HashMap<StringButtonDialogField, String>();
 
 	public IWorkspaceRoot wsroot;
 
@@ -48,12 +59,38 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 	public void createControl(Composite parent) {
 	}
 
-	protected StringButtonDialogField createStringButtonDialogField(IStringButtonAdapter adapter,
-			IDialogFieldListener listener, String label, String buttonLabel) {
-		StringButtonDialogField f = new StringButtonDialogField(adapter);
-		f.setDialogFieldListener(listener);
+	protected StringButtonDialogField createStringButtonDialogField( //
+			String label, //
+			String buttonLabel, //
+			short type, //
+			String filter, //
+			String filterRoot, //
+			StringButtonDialogField parentField //
+
+	) {
+		StringButtonDialogField f = new StringButtonDialogField(this);
+		f.setDialogFieldListener(this);
 		f.setLabelText(label);
 		f.setButtonLabel(buttonLabel);
+
+		fFieldAndType.put(f, type);
+		if (filter != null)
+			fFieldAndFilter.put(f, filter);
+
+		if (parentField != null)
+			fFieldAndParendField.put(f, parentField);
+
+		if (filterRoot != null)
+			fFieldAndRoot.put(f, filterRoot);
+
+		return f;
+	}
+
+	protected GroupTypeField createGroupTypeField(String label, int type, String... labels) {
+		GroupTypeField f = new GroupTypeField(type);
+		f.setDialogFieldListener(this);
+		f.setLabels(labels);
+		f.setLabelText(label);
 		return f;
 	}
 
@@ -64,9 +101,11 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 		return f;
 	}
 
-	protected void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field) {
+	protected void createStringButtonDialogField(Composite composite, int nColumns, StringButtonDialogField field,
+			boolean editable) {
 		field.doFillIntoGrid(composite, nColumns);
 		Text text = field.getTextControl(null);
+		text.setEditable(editable);
 		LayoutUtil.setWidthHint(text, getMaxFieldWidth());
 		LayoutUtil.setHorizontalGrabbing(text);
 	}
@@ -78,7 +117,13 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 		Text text = field.getTextControl(null);
 		LayoutUtil.setWidthHint(text, getMaxFieldWidth());
 		TextFieldNavigationHandler.install(text);
+	}
 
+	protected void createGroupTypeDialogField(Composite composite, int nColumns, GroupTypeField field, String label) {
+		field.doFillIntoGrid(composite, nColumns - 1);
+		if (label != null) {
+			field.setValue(label);
+		}
 	}
 
 	protected void createSeparator(Composite composite, int nColumns) {
@@ -90,10 +135,31 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 		return convertWidthInCharsToPixels(40);
 	}
 
+	// TOOD
+	public void changeControlPressed(DialogField field) {
+		switch (fFieldAndType.get(field)) {
+		case PROJECT:
+			chooseProject((StringButtonDialogField) field);
+			break;
+		case PACKAGE:
+			choosePackage((StringButtonDialogField) field);
+			break;
+		case FILE:
+			chooseFile((StringButtonDialogField) field);
+			break;
+		case CLASS:
+			// TODO
+			break;
+		case OTHER:
+			chooseOther((StringButtonDialogField) field);
+			break;
+		}
+	}
+
 	final protected void chooseProject(StringButtonDialogField field) {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 
-		List<IProject> filteredPorjects = filterProjects(projects);
+		List<IProject> filteredPorjects = filterProjects(projects, fFieldAndFilter.get(field));
 
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(),
 				new JavaElementLabelProvider());
@@ -106,16 +172,10 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 		if (dialog.open() == Window.OK) {
 			IProject f = (IProject) dialog.getFirstResult();
 			field.setText(f.getName());
-
-			JavaPackageCompletionProcessor processor = getJavaPackageCompletionProcessor(field);
-			if (processor != null) {
-				IPackageFragmentRoot root = getPackageFragmentRoot(field);
-				processor.setPackageFragmentRoot(root);
-			}
 		}
 	}
 
-	protected List<IProject> filterProjects(IProject[] projects) {
+	protected List<IProject> filterProjects(IProject[] projects, String filter) {
 		List<IProject> f = new ArrayList<IProject>();
 		for (IProject project : projects) {
 			IFolder folder = project.getFolder(SDTPlugin.D_RES);
@@ -126,31 +186,31 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 			if (folder == null || !folder.exists())
 				continue;
 
-			f.add(project);
+			String name = project.getName();
+			if (filter != null) {
+				String key = filter;
+				if (filter.charAt(0) == '^') {
+					key = key.substring(1);
+					if (name.startsWith(key))
+						f.add(project);
+				} else if (filter.charAt(filter.length() - 1) == '$') {
+					key = key.substring(0, key.length() - 1);
+					if (name.endsWith(key))
+						f.add(project);
+				} else {
+					if (name.contains(key))
+						f.add(project);
+				}
+			} else {
+				f.add(project);
+			}
 		}
 		return f;
 	}
 
-	final public IPackageFragmentRoot getPackageFragmentRoot(StringButtonDialogField field) {
-		if (field == null)
-			return null;
-
-		IPackageFragmentRoot f = null;
-		String name = field.getText();
-		IProject p = SDTPlugin.getProject(name);
-		IJavaProject jp = JavaCore.create(p);
-		try {
-			f = jp.findPackageFragmentRoot(new Path("/" + name + "/" + SDTPlugin.D_JAVA));
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-		}
-		return f;
-	}
-
-	public abstract JavaPackageCompletionProcessor getJavaPackageCompletionProcessor(StringButtonDialogField field);
-
-	final public void choosePackage(StringButtonDialogField field) {
-		IPackageFragmentRoot root = getPackageFragmentRoot(getProjFieldByPkgField(field));
+	final public void choosePackage(StringButtonDialogField packageField) {
+		IPackageFragmentRoot root = SDTPlugin.getPackageFragmentRoot(fFieldAndParendField.get(packageField)
+				.getText());
 		IJavaElement[] packages = null;
 		try {
 			packages = root.getChildren();
@@ -172,11 +232,40 @@ public abstract class NewWizardPage extends NewElementWizardPage {
 
 		if (dialog.open() == Window.OK) {
 			IPackageFragment p = (IPackageFragment) dialog.getFirstResult();
-			field.setText(p.getElementName());
+			packageField.setText(p.getElementName());
 		}
 	}
 
-	public abstract StringButtonDialogField getProjFieldByPkgField(StringButtonDialogField field);
+	private void chooseFile(StringButtonDialogField fileField) {
+		String root = fFieldAndRoot.get(fileField);
+		IProject project = SDTPlugin.getProject(fFieldAndParendField.get(fileField).getText());
+		IFolder folder = project.getFolder(root);
+		if (!folder.exists())
+			return;
+
+		List<IResource> f = new ArrayList<IResource>();
+		String filter = fFieldAndFilter.get(fileField);
+		SDTPlugin.findResource(f, folder, filter);
+		if (f.isEmpty())
+			return;
+
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(),
+				new ResourceItemLabelProvider(f));
+		dialog.setIgnoreCase(false);
+		dialog.setTitle("Select File");
+		dialog.setMessage("Select File");
+		dialog.setEmptyListMessage("Select File");
+		dialog.setElements(f.toArray());
+		dialog.setHelpAvailable(false);
+
+		if (dialog.open() == Window.OK) {
+			IResource r = (IResource) dialog.getFirstResult();
+			fileField.setText(r.getFullPath().makeRelativeTo(folder.getFullPath()).toString());
+		}
+	}
+
+	protected void chooseOther(StringButtonDialogField field) {
+	}
 
 	public abstract void refreshData();
 }

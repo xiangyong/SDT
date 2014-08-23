@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -25,6 +26,7 @@ import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -262,10 +264,6 @@ public class SDTPlugin extends AbstractUIPlugin {
 
 	}
 
-	public static IProject getProject(String name) {
-		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-	}
-
 	public static void addProject(IJavaProject from, IJavaProject to) {
 		IClasspathEntry[] entries = null;
 		try {
@@ -340,8 +338,62 @@ public class SDTPlugin extends AbstractUIPlugin {
 		return f;
 	}
 
+	public static void findResource(List<IResource> list, IFolder root, String filter) {
+		IResource[] rs = null;
+		try {
+			rs = root.members();
+			for (IResource r : rs) {
+				if (r.getType() == IFile.FILE) {
+					String name = r.getName();
+					String key = filter;
+					if (filter.charAt(0) == '^') {
+						key = key.substring(1);
+						if (name.startsWith(key))
+							list.add(r);
+					} else if (filter.charAt(filter.length() - 1) == '$') {
+						key = key.substring(0, key.length() - 1);
+						if (name.endsWith(key))
+							list.add(r);
+					} else {
+						if (name.contains(key))
+							list.add(r);
+					}
+				} else if (r.getType() == IFile.FOLDER) {
+					findResource(list, (IFolder) r, filter);
+				}
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static String getPreference(String name) {
 		return getDefault().getPreferenceStore().getString(name);
 	}
 
+	public static IProject getProject(String name) {
+		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+	}
+
+	public static IJavaProject getJavaProject(String name) {
+		IProject p = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+		IJavaProject jp = JavaCore.create(p);
+		return jp;
+	}
+
+	public static IPackageFragmentRoot getPackageFragmentRoot(String javaProjectName) {
+		IPackageFragmentRoot f = null;
+		IJavaProject jp = getJavaProject(javaProjectName);
+
+		try {
+			f = jp.findPackageFragmentRoot(new Path("/" + javaProjectName + "/" + D_JAVA));
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return f;
+	}
+
+	public static IPackageFragment getPackageFragment(String javaProjectName, String packageName) {
+		return getPackageFragmentRoot(javaProjectName).getPackageFragment(packageName);
+	}
 }
