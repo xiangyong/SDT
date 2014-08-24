@@ -23,11 +23,14 @@ public class _ {
 			if (s.startsWith("#")) {
 				js.append(s.substring(1) + "\n");
 			} else {
-				s += "\\n";
+				if (s.endsWith("\\")) {
+					s = s.substring(0, s.length() - 1);
+				} else {
+					s += "\\n";
+				}
 				js.append("_+=\'");
 				js.append(var(s));
-				js.append("';");
-				js.append("\n");
+				js.append("';\n");
 			}
 		}
 		js.append(";_");
@@ -59,7 +62,9 @@ public class _ {
 			if (c == '{') {
 				int j = i + 1;
 				int k = i - 1;
-				if (j < l && Character.isJavaIdentifierStart(f.charAt(j)) && (k >= 0 && f.charAt(k) != '$')) {
+				if ((j < l && Character.isJavaIdentifierStart(f.charAt(j))) //
+						&& (k >= 0 && f.charAt(k) != '$')//
+						|| i == 0) {
 					start = i;
 				}
 			}
