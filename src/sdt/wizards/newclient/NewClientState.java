@@ -2,7 +2,10 @@ package sdt.wizards.newclient;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -42,7 +45,9 @@ public class NewClientState implements NewWizardState {
 		context.put("implPackage", fPackage + ".ipml");
 		context.put("xml", fXml);
 
-		context.put("createXml", !SDTPlugin.getProject(fProject).getFile(SDTPlugin.D_SPRING + "/" + fXml).exists());
+		boolean createXml = !SDTPlugin.getProject(fProject).getFile(SDTPlugin.D_SPRING + "/" + fXml).exists();
+		context.put("createXml", createXml);
+		context.put("X", createXml ? "F" : "M");
 		context.put("type", fType);
 
 		context.put("facade", getFacade());
@@ -50,23 +55,55 @@ public class NewClientState implements NewWizardState {
 
 		Properties ps = new Properties();
 		try {
-			String dalConf = SDTPlugin.getTpl(context, "tpl/client/conf.vm");
+			String dalConf = SDTPlugin.getTpl(context, "tpl/client/confx.vm");
 			ps.load(new ByteArrayInputStream(dalConf.getBytes()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		int i = 0, l = ps.size();
-		Change[] f = new Change[l];
+		Collection<Change> f = new ArrayList<Change>();
 		for (Map.Entry<?, ?> entry : ps.entrySet()) {
 			String key = entry.getKey().toString();
-			IFile file = SDTPlugin.getFile(entry.getValue().toString());
-			String txt = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
-			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-			f[i++] = change;
+			List<String> args = f(entry.getValue().toString());
+
+			char changeAction = args.get(0).charAt(0);
+			IFile file;
+			String text;
+			TextFileChange textChange;
+			switch (changeAction) {
+			case 'F':
+				file = SDTPlugin.getFile(args.get(1));
+				text = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
+				textChange = SDTPlugin.createNewFileChange(file, text);
+				f.add(textChange);
+				break;
+			case 'M':
+				file = SDTPlugin.getFile(args.get(1));
+				text = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
+				textChange = SDTPlugin.createReplaceEdit(file, text, args.subList(2, args.size()).toArray(
+						new String[0]));
+				f.add(textChange);
+				break;
+			case 'D':
+				break;
+			case 'P':
+				break;
+			}
+
 		}
 
-		return f;
+		return f.toArray(new Change[0]);
+	}
+
+	private List<String> f(String line) {
+		List<String> c = new ArrayList<String>();
+		for (String s : line.split(" ")) {
+			String w = s.trim();
+			if (w.isEmpty())
+				continue;
+			c.add(w);
+		}
+		return c;
 	}
 
 	private Facade getFacade() {

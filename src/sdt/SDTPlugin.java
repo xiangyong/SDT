@@ -170,6 +170,69 @@ public class SDTPlugin extends AbstractUIPlugin {
 		return change;
 	}
 
+	public static TextFileChange createReplaceEdit(IFile to, String text, String... param) {
+		String oldText = readFile(to);
+		String newText = f(text, oldText, param);
+
+		// TODO
+		TextFileChange change = new TextFileChange("Merge " + to.getName(), to);
+		MultiTextEdit rootEdit = new MultiTextEdit();
+		rootEdit.addChild(new ReplaceEdit(0, oldText.length(), newText));
+		change.setEdit(rootEdit);
+		change.setTextType(to.getFileExtension());
+		return change;
+	}
+
+	public static String f(String insert, String toText, String... param) {
+
+		if (param.length == 0 || insert == null || toText == null)
+			return toText;
+		String action = param[0], regex = param[1];
+		char c = action.charAt(0);
+
+		StringBuffer f = new StringBuffer(toText);
+		switch (c) {
+		case 'i':
+			if (toText.contains(regex)) {
+				int p = f.indexOf(regex);
+				f.insert(p, insert);
+			}
+			break;
+		case 'a':
+			if (toText.contains(regex)) {
+				int p = f.indexOf(regex);
+				f.insert(p + regex.length(), insert);
+			}
+			break;
+		case 'I': {
+			String start = param[2], end = param[3];
+			if (start != null && end != null && toText.contains(start)) {
+				int startPosition = f.indexOf(start);
+				int endPosition = f.indexOf(end, startPosition);
+				int regexPosition = f.indexOf(regex, startPosition);
+				if (regexPosition < endPosition) {
+					f.insert(startPosition, insert);
+				}
+			}
+		}
+			break;
+		case 'A': {
+			String start = param[2], end = param[3];
+			if (start != null && end != null && toText.contains(start)) {
+				int startPosition = f.indexOf(start);
+				int endPosition = f.indexOf(end, startPosition);
+				int regexPosition = f.indexOf(regex, startPosition);
+				if (regexPosition < endPosition) {
+					f.insert(endPosition + end.length(), insert);
+				}
+			}
+		}
+			break;
+		}
+
+		return f.toString();
+	}
+
 	public static String readFile(IFile file) {
 		InputStream contents = null;
 		InputStreamReader reader = null;

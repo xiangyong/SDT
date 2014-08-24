@@ -83,9 +83,6 @@ public class NewClientWizardPage extends NewWizardPage {
 		if (dialog.open() == Window.OK) {
 			IJavaElement je = (IJavaElement) dialog.getFirstResult();
 			fFacade = je;
-			//			System.err.println(je.getParent().getElementName()); // .class
-			//			System.err.println(je.getParent().getParent().getElementName()); // package
-			//			System.err.println(je.getParent().getParent().getParent().getElementName()); // jar
 			field.setText(je.getElementName());
 		}
 	}
