@@ -3,72 +3,47 @@ package sdt.wizards.newservice;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.TextFileChange;
 
-import sdt.SDTPlugin;
+import sdt.NameUtil;
 import sdt.wizards.NewWizardState;
+import sdt.wizards.change.ChangeEngine;
 
 public class NewServiceState implements NewWizardState {
 
-	public String serviceFile;
-	public String servicePackage;
-	public String serviceName;
+	public String fServiceFile;
+	public String fServicePackage;
+	public String fServiceName;
 
-	public String implFile;
-	public String implPackage;
-	public String implName;
+	public String fImplFile;
+	public String fImplPackage;
+	public String fImplName;
 
-	public String xmlFile;
-	public boolean createXml;
+	public String fXmlFile;
+	public boolean fCreateXml;
 
-	public int serviceType;
+	public int fServiceType;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Change[] computeChanges() {
 		Map context = new HashMap();
-		context.put("servicePackage", servicePackage);
-		context.put("serviceName", serviceName);
-		context.put("implPackage", implPackage);
-		context.put("implName", implName);
-		context.put("createXml", createXml);
-		context.put("serviceType", serviceType);
-		StringBuffer buff = new StringBuffer(this.serviceName);
-		buff.setCharAt(0, Character.toLowerCase(buff.charAt(0)));
-		context.put("objectName", buff);
+		context.put("serviceFile", fServiceFile);
+		context.put("servicePackage", fServicePackage);
+		context.put("serviceName", fServiceName);
+		context.put("objectName", NameUtil.aaaBbbCcc(fServiceName));
 
-		int i = 0, l = 3;
-		Change[] f = new Change[l];
+		context.put("implFile", fImplFile);
+		context.put("implPackage", fImplPackage);
+		context.put("implName", fImplName);
 
-		// xml
-		{
-			IFile file = SDTPlugin.getFile(this.xmlFile);
-			String txt = SDTPlugin.getTpl(context, "tpl/service/xml.vm");
-			TextFileChange change = null;
-			if (this.createXml) {
-				change = SDTPlugin.createNewFileChange(file, txt);
-			} else {
-				change = SDTPlugin.createReplaceEdit(file, txt);
-			}
-			f[i++] = change;
-		}
-		// service
-		{
-			IFile file = SDTPlugin.getFile(this.serviceFile);
-			String txt = SDTPlugin.getTpl(context, "tpl/service/service.vm");
-			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-			f[i++] = change;
-		}
-		// impl
-		{
-			IFile file = SDTPlugin.getFile(this.implFile);
-			String txt = SDTPlugin.getTpl(context, "tpl/service/impl.vm");
-			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-			f[i++] = change;
-		}
-		return f;
+		context.put("xmlFile", fXmlFile);
+		context.put("createXml", fCreateXml);
+		context.put("X", fCreateXml ? "F" : "M");
+
+		context.put("serviceType", fServiceType);
+
+		return ChangeEngine.run(context, "service");
 	}
 
 }

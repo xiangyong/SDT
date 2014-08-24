@@ -1,0 +1,3 @@
+service	=F {serviceFile}
+impl	=F {implFile}
+xml		={X} {xmlFile} i </beans>

@@ -1,9 +1,7 @@
 package {implPackage};
 
-#if(servicePackage==implPackage){
 import {servicePackage}.{serviceName};
 
-#}
 public class {implName} implements {serviceName} {
 	
 }

@@ -124,28 +124,28 @@ public class NewServiceWizardPage extends NewWizardPage {
 
 	protected void refreshData() {
 
-		this.data.serviceFile = SDTPlugin.getPackageFragment(fServiceProjField.getText(), fServicePackageField
-				.getText())
+		this.data.fServiceFile = SDTPlugin.getPackageFragment(fServiceProjField.getText(),
+				fServicePackageField.getText()).getPath()
 				+ "/" + this.fServiceNameField.getText() + ".java";
-		this.data.servicePackage = this.fServicePackageField.getText();
-		this.data.serviceName = this.fServiceNameField.getText();
+		this.data.fServicePackage = this.fServicePackageField.getText();
+		this.data.fServiceName = this.fServiceNameField.getText();
 
-		this.data.implFile = SDTPlugin.getPackageFragment(fImplProjField.getText(), fImplPackageField.getText())
-				.getPath().toString()
+		this.data.fImplFile = SDTPlugin.getPackageFragment(fImplProjField.getText(), fImplPackageField.getText())
+				.getPath()
 				+ "/" + this.fImplNameField.getText() + ".java";
-		this.data.implPackage = this.fImplPackageField.getText();
-		this.data.implName = this.fImplNameField.getText();
+		this.data.fImplPackage = this.fImplPackageField.getText();
+		this.data.fImplName = this.fImplNameField.getText();
 
 		IFolder f = SDTPlugin.getProject(this.fImplProjField.getText()).getFolder(SDTPlugin.D_SPRING);
 		IResource r = f.findMember(this.fServiceXmlField.getText());
 		if (r == null || !r.exists()) {
-			this.data.createXml = true;
-			this.data.xmlFile = f.getFullPath().toString() + "/" + this.fServiceXmlField.getText();
+			this.data.fCreateXml = true;
+			this.data.fXmlFile = f.getFullPath().toString() + "/" + this.fServiceXmlField.getText();
 		} else {
-			this.data.xmlFile = r.getFullPath().toString();
+			this.data.fXmlFile = r.getFullPath().toString();
 		}
 
-		this.data.serviceType = this.fServiceTypeField.getValue();
+		this.data.fServiceType = this.fServiceTypeField.getValue();
 
 	}
 }

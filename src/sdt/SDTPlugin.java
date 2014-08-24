@@ -39,7 +39,6 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -124,114 +123,7 @@ public class SDTPlugin extends AbstractUIPlugin {
 		return null;
 	}
 
-	public static TextFileChange createNewFileChange(IFile targetFile, String contents) {
-		String fileName = targetFile.getName();
-		String message;
-		if (targetFile.exists()) {
-			message = String.format("Replace %1$s", new Object[] { fileName });
-		} else {
-			message = String.format("Create %1$s", new Object[] { fileName });
-		}
-		TextFileChange change = new TextFileChange(message, targetFile) {
-			protected IDocument acquireDocument(IProgressMonitor pm) throws CoreException {
-				IDocument document = super.acquireDocument(pm);
-				if (document.getLength() > 0) {
-					try {
-						document.replace(0, document.getLength(), "");
-					} catch (BadLocationException localBadLocationException) {
-						localBadLocationException.printStackTrace();
-					}
-				}
-				return document;
-			}
-		};
 
-		change.setTextType(targetFile.getFileExtension());
-
-		MultiTextEdit rootEdit = new MultiTextEdit();
-		rootEdit.addChild(new InsertEdit(0, contents));
-		change.setEdit(rootEdit);
-
-		return change;
-	}
-
-	public static TextFileChange createReplaceEdit(IFile to, String serviceXml) {
-		String fragment = serviceXml;
-
-		String currentXml = readFile(to);
-
-		String contents = currentXml.replace("</beans>", fragment + "\n</beans>");
-		// TODO
-		TextFileChange change = new TextFileChange("Merge " + to.getName(), to);
-		MultiTextEdit rootEdit = new MultiTextEdit();
-		rootEdit.addChild(new ReplaceEdit(0, currentXml.length(), contents));
-		change.setEdit(rootEdit);
-		change.setTextType(to.getFileExtension());
-		return change;
-	}
-
-	public static TextFileChange createReplaceEdit(IFile to, String text, String... param) {
-		String oldText = readFile(to);
-		String newText = f(text, oldText, param);
-
-		// TODO
-		TextFileChange change = new TextFileChange("Merge " + to.getName(), to);
-		MultiTextEdit rootEdit = new MultiTextEdit();
-		rootEdit.addChild(new ReplaceEdit(0, oldText.length(), newText));
-		change.setEdit(rootEdit);
-		change.setTextType(to.getFileExtension());
-		return change;
-	}
-
-	public static String f(String insert, String toText, String... param) {
-
-		if (param.length == 0 || insert == null || toText == null)
-			return toText;
-		String action = param[0], regex = param[1];
-		char c = action.charAt(0);
-
-		StringBuffer f = new StringBuffer(toText);
-		switch (c) {
-		case 'i':
-			if (toText.contains(regex)) {
-				int p = f.indexOf(regex);
-				f.insert(p, insert);
-			}
-			break;
-		case 'a':
-			if (toText.contains(regex)) {
-				int p = f.indexOf(regex);
-				f.insert(p + regex.length(), insert);
-			}
-			break;
-		case 'I': {
-			String start = param[2], end = param[3];
-			if (start != null && end != null && toText.contains(start)) {
-				int startPosition = f.indexOf(start);
-				int endPosition = f.indexOf(end, startPosition);
-				int regexPosition = f.indexOf(regex, startPosition);
-				if (regexPosition < endPosition) {
-					f.insert(startPosition, insert);
-				}
-			}
-		}
-			break;
-		case 'A': {
-			String start = param[2], end = param[3];
-			if (start != null && end != null && toText.contains(start)) {
-				int startPosition = f.indexOf(start);
-				int endPosition = f.indexOf(end, startPosition);
-				int regexPosition = f.indexOf(regex, startPosition);
-				if (regexPosition < endPosition) {
-					f.insert(endPosition + end.length(), insert);
-				}
-			}
-		}
-			break;
-		}
-
-		return f.toString();
-	}
 
 	public static String readFile(IFile file) {
 		InputStream contents = null;

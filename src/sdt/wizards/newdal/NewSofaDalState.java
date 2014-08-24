@@ -1,20 +1,15 @@
 package sdt.wizards.newdal;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.TextFileChange;
 
 import sdt.NameUtil;
-import sdt.SDTPlugin;
 import sdt.wizards.NewWizardState;
+import sdt.wizards.change.ChangeEngine;
 
 public class NewSofaDalState implements NewWizardState {
 
@@ -29,29 +24,11 @@ public class NewSofaDalState implements NewWizardState {
 		context.put("systemName", NameUtil.firstString(fProject, '-'));
 
 		context.put("packageRoot", fPackage);
-		context.put("packageRootDir", fPackage.replaceAll("[.]", "/"));
+		context.put("packageRootDir", fPackage.replace('.', '/'));
 
 		context.put("table", fTable);
 
-		Properties ps = new Properties();
-		try {
-			String dalConf = SDTPlugin.getTpl(context, "tpl/dal/conf.vm");
-			ps.load(new ByteArrayInputStream(dalConf.getBytes()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		int i = 0, l = ps.size();
-		Change[] f = new Change[l];
-		for (Map.Entry<?, ?> entry : ps.entrySet()) {
-			String key = entry.getKey().toString();
-			IFile file = SDTPlugin.getFile(entry.getValue().toString());
-			String txt = SDTPlugin.getTpl(context, "tpl/dal/" + key + ".vm");
-			TextFileChange change = SDTPlugin.createNewFileChange(file, txt);
-			f[i++] = change;
-		}
-
-		return f;
+		return ChangeEngine.run(context, "dal");
 	}
 
 	public static class Table {

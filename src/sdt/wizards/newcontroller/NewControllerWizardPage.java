@@ -52,7 +52,7 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		if (f != null)
 			return f;
 
-		IPackageFragment p = SDTPlugin.getPackageFragment(fProjectField.getText(), this.fPackageField.getText());
+		IPackageFragment p = SDTPlugin.getPackageFragment(fProjectField.getText(), fPackageField.getText());
 		if (p != null && p.exists()) {
 			ICompilationUnit cu = p.getCompilationUnit(fNameField.getText() + ".java");
 			if (cu != null && cu.exists()) {
@@ -71,7 +71,7 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 		}
 
 		this.data.fFile = SDTPlugin.getPackageFragmentRoot(fProjectField.getText()).getPackageFragment(
-				this.fPackageField.getText()).getPath().toString()
+				this.fPackageField.getText()).getPath()
 				+ "/" + className + ".java";
 		this.data.fPackage = this.fPackageField.getText();
 		this.data.fName = this.fNameField.getText();
