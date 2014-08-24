@@ -53,7 +53,7 @@ public class NewClientWizardPage extends NewWizardPage {
 		fNameField = createStringDialogField(this, "&" + i++ + " Name:", null);
 		fXmlField = createStringButtonDialogField("&" + i++ + " Xml:", "Browse &R", this.FILE, ".xml$",
 				SDTPlugin.D_SPRING, true, fProjectField);
-		fTypeField = createGroupTypeField("&" + i++ + " Service Type:", SWT.RADIO, "W&S", "W&S", "T&R");
+		fTypeField = createGroupTypeField("&" + i++ + " Service Type:", SWT.RADIO, "W&S", "W&S", "&TR");
 
 	}
 
