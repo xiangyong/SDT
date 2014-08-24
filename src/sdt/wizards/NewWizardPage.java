@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
+import org.eclipse.jdt.internal.ui.dialogs.StatusInfo;
 import org.eclipse.jdt.internal.ui.dialogs.TextFieldNavigationHandler;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.DialogField;
 import org.eclipse.jdt.internal.ui.wizards.dialogfields.IDialogFieldListener;
@@ -52,6 +53,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	protected final Map<StringButtonDialogField, String> fFieldAndRoot = new HashMap<StringButtonDialogField, String>();
 	protected final Map<DialogField, Boolean> fFieldAndEditable = new HashMap<DialogField, Boolean>();
 	protected final Map<DialogField, String> fFieldAndDefault = new HashMap<DialogField, String>();
+	protected final Map<DialogField, Object> fFieldAndResult = new HashMap<DialogField, Object>();
 
 	private final Collection<DialogField> fFields = new ArrayList<DialogField>();
 	public IWorkspaceRoot wsroot;
@@ -183,7 +185,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	}
 
 	private int getMaxFieldWidth() {
-		return convertWidthInCharsToPixels(40);
+		return convertWidthInCharsToPixels(63); // ÐÞ¸Ä¿í¶È
 	}
 
 	// TOOD
@@ -222,6 +224,7 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		dialog.setHelpAvailable(false);
 		if (dialog.open() == Window.OK) {
 			IProject f = (IProject) dialog.getFirstResult();
+			fFieldAndResult.put(field, f);
 			field.setText(f.getName());
 		}
 	}
@@ -269,7 +272,15 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 			JavaPlugin.log(e);
 		}
 		if (packages == null) {
-			packages = new IJavaElement[0];
+			packages = new IPackageFragment[0];
+		}
+
+		Collection<IPackageFragment> c = new ArrayList<IPackageFragment>();
+		for (IJavaElement je : packages) {
+			IPackageFragment pf = (IPackageFragment) je;
+			if (pf.isDefaultPackage())
+				continue;
+			c.add(pf);
 		}
 
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(),
@@ -278,12 +289,13 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		dialog.setTitle("choose a package");
 		dialog.setMessage("choose a package");
 		dialog.setEmptyListMessage("choose a package");
-		dialog.setElements(packages);
+		dialog.setElements(c.toArray());
 		dialog.setHelpAvailable(false);
 
 		if (dialog.open() == Window.OK) {
-			IPackageFragment p = (IPackageFragment) dialog.getFirstResult();
-			packageField.setText(p.getElementName());
+			IPackageFragment f = (IPackageFragment) dialog.getFirstResult();
+			fFieldAndResult.put(packageField, f);
+			packageField.setText(f.getElementName());
 		}
 	}
 
@@ -294,24 +306,25 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		if (!folder.exists())
 			return;
 
-		List<IResource> f = new ArrayList<IResource>();
+		List<IResource> list = new ArrayList<IResource>();
 		String filter = fFieldAndFilter.get(fileField);
-		SDTPlugin.findResource(f, folder, filter);
-		if (f.isEmpty())
+		SDTPlugin.findResource(list, folder, filter);
+		if (list.isEmpty())
 			return;
 
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(),
-				new ResourceItemLabelProvider(f));
+				new ResourceItemLabelProvider(list));
 		dialog.setIgnoreCase(false);
 		dialog.setTitle("Select File");
 		dialog.setMessage("Select File");
 		dialog.setEmptyListMessage("Select File");
-		dialog.setElements(f.toArray());
+		dialog.setElements(list.toArray());
 		dialog.setHelpAvailable(false);
 
 		if (dialog.open() == Window.OK) {
-			IResource r = (IResource) dialog.getFirstResult();
-			fileField.setText(r.getFullPath().makeRelativeTo(folder.getFullPath()).toString());
+			IResource f = (IResource) dialog.getFirstResult();
+			fFieldAndResult.put(fileField, f);
+			fileField.setText(f.getFullPath().makeRelativeTo(folder.getFullPath()).toString());
 		}
 	}
 
@@ -324,6 +337,20 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 		if (f.isOK()) {
 			refreshData();
 		}
+	}
+
+	protected IStatus getStatus(StringDialogField... fields) {
+		for (StringDialogField field : fields) {
+			if (field.getText().isEmpty()) {
+				String m = "\"" + field.getLabelControl(null).getText() + "\" is Emply";
+				if (field instanceof StringButtonDialogField) {
+					m = m + ", Using \"" + ((StringButtonDialogField) field).getChangeControl(null).getText()
+							+ "\" to choose one";
+				}
+				return new StatusInfo(IStatus.ERROR, m);
+			}
+		}
+		return null;
 	}
 
 	abstract protected void refreshData();

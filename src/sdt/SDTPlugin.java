@@ -30,6 +30,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
@@ -395,5 +396,47 @@ public class SDTPlugin extends AbstractUIPlugin {
 
 	public static IPackageFragment getPackageFragment(String javaProjectName, String packageName) {
 		return getPackageFragmentRoot(javaProjectName).getPackageFragment(packageName);
+	}
+
+	public static String getJavaType(String type) {
+		char c = type.charAt(0);
+
+		switch (c) {
+		case Signature.C_ARRAY:
+			return Signature.getElementType(type) + "[] " + type.substring(1, type.length() - 1);
+		case Signature.C_RESOLVED:
+			return type.substring(1, type.length() - 1);
+		case Signature.C_UNRESOLVED:
+			break;
+		case Signature.C_TYPE_VARIABLE:
+			break;
+		case Signature.C_BOOLEAN:
+			return "boolean ";
+		case Signature.C_BYTE:
+			return "byte ";
+		case Signature.C_CHAR:
+			return "char ";
+		case Signature.C_DOUBLE:
+			return "double ";
+		case Signature.C_FLOAT:
+			return "float ";
+		case Signature.C_INT:
+			return "int ";
+		case Signature.C_LONG:
+			return "long ";
+		case Signature.C_SHORT:
+			return "short ";
+		case Signature.C_VOID:
+			return "void ";
+		case Signature.C_STAR:
+		case Signature.C_SUPER:
+		case Signature.C_EXTENDS:
+			break;
+		case Signature.C_CAPTURE:
+			break;
+		default:
+			return null;
+		}
+		return null;
 	}
 }

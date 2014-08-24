@@ -155,18 +155,13 @@ public class NewProjectWizardPage extends NewWizardPage implements IStringButton
 	}
 
 	protected IStatus getStatus() {
-		if (this.fSystemField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.fSystemField) + " is Empty");
-		}
-		if (this.fTypeField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.fTypeField) + " is Empty");
-		}
-		if (this.fNameField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, getLabel(this.fNameField) + " is Empty");
-		}
-		if (this.fNameField.getText().endsWith("-")) {
+		IStatus f = getStatus(fSystemField, fTypeField, fNameField);
+		if (f != null)
+			return f;
+
+		if (this.fNameField.getText().endsWith("-"))
 			return new StatusInfo(IStatus.ERROR, getLabel(this.fNameField) + " is Invalid");
-		}
+
 		{
 			IProject p = SDTPlugin.getProject(this.fNameField.getText());
 			if (p.exists()) {

@@ -1,0 +1,19 @@
+package {implPackage};
+
+#for(i in facade.imports) {
+import {facade.imports[i]};
+# }
+import {clientPackage}.{client};
+
+public class {impl} implements {client} {
+
+	private {facade.name} {facade.objectName};
+
+#for(i in facade.methods){
+#	m=facade.methods[i];
+	public {m.rt} {m.name} ({m.pts}) {
+		return {facade.objectName}.{m.name}({m.pns});	
+	}
+
+# }
+}

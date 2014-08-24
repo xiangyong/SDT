@@ -1,0 +1,10 @@
+package {clientPackage};
+
+public interface {client} {
+
+#for(i in facade.methods){
+#	m=facade.methods[i];
+	public {m.rt} {m.name} ({m.pts});
+	
+# }
+}

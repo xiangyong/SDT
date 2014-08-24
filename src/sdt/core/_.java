@@ -14,19 +14,20 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 public class _ {
-	@SuppressWarnings("unchecked")
-	public static String f(String txt, Map ctx) {
+
+	public static String f(String txt, Map<String, ?> ctx) {
 		String[] ss = txt.split("\n");
 		StringBuffer js = new StringBuffer("_='';");
 		for (String s : ss) {
 			s = s.replaceAll("\\'", "\\\\\\'");
 			if (s.startsWith("#")) {
-				js.append(s.substring(1));
+				js.append(s.substring(1) + "\n");
 			} else {
 				s += "\\n";
 				js.append("_+=\'");
 				js.append(var(s));
 				js.append("';");
+				js.append("\n");
 			}
 		}
 		js.append(";_");

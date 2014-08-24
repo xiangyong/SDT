@@ -48,26 +48,16 @@ public class NewControllerWizardPage extends NewWizardPage implements IStringBut
 	}
 
 	protected IStatus getStatus() {
-		for (StringDialogField field : new StringDialogField[] { fPackageField, fPackageField, fNameField }) {
-			if (field.getText().isEmpty()) {
-				String m = "\"" + field.getLabelControl(null).getText() + "\" is Emply";
-				if (field instanceof StringButtonDialogField) {
-					m = m + ", Using \"" + ((StringButtonDialogField) field).getChangeControl(null).getText()
-							+ "\" to choose one";
-				}
-				return new StatusInfo(IStatus.ERROR, m);
-			}
-		}
+		IStatus f = getStatus(fPackageField, fPackageField, fNameField);
+		if (f != null)
+			return f;
 
-		{
-			IPackageFragment p = SDTPlugin
-					.getPackageFragment(fProjectField.getText(), this.fPackageField.getText());
-			if (p != null && p.exists()) {
-				ICompilationUnit cu = p.getCompilationUnit(fNameField.getText() + ".java");
-				if (cu != null && cu.exists()) {
-					return new StatusInfo(IStatus.ERROR, "\"" + fNameField.getLabelControl(null).getText()
-							+ "\" is already exist");
-				}
+		IPackageFragment p = SDTPlugin.getPackageFragment(fProjectField.getText(), this.fPackageField.getText());
+		if (p != null && p.exists()) {
+			ICompilationUnit cu = p.getCompilationUnit(fNameField.getText() + ".java");
+			if (cu != null && cu.exists()) {
+				return new StatusInfo(IStatus.ERROR, "\"" + fNameField.getLabelControl(null).getText()
+						+ "\" is already exist");
 			}
 		}
 

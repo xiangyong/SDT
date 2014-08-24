@@ -22,10 +22,9 @@ public class NewSofaDalState implements NewWizardState {
 	public String fProject;
 	public String fPackage;
 
-	@SuppressWarnings("unchecked")
 	public Change[] computeChanges() {
 
-		Map context = new HashMap();
+		Map<String, Object> context = new HashMap<String, Object>();
 		context.put("projectName", fProject);
 		context.put("systemName", NameUtil.firstString(fProject, '-'));
 
@@ -44,7 +43,7 @@ public class NewSofaDalState implements NewWizardState {
 
 		int i = 0, l = ps.size();
 		Change[] f = new Change[l];
-		for (Map.Entry entry : ps.entrySet()) {
+		for (Map.Entry<?, ?> entry : ps.entrySet()) {
 			String key = entry.getKey().toString();
 			IFile file = SDTPlugin.getFile(entry.getValue().toString());
 			String txt = SDTPlugin.getTpl(context, "tpl/dal/" + key + ".vm");

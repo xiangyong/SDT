@@ -86,17 +86,10 @@ public class NewServiceWizardPage extends NewWizardPage {
 	}
 
 	protected IStatus getStatus() {
-		for (StringDialogField field : new StringDialogField[] { fServiceProjField, fServicePackageField,
-				fServiceNameField, fImplProjField, fImplPackageField, fImplNameField, fServiceXmlField }) {
-			if (field.getText().isEmpty()) {
-				String m = "\"" + field.getLabelControl(null).getText() + "\" is Emply";
-				if (field instanceof StringButtonDialogField) {
-					m = m + ", Using \"" + ((StringButtonDialogField) field).getChangeControl(null).getText()
-							+ "\" to choose one";
-				}
-				return new StatusInfo(IStatus.ERROR, m);
-			}
-		}
+		IStatus f = getStatus(fServiceProjField, fServicePackageField, fServiceNameField, fImplProjField,
+				fImplPackageField, fImplNameField, fServiceXmlField);
+		if (f != null)
+			return f;
 
 		{
 			IPackageFragment p = SDTPlugin.getPackageFragment(fServiceProjField.getText(), fServicePackageField

@@ -194,13 +194,11 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			return this.status;
 		}
 
-		if (this.fTableField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, "请选择 Table");
-		} else if (this.fProjectField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, "请选择 Project");
-		} else if (this.fPackageField.getText().isEmpty()) {
-			return new StatusInfo(IStatus.ERROR, "请选择 Package");
-		} else if (this.fPackageField.getText().endsWith(".")) {
+		IStatus f = getStatus(fTableField, fProjectField, fPackageField);
+		if (f != null)
+			return f;
+
+		if (this.fPackageField.getText().endsWith(".")) {
 			return new StatusInfo(IStatus.WARNING, "Package 不合法");
 		}
 

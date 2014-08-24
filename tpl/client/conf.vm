@@ -1,0 +1,3 @@
+xml		={project}/src/main/resources/spring/{xml}
+impl	={project}/src/main/java/{packageDir}/impl/{impl}.java
+client	={project}/src/main/java/{packageDir}/{client}.java
