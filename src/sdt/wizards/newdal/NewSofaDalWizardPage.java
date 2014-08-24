@@ -59,7 +59,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	public NewSofaDalWizardPage(IStructuredSelection selection, NewSofaDalState data) {
 		super("New Dal");
 		this.data = data;
-		this.status = new StatusInfo();
+		this.status = new StatusInfo(IStatus.OK, "");
 
 		int i = 1;
 		fDalDbTypeField = createGroupTypeField("Database:", SWT.RADIO, "MySQL", "MySQL");
@@ -190,25 +190,29 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		dialog.setHelpAvailable(false);
 		if (dialog.open() == Window.OK) {
 			Table table = (Table) dialog.getFirstResult();
-			this.fTableField.setText(table.toStr());
 			this.data.fTable = table;
+			this.fTableField.setText(table.toStr());
 		}
 	}
 
 	// TODO IDialogFieldListener#dialogFieldChanged
 	@Override
 	public void dialogFieldChanged(DialogField field) {
+		if (field == fDalDbTypeField || field == fServerField || field == fPortField || field == fUsernameField
+				|| field == fPasswordField) {
+			return;
+		}
 		if (field == this.fProjectField && this.fPackageField.getText().isEmpty()) {
 			String system = NameUtil.firstString(this.fProjectField.getText(), '-');
 			this.fPackageField.setText("com.alipay." + system + ".common.dal");
-		} else {
-			updateStatus();
 		}
+		updateStatus();
+
 	}
 
 	@SuppressWarnings("unchecked")
 	protected IStatus getStatus() {
-		if (this.status != null || this.status.isError()) {
+		if (this.status != null && this.status.isError()) {
 			return this.status;
 		}
 
