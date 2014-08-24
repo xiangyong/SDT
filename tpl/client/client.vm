@@ -1,5 +1,9 @@
 package {clientPackage};
 
+#for(i in facade.imports) {
+import {facade.imports[i]};
+# }
+
 public interface {client} {
 
 #for(i in facade.methods){

@@ -6,7 +6,7 @@ public class CreatePackageChange extends CreateDirChange {
 	private String pkg;
 
 	public CreatePackageChange(String root, String pkg) {
-		super(root + "/" + pkg.replaceAll("[.]", "/"));
+		super(root + "/" + pkg.replace('.', '/'));
 		this.root = root;
 		this.pkg = pkg;
 	}

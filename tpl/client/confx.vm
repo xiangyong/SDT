@@ -1,6 +1,0 @@
-xml		={X} {project}/src/main/resources/META-INF/spring/{xml} i </beans>
-impl	=F {project}/src/main/java/{packageDir}/impl/{impl}.java
-client	=F {project}/src/main/java/{packageDir}/{client}.java
-
-package =P {project}/src/main/java com.alipay.{system}.joke
-sql		=D {project}/src/main/resources/sqlxxx

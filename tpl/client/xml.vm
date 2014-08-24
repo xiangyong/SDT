@@ -13,7 +13,7 @@
          http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd"
 	default-autowire="byName">
 # }
-	<sofa:reference id="{client}" interface="{facade.fullName}">
+	<sofa:reference id="{facade.objectName}" interface="{facade.fullName}">
 #if(type==1)	{
 		<sofa:binding.ws testURL="{vip}">
 			<attributes http.connection.manager.timeout="1000" http.connection.timeout="2000" http.timeout="3000"
@@ -28,8 +28,8 @@
 		</sofa:binding.tr>
 # }
 	</sofa:reference>
-	<bean id="{client}" class="{implPackage}.{impl}" />
-	<sofa:service ref="{client}" interface="{clientPackage}.{client}" />
+	<bean id="{clientObjectName}" class="{implPackage}.{impl}" />
+	<sofa:service ref="{clientObjectName}" interface="{clientPackage}.{client}" />
 
 # if(createXml){
 </beans>

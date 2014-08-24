@@ -3,6 +3,7 @@ package {implPackage};
 #for(i in facade.imports) {
 import {facade.imports[i]};
 # }
+import {facade.fullName};
 import {clientPackage}.{client};
 
 public class {impl} implements {client} {
@@ -16,4 +17,8 @@ public class {impl} implements {client} {
 	}
 
 # }
+	public void set{facade.name}({facade.name} {facade.objectName}){
+		this.{facade.objectName} = {facade.objectName};
+	}
+
 }

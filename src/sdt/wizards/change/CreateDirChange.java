@@ -1,7 +1,5 @@
 package sdt.wizards.change;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -13,20 +11,20 @@ import org.eclipse.ltk.core.refactoring.resource.DeleteResourceChange;
 import sdt.SDTPlugin;
 
 public class CreateDirChange extends Change {
-	protected IFolder folder;
+	protected IFolder fFolder;
 
 	public CreateDirChange(String name) {
-		this.folder = SDTPlugin.getFolder(name);
+		this.fFolder = SDTPlugin.getFolder(name);
 	}
 
 	@Override
 	public Object getModifiedElement() {
-		return folder;
+		return fFolder;
 	}
 
 	@Override
 	public String getName() {
-		return folder.getName() + "/ - " + folder.getParent().getFullPath().makeRelative();
+		return fFolder.getName() + "/ - " + fFolder.getParent().getFullPath().makeRelative();
 	}
 
 	@Override
@@ -40,7 +38,16 @@ public class CreateDirChange extends Change {
 
 	@Override
 	public Change perform(IProgressMonitor pm) throws CoreException {
-		new File(folder.getLocationURI().getPath()).mkdirs();
-		return new DeleteResourceChange(folder.getFullPath(), true);
+		String p = fFolder.getFullPath().toString();
+		String[] ss = p.split("/");
+		String s = ss[1];
+		for (int i = 2; i < ss.length; i++) {
+			s += "/" + ss[i];
+			IFolder f = SDTPlugin.getFolder('/' + s);
+			if (!f.exists())
+				f.create(true, true, pm);
+		}
+
+		return new DeleteResourceChange(fFolder.getFullPath(), true);
 	}
 }

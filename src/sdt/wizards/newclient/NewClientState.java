@@ -1,30 +1,21 @@
 package sdt.wizards.newclient;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.TextFileChange;
 
 import sdt.NameUtil;
 import sdt.SDTPlugin;
 import sdt.wizards.NewWizardState;
-import sdt.wizards.change.CreateDirChange;
-import sdt.wizards.change.CreatePackageChange;
+import sdt.wizards.change.ChangeEngine;
 
 public class NewClientState implements NewWizardState {
 
@@ -44,8 +35,9 @@ public class NewClientState implements NewWizardState {
 		context.put("packageDir", fPackage.replace('.', '/'));
 		context.put("clientPackage", fPackage);
 		context.put("client", fName);
-		context.put("impl", fName + "Ipml");
-		context.put("implPackage", fPackage + ".ipml");
+		context.put("clientObjectName", NameUtil.aaaBbbCcc(fName));
+		context.put("impl", fName + "Impl");
+		context.put("implPackage", fPackage + ".impl");
 		context.put("xml", fXml);
 
 		boolean createXml = !SDTPlugin.getProject(fProject).getFile(SDTPlugin.D_SPRING + "/" + fXml).exists();
@@ -56,61 +48,7 @@ public class NewClientState implements NewWizardState {
 		context.put("facade", getFacade());
 		context.put("vip", getVip());
 
-		Properties ps = new Properties();
-		try {
-			String dalConf = SDTPlugin.getTpl(context, "tpl/client/confx.vm");
-			ps.load(new ByteArrayInputStream(dalConf.getBytes()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Collection<Change> f = new ArrayList<Change>();
-		for (Map.Entry<?, ?> entry : ps.entrySet()) {
-			String key = entry.getKey().toString();
-			List<String> args = f(entry.getValue().toString());
-
-			char changeAction = args.get(0).charAt(0);
-			IFile file;
-			String text;
-			Change change;
-			switch (changeAction) {
-			case 'F':
-				file = SDTPlugin.getFile(args.get(1));
-				text = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
-				change = SDTPlugin.createNewFileChange(file, text);
-				f.add(change);
-				break;
-			case 'M':
-				file = SDTPlugin.getFile(args.get(1));
-				text = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
-				change = SDTPlugin.createReplaceEdit(file, text, args.subList(2, args.size())
-						.toArray(new String[0]));
-				f.add(change);
-				break;
-			case 'D':
-				change = new CreateDirChange(args.get(1));
-				f.add(change);
-				break;
-			case 'P':
-				change = new CreatePackageChange(args.get(1), args.get(2));
-				f.add(change);
-				break;
-			}
-
-		}
-
-		return f.toArray(new Change[0]);
-	}
-
-	private List<String> f(String line) {
-		List<String> c = new ArrayList<String>();
-		for (String s : line.split(" ")) {
-			String w = s.trim();
-			if (w.isEmpty())
-				continue;
-			c.add(w);
-		}
-		return c;
+		return ChangeEngine.run(context, "client");
 	}
 
 	private Facade getFacade() {
@@ -124,10 +62,9 @@ public class NewClientState implements NewWizardState {
 
 			// fullName
 			f.fullName = facade.getFullyQualifiedName();
-			Set<String> imports = new TreeSet<String>();
-			imports.add(f.fullName);
 
 			// methods
+			Set<String> imports = new TreeSet<String>();
 			IMethod[] imds = facade.getMethods();
 			f.methods = new Method[imds.length];
 			for (int j = 0; j < imds.length; j++) {
