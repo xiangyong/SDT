@@ -23,6 +23,8 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import sdt.NameUtil;
 import sdt.SDTPlugin;
 import sdt.wizards.NewWizardState;
+import sdt.wizards.change.CreateDirChange;
+import sdt.wizards.change.CreatePackageChange;
 
 public class NewClientState implements NewWizardState {
 
@@ -37,6 +39,7 @@ public class NewClientState implements NewWizardState {
 	public Change[] computeChanges() {
 		// NewTypeWizardPage: createInheritedMethods: 2482
 		Map<String, Object> context = new HashMap<String, Object>();
+		context.put("system", NameUtil.firstString(fProject, '-'));
 		context.put("project", fProject);
 		context.put("packageDir", fPackage.replace('.', '/'));
 		context.put("clientPackage", fPackage);
@@ -69,24 +72,28 @@ public class NewClientState implements NewWizardState {
 			char changeAction = args.get(0).charAt(0);
 			IFile file;
 			String text;
-			TextFileChange textChange;
+			Change change;
 			switch (changeAction) {
 			case 'F':
 				file = SDTPlugin.getFile(args.get(1));
 				text = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
-				textChange = SDTPlugin.createNewFileChange(file, text);
-				f.add(textChange);
+				change = SDTPlugin.createNewFileChange(file, text);
+				f.add(change);
 				break;
 			case 'M':
 				file = SDTPlugin.getFile(args.get(1));
 				text = SDTPlugin.getTpl(context, "tpl/client/" + key + ".vm");
-				textChange = SDTPlugin.createReplaceEdit(file, text, args.subList(2, args.size()).toArray(
-						new String[0]));
-				f.add(textChange);
+				change = SDTPlugin.createReplaceEdit(file, text, args.subList(2, args.size())
+						.toArray(new String[0]));
+				f.add(change);
 				break;
 			case 'D':
+				change = new CreateDirChange(args.get(1));
+				f.add(change);
 				break;
 			case 'P':
+				change = new CreatePackageChange(args.get(1), args.get(2));
+				f.add(change);
 				break;
 			}
 
