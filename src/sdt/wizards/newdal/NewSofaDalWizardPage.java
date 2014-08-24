@@ -3,6 +3,7 @@ package sdt.wizards.newdal;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
@@ -27,7 +28,6 @@ import org.eclipse.jdt.internal.ui.wizards.dialogfields.StringDialogField;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
@@ -36,6 +36,7 @@ import sdt.SDTPlugin;
 import sdt.preference.PreferencePage;
 import sdt.wizards.GroupTypeField;
 import sdt.wizards.NewWizardPage;
+import sdt.wizards.change.ChangeEngine;
 import sdt.wizards.newdal.NewSofaDalState.Table;
 import sdt.wizards.newdal.NewSofaDalState.Table.Column;
 
@@ -78,8 +79,12 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 	}
 
-	public Connection getConnection() {
+	private Connection fConn;
 
+	public Connection getConnection() {
+		if (fConn != null) {
+			return fConn;
+		}
 		Connection conn = null;
 		try {
 
@@ -93,7 +98,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			String username = this.fUsernameField.getText();
 			String password = this.fPasswordField.getText();
 
-			URLClassLoader classloader = new URLClassLoader(new URL[] { new File(jar).toURI().toURL() });
+			URLClassLoader classloader = getClassLoader();
 			Class<?> clazz = classloader.loadClass(driverName);
 			Driver driver = (Driver) clazz.newInstance();
 			Properties ps = new Properties();
@@ -105,12 +110,28 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			if (conn == null || conn.isClosed())
 				return null;
 		} catch (Exception e) {
-			e.printStackTrace();
-			this.status.setError("获取数据库连接失败");
-			updateStatus();
 			closeDB(conn, null, null);
+			e.printStackTrace();
 		}
+		fConn = conn;
 		return conn;
+	}
+
+	private String fJar = null;
+	private URLClassLoader cachedURLClassLoader;
+
+	private URLClassLoader getClassLoader() {
+		String jar = SDTPlugin.getPreference(PreferencePage.MYSQL_CONNECTOR);
+		if (fJar != null && cachedURLClassLoader != null && !fJar.equals(jar))
+			return cachedURLClassLoader;
+
+		URLClassLoader classloader = null;
+		try {
+			classloader = new URLClassLoader(new URL[] { new File(jar).toURI().toURL() });
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return classloader;
 	}
 
 	private void closeDB(Connection conn, Statement statement, ResultSet rs) {
@@ -129,7 +150,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -158,8 +179,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 			}
 		} catch (SQLException e) {
 			System.err.println("chooseTable 连接出错");
-		} finally {
-			closeDB(conn, statement, rs);
 		}
 
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new LabelProvider());
@@ -179,13 +198,12 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	// TODO IDialogFieldListener#dialogFieldChanged
 	@Override
 	public void dialogFieldChanged(DialogField field) {
-		if (field == this.fProjectField) {
-			if (this.fPackageField.getText().isEmpty()) {
-				String system = NameUtil.firstString(this.fProjectField.getText(), '-');
-				this.fPackageField.setText("com.alipay." + system + ".common.dal");
-			}
+		if (field == this.fProjectField && this.fPackageField.getText().isEmpty()) {
+			String system = NameUtil.firstString(this.fProjectField.getText(), '-');
+			this.fPackageField.setText("com.alipay." + system + ".common.dal");
+		} else {
+			updateStatus();
 		}
-		updateStatus();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -207,20 +225,36 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		context.put("projectName", project);
 		context.put("systemName", NameUtil.firstString(project, '-'));
 		context.put("packageRoot", this.fPackageField.getText());
-		context.put("packageRootDir", this.fPackageField.getText().replaceAll("[.]", "/"));
+		context.put("packageRootDir", this.fPackageField.getText().replace('.', '/'));
 		context.put("table", this.data.fTable);
 		Properties ps = new Properties();
+		ByteArrayInputStream is = null;
 		try {
 			String dalConf = SDTPlugin.getTpl(context, "tpl/dal/conf.vm");
-			ps.load(new ByteArrayInputStream(dalConf.getBytes()));
+			is = new ByteArrayInputStream(dalConf.getBytes());
+			ps.load(is);
+			is.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+					is = null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		for (Map.Entry entry : ps.entrySet()) {
-			IFile file = SDTPlugin.getFile(entry.getValue().toString());
-			if (file != null && file.exists()) {
-				return new StatusInfo(IStatus.ERROR, "\"" + file.getName() + "\" is already exists");
+			List<String> args = ChangeEngine.getArgs(entry.getValue().toString());
+			char changeAction = args.get(0).charAt(0);
+			if (changeAction == 'F' || changeAction == 'M') {
+				IFile file = SDTPlugin.getFile(args.get(1));
+				if (file != null && file.exists()) {
+					return new StatusInfo(IStatus.ERROR, "\"" + file.getName() + "\" is already exists");
+				}
 			}
 		}
 
@@ -271,18 +305,8 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			closeDB(conn, statement, rs);
 		}
-	}
-
-	@Override
-	public IWizardPage getNextPage() {
-		// TODO Auto-generated method stub
-		if (this.data == null || this.fTableField.getText().isEmpty() || this.fProjectField.getText().isEmpty()) {
-			return null;
-		}
-		return super.getNextPage();
+		closeDB(null, statement, rs);
 	}
 
 }

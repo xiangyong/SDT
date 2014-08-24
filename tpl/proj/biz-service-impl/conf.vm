@@ -4,3 +4,5 @@ ref			=F {project}/src/main/resources/META-INF/spring/{projectSpring}-ref.xml
 fragment	=F {project}/src/main/resources/OSGI-INF/deployment-fragment.xml
 pom			=F {project}/pom.xml
 project		=F {project}/.project
+java		=P {project}/src/main/java {defaultPackage}
+classes		=D {project}/target/classes

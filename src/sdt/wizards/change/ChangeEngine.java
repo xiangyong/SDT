@@ -164,7 +164,7 @@ public class ChangeEngine {
 		return f.toString();
 	}
 
-	private static List<String> getArgs(String line) {
+	public static List<String> getArgs(String line) {
 		List<String> c = new ArrayList<String>();
 		for (String s : line.split(" ")) {
 			String w = s.trim();

@@ -1,7 +1,9 @@
-manifest=F {project}/src/main/resources/META-INF/MANIFEST.MF
-spring=F {project}/src/main/resources/META-INF/spring/{projectSpring}.xml
-ref=F {project}/src/main/resources/META-INF/spring/{projectSpring}-ref.xml
-fragment=F {project}/src/main/resources/OSGI-INF/deployment-fragment.xml
-security=F {project}/src/main/resources/security/{security}.acf
-pom=F {project}/pom.xml
-project=F {project}/.project
+manifest	=F {project}/src/main/resources/META-INF/MANIFEST.MF
+spring		=F {project}/src/main/resources/META-INF/spring/{projectSpring}.xml
+ref			=F {project}/src/main/resources/META-INF/spring/{projectSpring}-ref.xml
+fragment	=F {project}/src/main/resources/OSGI-INF/deployment-fragment.xml
+security	=F {project}/src/main/resources/security/{security}.acf
+pom			=F {project}/pom.xml
+project		=F {project}/.project
+java		=P {project}/src/main/java {defaultPackage}
+classes		=D {project}/target/classes

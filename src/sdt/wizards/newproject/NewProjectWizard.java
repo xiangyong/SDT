@@ -345,6 +345,7 @@ public class NewProjectWizard extends NewWizard {
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		if (page == wizardPage) {
+			wizardPage.refreshData();
 			return previewPage;
 		}
 		return null;

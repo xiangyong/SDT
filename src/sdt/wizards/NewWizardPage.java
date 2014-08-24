@@ -334,9 +334,6 @@ public abstract class NewWizardPage extends NewElementWizardPage implements IStr
 	protected void updateStatus() {
 		IStatus f = getStatus();
 		updateStatus(f);
-		if (f.isOK()) {
-			refreshData();
-		}
 	}
 
 	protected IStatus getStatus(StringDialogField... fields) {
