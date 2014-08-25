@@ -169,7 +169,6 @@ public class _ {
 
 	// Translate English To Chinese
 	public static String en2cn(String word) {
-		System.err.println(word);
 		String f = null;
 		InputStream in = null;
 		BufferedInputStream bis = null;
@@ -177,7 +176,6 @@ public class _ {
 			URL fUrl = new URL("http://fanyi.baidu.com/v2transapi?from=en&to=zh&query="
 					+ URLEncoder.encode(word, "utf-8"));
 
-			System.err.println(fUrl);
 			URLConnection connection = fUrl.openConnection();
 			in = connection.getInputStream();
 			int len = 512;

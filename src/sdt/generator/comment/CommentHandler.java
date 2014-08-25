@@ -55,7 +55,6 @@ public class CommentHandler extends AbstractHandler {
 		SrcVisitor d = new SrcVisitor(null);
 		cu.accept(d);
 		StringBuffer query = new StringBuffer();
-		System.err.println(d.fFields);
 		String[] words = d.fFields.toArray(new String[0]);
 		for (int i = 0; i < words.length; i++) {
 			if (i != 0)
@@ -68,7 +67,6 @@ public class CommentHandler extends AbstractHandler {
 		for (int i = 0; i < cns.length; i++) {
 			dic.put(words[i], cns[i]);
 		}
-		System.err.println("m:" + dic);
 		// 第二次遍历
 		d.fAst = ast;
 		d.fDic = dic;
