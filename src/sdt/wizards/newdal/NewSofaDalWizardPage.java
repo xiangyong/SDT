@@ -46,7 +46,6 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 	private NewSofaDalState data;
 	private StatusInfo status;
 
-	@SuppressWarnings("unused")
 	private GroupTypeField fDalDbTypeField;
 	private StringDialogField fServerField;
 	private StringDialogField fPortField;

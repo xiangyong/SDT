@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -45,7 +46,11 @@ public class NewClientState implements NewWizardState {
 		context.put("X", createXml ? "F" : "M");
 		context.put("type", fType);
 
-		context.put("facade", getFacade());
+		try {
+			context.put("facade", getFacade());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		context.put("vip", getVip());
 
 		return ChangeEngine.run(context, "client");
@@ -63,8 +68,15 @@ public class NewClientState implements NewWizardState {
 			// fullName
 			f.fullName = facade.getFullyQualifiedName();
 
+			// imports
+			IImportDeclaration[] facadeImports = facade.getCompilationUnit().getImports();
+			f.imports = new String[facadeImports.length];
+			for (int i = 0; i < facadeImports.length; i++) {
+				IImportDeclaration id = facadeImports[i];
+				f.imports[i] = id.getElementName();
+			}
+
 			// methods
-			Set<String> imports = new TreeSet<String>();
 			IMethod[] imds = facade.getMethods();
 			f.methods = new Method[imds.length];
 			for (int j = 0; j < imds.length; j++) {
@@ -76,7 +88,6 @@ public class NewClientState implements NewWizardState {
 				// rt
 				type = im.getReturnType();
 				m.rt = Signature.getSignatureSimpleName(type);
-				addImport(imports, type);
 
 				String[] pns = im.getParameterNames();
 				String[] pts = im.getParameterTypes();
@@ -89,10 +100,8 @@ public class NewClientState implements NewWizardState {
 
 					type = pts[i];
 					m.pts += Signature.getSignatureSimpleName(type) + " " + pns[i];
-					addImport(imports, type);
 				}
 			}
-			f.imports = imports.toArray(new String[0]);
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
@@ -116,7 +125,8 @@ public class NewClientState implements NewWizardState {
 		public String pns = "";
 	}
 
-	private void addImport(Set<String> imports, String s) {
+	@SuppressWarnings("unused")
+	private void addImports(Set<String> imports, String s) {
 		int t = Signature.getTypeSignatureKind(s);
 		if (t != Signature.CLASS_TYPE_SIGNATURE)
 			return;
@@ -129,12 +139,16 @@ public class NewClientState implements NewWizardState {
 	}
 
 	private String getVip() {
-		String f = NameUtil.firstString(fFacade.getParent().getParent().getParent().getElementName(), '-');
-		switch (fType) {
-		case 1:
-			return "${" + f + "_service_url}";
-		case 2:
-			return "${" + f + "_tr_service_url}";
+		try {
+			String f = NameUtil.firstString(fFacade.getParent().getParent().getParent().getElementName(), '-');
+			switch (fType) {
+			case 1:
+				return "${" + f + "_service_url}";
+			case 2:
+				return "${" + f + "_tr_service_url}";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return "";
 	}
