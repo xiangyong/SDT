@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -18,6 +19,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+
+import sun.net.www.http.HttpClient;
 
 public class _ {
 
@@ -165,19 +168,24 @@ public class _ {
 	}
 
 	// Translate English To Chinese
-	public static String translate(String word) {
+	public static String en2cn(String word) {
+		System.err.println(word);
 		String f = null;
 		InputStream in = null;
 		BufferedInputStream bis = null;
 		try {
-			URL fUrl = new URL("http://fanyi.baidu.com/v2transapi?from=en&to=cn&query=" + word);
+			URL fUrl = new URL("http://fanyi.baidu.com/v2transapi?from=en&to=zh&query="
+					+ URLEncoder.encode(word, "utf-8"));
+
+			System.err.println(fUrl);
 			URLConnection connection = fUrl.openConnection();
 			in = connection.getInputStream();
-			int len = 256;
+			int len = 512;
 			bis = new BufferedInputStream(in, len);
 			byte[] bs = new byte[len];
 			bis.read(bs);
 			String s = new String(bs);
+			System.err.println(s);
 			int p = s.indexOf('"', 90);
 			f = decode(s.substring(90, p));
 			bis.close();

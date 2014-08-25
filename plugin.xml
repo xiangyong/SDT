@@ -85,6 +85,25 @@
       </objectContribution>
    </extension>
 
-
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="SDT.GenerateComment"
+            name="SDT.GenerateComment">
+         <defaultHandler
+               class="sdt.generator.comment.CommentHandler">
+            <parameter
+                  name="SDT.GenerateComment"
+                  value="SDT.GenerateComment">
+            </parameter>
+         </defaultHandler>
+      </command>
+      <keyBinding
+            command="SDT.GenerateComment"
+            configuration="org.eclipse.ui.defaultAcceleratorConfiguration"
+            keySequence="Alt+J"></keyBinding>
+      <activeKeyConfiguration
+            value="org.eclipse.ui.defaultAcceleratorConfiguration"></activeKeyConfiguration>
+   </extension>
 
 </plugin>
