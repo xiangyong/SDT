@@ -1,7 +1,9 @@
 package sdt.generator.comment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +17,8 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Javadoc;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -118,8 +122,53 @@ public class CommentHandler extends AbstractHandler {
 			return true;
 		}
 
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean visit(MethodDeclaration node) {
+			if (node.getJavadoc() != null)
+				return true;
+
+			String words = getWords(node.getName().getFullyQualifiedName());
+			List<SingleVariableDeclaration> list = node.parameters();
+			if (fAst != null) {
+				String cn = fDic.get(words);
+				if (cn == null)
+					return true;
+
+				List<TagElement> tes = new ArrayList<TagElement>();
+				TagElement tag = fAst.newTagElement();
+				tag.setTagName("<b>" + node.getName().getFullyQualifiedName() + "</b>\t");
+				TextElement txt = fAst.newTextElement();
+				tag.fragments().add(txt);
+				txt.setText(cn);
+				tes.add(tag);
+				for (SingleVariableDeclaration var : list) {
+					cn = fDic.get(getWords(var.getName().getFullyQualifiedName()));
+					if (cn == null)
+						return true;
+					tag = fAst.newTagElement();
+					tag.setTagName("@param " + var.getName().getFullyQualifiedName() + "\t");
+					txt = fAst.newTextElement();
+					tag.fragments().add(txt);
+					txt.setText(cn);
+					tes.add(tag);
+				}
+				Javadoc jd = fAst.newJavadoc();
+				jd.tags().addAll(tes);
+				node.setJavadoc(jd);
+			} else {
+				fFields.add(words);
+				for (SingleVariableDeclaration var : list) {
+					fFields.add(getWords(var.getName().getFullyQualifiedName()));
+				}
+			}
+			return true;
+		}
+
 		private String getWords(String s) {
 			s = s.replace('_', ' ');
+			s = s.replace('>', ' ');
+			s = s.replaceAll("<", " of ");
 			StringBuffer f = new StringBuffer(s);
 			char c;
 			for (int i = 0; i < f.length(); i++) {
