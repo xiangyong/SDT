@@ -64,7 +64,7 @@ public class NewClientWizardPage extends NewWizardPage {
 		IRunnableContext context = new ProgressMonitorDialog(parent);
 		IProject project = SDTPlugin.getProject(fProjectField.getText());
 		IJavaSearchScope scope = JavaSearchScopeFactory.getInstance().createJavaSearchScope(
-				new IResource[] { project }, JavaSearchScopeFactory.LIBS | JavaSearchScopeFactory.NO_JRE_NO_PROJ);
+				new IResource[] { project }, JavaSearchScopeFactory.LIBS);
 		int elementKinds = IJavaElementSearchConstants.CONSIDER_INTERFACES; // IJavaSearchConstants.INTERFACE
 		String filter = "*facade";
 		FilteredTypesSelectionDialog dialog = null;
