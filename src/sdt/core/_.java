@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -132,5 +136,23 @@ public class _ {
 			}
 
 		}
+	}
+
+	public static String readFromJar(String file) { // ***.jar!/***.java
+		System.err.println(file);
+		StringBuffer f = new StringBuffer();
+		try {
+			URL url = new URL("jar:file:" + file);
+			JarURLConnection jarConnection = (JarURLConnection) url.openConnection();
+			InputStream in = jarConnection.getInputStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String line;
+			while ((line = br.readLine()) != null) {
+				f.append(line).append("\n");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return f.toString();
 	}
 }
