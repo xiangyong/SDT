@@ -13,7 +13,11 @@ public class {impl} implements {client} {
 #for(i in facade.methods){
 #	m=facade.methods[i];
 	public {m.rt} {m.name} ({m.pts}) {
-		return {facade.objectName}.{m.name}({m.pns});	
+#if(m.rt=="void") {
+		{facade.objectName}.{m.name}({m.pns});
+# } else {
+		return {facade.objectName}.{m.name}({m.pns});
+# }
 	}
 
 # }

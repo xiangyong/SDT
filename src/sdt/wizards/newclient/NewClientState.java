@@ -6,17 +6,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.ltk.core.refactoring.Change;
 
 import sdt.NameUtil;
@@ -68,78 +66,70 @@ public class NewClientState implements NewWizardState {
 		f.name = fFacade.getElementName();
 		f.objectName = NameUtil.aaaBbbCcc(f.name);
 
-		try {
-			String type;
-			IType facade = (IType) fFacade;
+		IType facade = (IType) fFacade;
 
-			System.err.println("======================================1");
+		// fullName
+		f.fullName = facade.getFullyQualifiedName();
+		ICompilationUnit icu = facade.getCompilationUnit();
+		if (icu == null) {
+			String srcJar = facade.getPath().toString().replaceAll(".jar", "-sources.jar");
+			String src = facade.getPackageFragment().getElementName().replace('.', '/') + '/'
+					+ facade.getElementName() + ".java";
+			String content = _.readFromJar(srcJar + "!/" + src);
 
-			// fullName
-			f.fullName = facade.getFullyQualifiedName();
-			// imports
-			ICompilationUnit icu = facade.getCompilationUnit();
-			if (icu == null) {
-				System.err.println(facade);
-				String srcJar = facade.getPath().toString().replaceAll(".jar", "-sources.jar");
-				String src = facade.getPackageFragment().getElementName().replace('.', '/') + '/'
-						+ facade.getElementName() + ".java";
-				String content = _.readFromJar(srcJar + "!/" + src);
-
-				ASTParser astParser = ASTParser.newParser(AST.JLS3);
-				astParser.setSource(content.toCharArray());
-				astParser.setKind(ASTParser.K_COMPILATION_UNIT);
-				CompilationUnit cu = (CompilationUnit) (astParser.createAST(null));
-				ImportVisitor d = new ImportVisitor();
-				cu.accept(d);
-				f.imports = d.fData.toArray(new String[0]);
-			} else {
-				IImportDeclaration[] facadeImports = icu.getImports();
-				f.imports = new String[facadeImports.length];
-				for (int i = 0; i < facadeImports.length; i++) {
-					IImportDeclaration id = facadeImports[i];
-					f.imports[i] = id.getElementName();
-				}
-			}
-
-			// methods
-			IMethod[] imds = facade.getMethods();
-			f.methods = new Method[imds.length];
-			for (int j = 0; j < imds.length; j++) {
-				IMethod im = imds[j];
-				Method m = new Method();
-				f.methods[j] = m;
-				m.name = im.getElementName();
-
-				// rt
-				type = im.getReturnType();
-				m.rt = Signature.getSignatureSimpleName(type);
-
-				String[] pns = im.getParameterNames();
-				String[] pts = im.getParameterTypes();
-				for (int i = 0; i < im.getNumberOfParameters(); i++) {
-					if (i != 0) {
-						m.pts += ',';
-						m.pns += ',';
-					}
-					m.pns += pns[i];
-
-					type = pts[i];
-					m.pts += Signature.getSignatureSimpleName(type) + " " + pns[i];
-				}
-			}
-		} catch (JavaModelException e) {
-			e.printStackTrace();
+			ASTParser astParser = ASTParser.newParser(AST.JLS3);
+			astParser.setSource(content.toCharArray());
+			astParser.setKind(ASTParser.K_COMPILATION_UNIT);
+			CompilationUnit cu = (CompilationUnit) (astParser.createAST(null));
+			SrcVisitor d = new SrcVisitor();
+			cu.accept(d);
+			f.imports = d.fImports.toArray(new String[0]);
+			f.methods = d.fMethods.toArray(new Method[0]);
 		}
 
 		return f;
 	}
 
-	static class ImportVisitor extends ASTVisitor {
-		public Set<String> fData = new HashSet<String>();
+	static class SrcVisitor extends ASTVisitor {
+		public Set<String> fImports = new HashSet<String>();
+		public Set<Method> fMethods = new HashSet<Method>();
 
 		@Override
 		public boolean visit(ImportDeclaration node) {
-			fData.add(node.getName().getFullyQualifiedName());
+			fImports.add(node.getName().getFullyQualifiedName());
+			return true;
+		}
+
+		static class SimpleMethod {
+			public String name;
+			public String returnType;
+			public String parameters;
+
+			public String toString() {
+				return returnType + " " + name + " (" + parameters + ")";
+			}
+		}
+
+		@Override
+		public boolean visit(MethodDeclaration node) {
+			Method method = new Method();
+			method.name = node.getName().toString();
+			method.rt = node.getReturnType2().toString();
+			StringBuffer pts = new StringBuffer();
+			StringBuffer pns = new StringBuffer();
+			for (int i = 0; i < node.parameters().size(); i++) {
+				SingleVariableDeclaration var = (SingleVariableDeclaration) node.parameters().get(i);
+				if (i != 0) {
+					pts.append(',');
+					pns.append(',');
+				}
+				pts.append(var);
+				pns.append(var.getName());
+			}
+			method.pts = pts.toString();
+			method.pns = pns.toString();
+			fMethods.add(method);
+
 			return true;
 		}
 	}
@@ -158,19 +148,6 @@ public class NewClientState implements NewWizardState {
 		public String rt;
 		public String pts = "";
 		public String pns = "";
-	}
-
-	@SuppressWarnings("unused")
-	private void addImports(Set<String> imports, String s) {
-		int t = Signature.getTypeSignatureKind(s);
-		if (t != Signature.CLASS_TYPE_SIGNATURE)
-			return;
-
-		String f = Signature.getSignatureQualifier(s);
-		if (f.equals("java.lang"))
-			return;
-
-		imports.add(Signature.toString(s));
 	}
 
 	private String getVip() {
