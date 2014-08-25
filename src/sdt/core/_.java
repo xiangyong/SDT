@@ -20,8 +20,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import sun.net.www.http.HttpClient;
-
 public class _ {
 
 	// TODO Template Engine
@@ -150,7 +148,6 @@ public class _ {
 
 	// TODO Read From Jar
 	public static String readFromJar(String file) { // ***.jar!/***.java
-		System.err.println(file);
 		StringBuffer f = new StringBuffer();
 		try {
 			URL url = new URL("jar:file:" + file);
@@ -183,7 +180,6 @@ public class _ {
 			byte[] bs = new byte[len];
 			bis.read(bs);
 			String s = new String(bs);
-			System.err.println(s);
 			int p = s.indexOf('"', 90);
 			f = decode(s.substring(90, p));
 			bis.close();

@@ -32,12 +32,12 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import sdt.core._;
 
+@SuppressWarnings("restriction")
 public class CommentHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		String f = "";
 		// 获取 EditorPart
 		IEditorPart ep = Workbench.getInstance().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 		// 强转会出问题
@@ -89,11 +89,13 @@ public class CommentHandler extends AbstractHandler {
 		public Set<String> fFields = new HashSet<String>();
 		public AST fAst;
 		public Map<String, String> fDic;
+		public Map<String, Integer> fMax = new HashMap<String, Integer>();
 
 		public SrcVisitor(AST ast) {
 			this.fAst = ast;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean visit(FieldDeclaration node) {
 			if (node.getJavadoc() != null)
@@ -129,10 +131,11 @@ public class CommentHandler extends AbstractHandler {
 			String words = getWords(node.getName().getFullyQualifiedName());
 			List<SingleVariableDeclaration> list = node.parameters();
 			if (fAst != null) {
+				int maxLength = fMax.get(node.getName().getFullyQualifiedName());
+				// method name
 				String cn = fDic.get(words);
 				if (cn == null)
 					return true;
-
 				List<TagElement> tes = new ArrayList<TagElement>();
 				TagElement tag = fAst.newTagElement();
 				tag.setTagName("<b>" + node.getName().getFullyQualifiedName() + "</b>\t");
@@ -140,25 +143,46 @@ public class CommentHandler extends AbstractHandler {
 				tag.fragments().add(txt);
 				txt.setText(cn);
 				tes.add(tag);
+
+				// parameters
 				for (SingleVariableDeclaration var : list) {
 					cn = fDic.get(getWords(var.getName().getFullyQualifiedName()));
 					if (cn == null)
 						return true;
 					tag = fAst.newTagElement();
-					tag.setTagName("@param " + var.getName().getFullyQualifiedName() + "\t");
+					tag.setTagName(column("@param ", var.getName().getFullyQualifiedName(), maxLength));
 					txt = fAst.newTextElement();
 					tag.fragments().add(txt);
 					txt.setText(cn);
 					tes.add(tag);
 				}
+
+				// return
+				cn = fDic.get(getWords(node.getReturnType2().toString()));
+				if (cn == null)
+					return true;
+				tag = fAst.newTagElement();
+				tag.setTagName(column("@return", "", maxLength));
+				txt = fAst.newTextElement();
+				tag.fragments().add(txt);
+				txt.setText(cn);
+				tes.add(tag);
+
+				// TODO
 				Javadoc jd = fAst.newJavadoc();
 				jd.tags().addAll(tes);
 				node.setJavadoc(jd);
 			} else {
 				fFields.add(words);
+				int i = 0;
 				for (SingleVariableDeclaration var : list) {
+					int l = var.getName().getFullyQualifiedName().length();
 					fFields.add(getWords(var.getName().getFullyQualifiedName()));
+					if (l > i)
+						i = l;
 				}
+				fMax.put(node.getName().getFullyQualifiedName(), i);
+				fFields.add(getWords(node.getReturnType2().toString()));
 			}
 			return true;
 		}
@@ -174,6 +198,18 @@ public class CommentHandler extends AbstractHandler {
 				if (Character.isUpperCase(c) && i > 0 && Character.isLowerCase(f.charAt(i - 1))) {
 					f.insert(i, " ");
 				}
+			}
+			return f.toString();
+		}
+
+		private String column(String s1, String s2, int max) {
+			return s1 + rspace(s2, max - s2.length());
+		}
+
+		private String rspace(String txt, int length) {
+			StringBuffer f = new StringBuffer(txt);
+			for (int i = 0; i < length; i++) {
+				f.append(" ");
 			}
 			return f.toString();
 		}
