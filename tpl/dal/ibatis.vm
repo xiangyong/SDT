@@ -1,3 +1,9 @@
+# today = new Date();
+# user = java.lang.System.getenv("USERNAME");
+/**
+ * Alipay.com Inc.
+ * Copyright (c) 2004-{today.getFullYear()} All Rights Reserved.
+ */
 package {packageRoot}.ibatis;
 
 import java.util.List;
@@ -9,6 +15,11 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 import {packageRoot}.daointerface.{table.className}DAO;
 import {packageRoot}.dataobject.{table.className}DO;
 
+/**
+ * 
+ * @author {user}
+ * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ */
 public class Ibatis{table.className}DAO extends SqlMapClientDaoSupport implements {table.className}DAO {
 
 	public void insert({table.className}DO {table.objectName}DO) throws DataAccessException {

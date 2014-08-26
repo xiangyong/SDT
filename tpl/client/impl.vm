@@ -1,4 +1,10 @@
-package {implPackage};
+# today = new Date();
+# user = java.lang.System.getenv("USERNAME");
+/**
+ * Alipay.com Inc.
+ * Copyright (c) 2004-{today.getFullYear()} All Rights Reserved.
+ */
+ package {implPackage};
 
 #for(i in facade.imports) {
 import {facade.imports[i]};
@@ -6,6 +12,11 @@ import {facade.imports[i]};
 import {facade.fullName};
 import {clientPackage}.{client};
 
+/**
+ * 
+ * @author {user}
+ * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ */
 public class {impl} implements {client} {
 
 	private {facade.name} {facade.objectName};

@@ -1,9 +1,20 @@
+# today = new Date();
+# user = java.lang.System.getenv("USERNAME");
+/**
+ * Alipay.com Inc.
+ * Copyright (c) 2004-{today.getFullYear()} All Rights Reserved.
+ */
 package {clientPackage};
 
 #for(i in facade.imports) {
 import {facade.imports[i]};
 # }
 
+/**
+ * 
+ * @author {user}
+ * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ */
 public interface {client} {
 
 #for(i in facade.methods){

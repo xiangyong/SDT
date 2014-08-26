@@ -1,7 +1,18 @@
+# today = new Date();
+# user = java.lang.System.getenv("USERNAME");
+/**
+ * Alipay.com Inc.
+ * Copyright (c) 2004-{today.getFullYear()} All Rights Reserved.
+ */
 package {implPackage};
 
 import {servicePackage}.{serviceName};
 
+/**
+ * 
+ * @author {user}
+ * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ */
 public class {implName} implements {serviceName} {
 	
 }
