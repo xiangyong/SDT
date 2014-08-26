@@ -212,16 +212,16 @@ public class CommentHandler extends AbstractHandler {
 			if (f.length() == 0)
 				return null;
 			String enWord = getWords(f);
-			System.err.println(enWord);
 			fFields.add(enWord);
 			return enWord;
 		}
 
 		private String getWords(String s) {
-
 			s = s.replace('_', ' ');
 			s = s.replace('>', ' ');
 			s = s.replaceAll("<", " of ");
+			if (s.contains("[]"))
+				s = "array of " + s.replaceAll("\\[\\]", "");
 			StringBuffer f = new StringBuffer(s.trim());
 			char c;
 			for (int i = 0; i < f.length(); i++) {
@@ -235,8 +235,6 @@ public class CommentHandler extends AbstractHandler {
 
 		private String getCnWord(String s) {
 			String enWord = getEnWord(s);
-			System.err.println("fDic:" + fDic);
-			System.err.println("enWord:" + enWord);
 			String cn = fDic.get(enWord);
 			if (cn == null)
 				cn = "";
