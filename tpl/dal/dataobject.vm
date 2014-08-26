@@ -13,7 +13,7 @@ import {table.getImports()[i]};
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: {table.className}DO.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 public class {table.className}DO {
 

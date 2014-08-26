@@ -16,7 +16,7 @@ import {packageRoot}.dataobject.{table.className}DO;
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: {table.className}DAO.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 public interface {table.className}DAO {
 

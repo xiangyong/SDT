@@ -11,7 +11,7 @@ import {servicePackage}.{serviceName};
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: {implName}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 public class {implName} implements {serviceName} {
 	

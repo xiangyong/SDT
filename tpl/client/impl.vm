@@ -15,7 +15,7 @@ import {clientPackage}.{client};
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: {impl}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 public class {impl} implements {client} {
 

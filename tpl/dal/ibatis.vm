@@ -18,7 +18,7 @@ import {packageRoot}.dataobject.{table.className}DO;
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: Ibatis{table.className}DAO.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 public class Ibatis{table.className}DAO extends SqlMapClientDaoSupport implements {table.className}DAO {
 

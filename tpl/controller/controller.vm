@@ -16,7 +16,7 @@ import com.alibaba.common.lang.StringUtil;
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: {className}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 @Controller
 public class {className} {

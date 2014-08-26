@@ -9,7 +9,7 @@ package {servicePackage};
 /**
  * 
  * @author {user}
- * @version $$Id: {client}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
+ * @version $$Id: {serviceName}.java, v 0.1 {new Date().toLocaleString()} {user} Exp $$
  */
 public interface {serviceName} {
 	
