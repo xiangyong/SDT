@@ -88,9 +88,12 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		try {
 
 			String jar = SDTPlugin.getPreference(PreferencePage.MYSQL_CONNECTOR);
-			if (jar == null || jar.isEmpty())
+			System.err.println("jar: " + new File(jar).exists());
+			if (jar == null || jar.isEmpty() || !new File(jar).exists()) {
+				updateStatus(new StatusInfo(IStatus.ERROR,
+						"MySql Connector Is Invalid, See Window/Preferences/Sofa/MySql Connector"));
 				return null;
-
+			}
 			String driverName = "com.mysql.jdbc.Driver";
 			String server = this.fServerField.getText();
 			String port = this.fPortField.getText();
@@ -111,6 +114,7 @@ public class NewSofaDalWizardPage extends NewWizardPage implements IStringButton
 		} catch (Exception e) {
 			closeDB(conn, null, null);
 			e.printStackTrace();
+			updateStatus(new StatusInfo(IStatus.ERROR, e.getClass() + ": " + e.getMessage()));
 		}
 		fConn = conn;
 		return conn;
