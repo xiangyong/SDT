@@ -185,10 +185,18 @@ public class CommentHandler extends AbstractHandler {
 
 			int len = s.length();
 			String f = s;
+
+			if (len >= 6) {
+				String l6 = s.substring(len - 3);
+				if (l6.equalsIgnoreCase("Facade")) {
+					f = s.substring(0, len - 6);
+				}
+			}
+
 			if (len >= 3) {
 				String l3 = s.substring(len - 3);
 				if (l3.equalsIgnoreCase("DAO")) {
-					f = s.substring(0, len - "DAO".length());
+					f = s.substring(0, len - 3);
 					if (f.startsWith("Ibatis")) {
 						f = f.substring("Ibatis".length());
 					}
@@ -231,6 +239,12 @@ public class CommentHandler extends AbstractHandler {
 				cn = "";
 			StringBuffer f = new StringBuffer(cn);
 			int len = s.length();
+			if (s.length() >= 6) {
+				String l6 = s.substring(len - 6);
+				if (l6.equalsIgnoreCase("Facade")) {
+					f.append(" Facade");
+				}
+			}
 			if (s.length() >= 3) {
 				String l3 = s.substring(len - 3);
 				if (l3.equalsIgnoreCase("DAO")) {
