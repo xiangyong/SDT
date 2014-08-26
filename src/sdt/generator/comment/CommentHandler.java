@@ -102,7 +102,7 @@ public class CommentHandler extends AbstractHandler {
 			String words = getWords(((VariableDeclarationFragment) node.fragments().get(0)).getName()
 					.getFullyQualifiedName());
 			if (fAst != null) {
-				String cn = fDic.get(words);
+				String cn = getCnWord(words);
 				if (cn == null)
 					return true;
 				Javadoc jd = fAst.newJavadoc();
@@ -115,7 +115,7 @@ public class CommentHandler extends AbstractHandler {
 
 				node.setJavadoc(jd);
 			} else {
-				fFields.add(words);
+				getEnWord(words);
 			}
 			return true;
 		}
@@ -131,7 +131,7 @@ public class CommentHandler extends AbstractHandler {
 			if (fAst != null) {
 				int maxLength = fMax.get(node.getName().getFullyQualifiedName());
 				// method name
-				String cn = fDic.get(words);
+				String cn = getCnWord(words);
 				if (cn == null)
 					return true;
 				List<TagElement> tes = new ArrayList<TagElement>();
@@ -144,7 +144,7 @@ public class CommentHandler extends AbstractHandler {
 
 				// parameters
 				for (SingleVariableDeclaration var : list) {
-					cn = fDic.get(getWords(var.getName().getFullyQualifiedName()));
+					cn = getCnWord(var.getName().getFullyQualifiedName());
 					if (cn == null)
 						return true;
 					tag = fAst.newTagElement();
@@ -156,7 +156,7 @@ public class CommentHandler extends AbstractHandler {
 				}
 
 				// return
-				cn = fDic.get(getWords(node.getReturnType2().toString()));
+				cn = getCnWord(node.getReturnType2().toString());
 				if (cn == null)
 					return true;
 				tag = fAst.newTagElement();
@@ -171,21 +171,52 @@ public class CommentHandler extends AbstractHandler {
 				jd.tags().addAll(tes);
 				node.setJavadoc(jd);
 			} else {
-				fFields.add(words);
-				int i = 0;
+				getEnWord(words);
+				int max = 0;
 				for (SingleVariableDeclaration var : list) {
-					int l = var.getName().getFullyQualifiedName().length();
-					fFields.add(getWords(var.getName().getFullyQualifiedName()));
-					if (l > i)
-						i = l;
+					String varName = var.getName().getFullyQualifiedName();
+					int len = varName.length();
+					getEnWord(varName);
+					if (len > max)
+						max = len;
 				}
-				fMax.put(node.getName().getFullyQualifiedName(), i);
-				fFields.add(getWords(node.getReturnType2().toString()));
+				fMax.put(node.getName().getFullyQualifiedName(), max);
+				getEnWord(node.getReturnType2().toString());
 			}
 			return true;
 		}
 
+		private String getEnWord(String s) {
+			s = s.trim();
+
+			int len = s.length();
+			String f = s;
+			if (len >= 3) {
+				String l3 = s.substring(len - 3);
+				if (l3.equalsIgnoreCase("DAO")) {
+					f = s.substring(0, len - "DAO".length());
+					if (f.startsWith("Ibatis")) {
+						f = f.substring("Ibatis".length());
+					}
+				}
+			}
+
+			if (len >= 2) {
+				String l2 = s.substring(len - 2);
+				if (l2.equalsIgnoreCase("VO") || l2.equalsIgnoreCase("ID") || l2.equalsIgnoreCase("DO")) {
+					f = s.substring(0, len - 2);
+				}
+			}
+			if (f.length() == 0)
+				return null;
+			String enWord = getWords(f);
+			System.err.println(enWord);
+			fFields.add(enWord);
+			return enWord;
+		}
+
 		private String getWords(String s) {
+
 			s = s.replace('_', ' ');
 			s = s.replace('>', ' ');
 			s = s.replaceAll("<", " of ");
@@ -197,6 +228,37 @@ public class CommentHandler extends AbstractHandler {
 					f.insert(i, " ");
 				}
 			}
+			return f.toString();
+		}
+
+		private String getCnWord(String s) {
+			String cn = fDic.get(getEnWord(s));
+			if (cn == null)
+				cn = "";
+			StringBuffer f = new StringBuffer(cn);
+			int len = s.length();
+			if (s.length() >= 3) {
+				String l3 = s.substring(len - 3);
+				if (l3.equalsIgnoreCase("DAO")) {
+					if (s.startsWith("Ibatis")) {
+						f.append(" Ibatis");
+					}
+					f.append(" DAO");
+				}
+			}
+			if (len >= 2) {
+				String l2 = s.substring(len - 2);
+				if (l2.equalsIgnoreCase("VO")) {
+					f.append(" VO");
+				} else if (l2.equalsIgnoreCase("DO")) {
+					f.append(" DO");
+				} else if (l2.equalsIgnoreCase("ID")) {
+					if (len > 2)
+						f.append(" ");
+					f.append("ID");
+				}
+			}
+
 			return f.toString();
 		}
 
