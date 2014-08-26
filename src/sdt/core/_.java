@@ -218,28 +218,28 @@ public class _ {
 		return new String[0];
 	}
 
-	public static String decode(String unicodeStr) {
-		if (unicodeStr == null) {
+	public static String decode(String unicode) {
+		if (unicode == null) {
 			return null;
 		}
-		StringBuffer retBuf = new StringBuffer();
-		int maxLoop = unicodeStr.length();
-		for (int i = 0; i < maxLoop; i++) {
-			if (unicodeStr.charAt(i) == '\\') {
-				if ((i < maxLoop - 5) && ((unicodeStr.charAt(i + 1) == 'u') || (unicodeStr.charAt(i + 1) == 'U')))
+		StringBuffer f = new StringBuffer();
+		int l = unicode.length();
+		for (int i = 0; i < l; i++) {
+			if (unicode.charAt(i) == '\\') {
+				if ((i < l - 5) && ((unicode.charAt(i + 1) == 'u') || (unicode.charAt(i + 1) == 'U')))
 					try {
-						retBuf.append((char) Integer.parseInt(unicodeStr.substring(i + 2, i + 6), 16));
+						f.append((char) Integer.parseInt(unicode.substring(i + 2, i + 6), 16));
 						i += 5;
 					} catch (NumberFormatException localNumberFormatException) {
-						retBuf.append(unicodeStr.charAt(i));
+						f.append(unicode.charAt(i));
 					}
 				else
-					retBuf.append(unicodeStr.charAt(i));
+					f.append(unicode.charAt(i));
 			} else {
-				retBuf.append(unicodeStr.charAt(i));
+				f.append(unicode.charAt(i));
 			}
 		}
-		return retBuf.toString();
+		return f.toString();
 	}
 
 }
