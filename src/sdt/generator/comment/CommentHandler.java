@@ -222,7 +222,7 @@ public class CommentHandler extends AbstractHandler {
 			s = s.replace('_', ' ');
 			s = s.replace('>', ' ');
 			s = s.replaceAll("<", " of ");
-			StringBuffer f = new StringBuffer(s);
+			StringBuffer f = new StringBuffer(s.trim());
 			char c;
 			for (int i = 0; i < f.length(); i++) {
 				c = f.charAt(i);
@@ -234,7 +234,10 @@ public class CommentHandler extends AbstractHandler {
 		}
 
 		private String getCnWord(String s) {
-			String cn = fDic.get(getEnWord(s));
+			String enWord = getEnWord(s);
+			System.err.println("fDic:" + fDic);
+			System.err.println("enWord:" + enWord);
+			String cn = fDic.get(enWord);
 			if (cn == null)
 				cn = "";
 			StringBuffer f = new StringBuffer(cn);
