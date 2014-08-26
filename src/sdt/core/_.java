@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -165,32 +164,46 @@ public class _ {
 	}
 
 	// Translate English To Chinese
-	public static String en2cn(String word) {
-		String f = null;
-		InputStream in = null;
+	public static String[] en2cn(String... words) {
+		InputStream is = null;
 		BufferedInputStream bis = null;
+
+		int wordCount = words.length;
+		StringBuffer query = new StringBuffer();
+		for (int i = 0; i < wordCount; i++) {
+			if (i != 0)
+				query.append("%0A");
+			query.append(words[i]);
+		}
 		try {
-			URL fUrl = new URL("http://fanyi.baidu.com/v2transapi?from=en&to=zh&query="
-					+ URLEncoder.encode(word, "utf-8"));
+			URL fUrl = new URL("http://fanyi.baidu.com/v2transapi?from=en&to=zh&query=" + query);
 
 			URLConnection connection = fUrl.openConnection();
-			in = connection.getInputStream();
-			int len = 512;
-			bis = new BufferedInputStream(in, len);
+			is = connection.getInputStream();
+			int len = 2048;
+			bis = new BufferedInputStream(is, len);
 			byte[] bs = new byte[len];
 			bis.read(bs);
 			String s = new String(bs);
-			int p = s.indexOf('"', 90);
-			f = decode(s.substring(90, p));
-			bis.close();
-			in.close();
+
+			String key = "\"dst\":\"";
+			String[] f = new String[wordCount];
+			int i = 0, start = 0, end = 0;
+			while ((start = s.indexOf(key, end)) > 0) {
+				int wordStart = start + key.length();
+				end = s.indexOf('"', wordStart);
+				f[i++] = decode(s.substring(wordStart, end));
+			}
+
+			return f;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (in != null) {
-					in.close();
-					in = null;
+				if (is != null) {
+					is.close();
+					is = null;
 				}
 				if (bis != null) {
 					bis.close();
@@ -202,7 +215,7 @@ public class _ {
 
 		}
 
-		return f;
+		return new String[0];
 	}
 
 	public static String decode(String unicodeStr) {

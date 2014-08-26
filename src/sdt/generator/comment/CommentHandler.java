@@ -54,15 +54,13 @@ public class CommentHandler extends AbstractHandler {
 		// 第一次遍历
 		SrcVisitor d = new SrcVisitor(null);
 		cu.accept(d);
-		StringBuffer query = new StringBuffer();
+
 		String[] words = d.fFields.toArray(new String[0]);
-		for (int i = 0; i < words.length; i++) {
-			if (i != 0)
-				query.append("!");
-			query.append(words[i]);
-		}
-		String cnString = _.en2cn(query.toString());
-		String[] cns = cnString.split("！|。");
+		if (words.length == 0)
+			return null;
+
+		String[] cns = _.en2cn(words);
+		//		String[] cns = cnString.split("！|。");
 		Map<String, String> dic = new HashMap<String, String>();
 		for (int i = 0; i < cns.length; i++) {
 			dic.put(words[i], cns[i]);
