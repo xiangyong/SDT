@@ -59,15 +59,9 @@ public class CommentHandler extends AbstractHandler {
 		if (words.length == 0)
 			return null;
 
-		String[] cns = _.en2cn(words);
-		//		String[] cns = cnString.split("！|。");
-		Map<String, String> dic = new HashMap<String, String>();
-		for (int i = 0; i < cns.length; i++) {
-			dic.put(words[i], cns[i]);
-		}
 		// 第二次遍历
 		d.fAst = ast;
-		d.fDic = dic;
+		d.fDic = _.en2cn(words);
 		try {
 			cu.recordModifications();
 			cu.accept(d);

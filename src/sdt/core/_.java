@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -164,7 +165,9 @@ public class _ {
 	}
 
 	// Translate English To Chinese
-	public static String[] en2cn(String... words) {
+	public static Map<String, String> en2cn(String... words) {
+
+		Map<String, String> f = new HashMap<String, String>();
 		InputStream is = null;
 		BufferedInputStream bis = null;
 
@@ -186,13 +189,22 @@ public class _ {
 			bis.read(bs);
 			String s = new String(bs);
 
-			String key = "\"dst\":\"";
-			String[] f = new String[wordCount];
-			int i = 0, start = 0, end = 0;
-			while ((start = s.indexOf(key, end)) > 0) {
-				int wordStart = start + key.length();
+			String keyCn = "\"dst\":\"";
+			String keyEn = "\"src\":\"";
+			//			String[] f = new String[wordCount];
+			int start = 0, end = 0;
+			while ((start = s.indexOf(keyCn, end)) > 0) {
+				// cn
+				int wordStart = start + keyCn.length();
 				end = s.indexOf('"', wordStart);
-				f[i++] = decode(s.substring(wordStart, end));
+				String cn = decode(s.substring(wordStart, end));
+				// en
+				start = s.indexOf(keyEn, end);
+				wordStart = start + keyEn.length();
+				end = s.indexOf('"', wordStart);
+				String en = s.substring(wordStart, end);
+
+				f.put(en, cn);
 			}
 
 			return f;
@@ -215,7 +227,7 @@ public class _ {
 
 		}
 
-		return new String[0];
+		return f;
 	}
 
 	public static String decode(String unicode) {
