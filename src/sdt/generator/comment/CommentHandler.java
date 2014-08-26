@@ -150,16 +150,9 @@ public class CommentHandler extends AbstractHandler {
 				}
 
 				// return
-				cn = getCnWord(node.getReturnType2().toString());
-				if (cn == null)
-					return true;
 				tag = fAst.newTagElement();
-				tag.setTagName(column("@return", "", maxLength));
-				txt = fAst.newTextElement();
-				tag.fragments().add(txt);
-				txt.setText(cn);
+				tag.setTagName("@return");
 				tes.add(tag);
-
 				// TODO
 				Javadoc jd = fAst.newJavadoc();
 				jd.tags().addAll(tes);
@@ -175,7 +168,6 @@ public class CommentHandler extends AbstractHandler {
 						max = len;
 				}
 				fMax.put(node.getName().getFullyQualifiedName(), max);
-				getEnWord(node.getReturnType2().toString());
 			}
 			return true;
 		}
@@ -197,16 +189,15 @@ public class CommentHandler extends AbstractHandler {
 				String l3 = s.substring(len - 3);
 				if (l3.equalsIgnoreCase("DAO")) {
 					f = s.substring(0, len - 3);
-					if (f.startsWith("Ibatis")) {
-						f = f.substring("Ibatis".length());
-					}
 				}
 			}
 
 			if (len >= 2) {
 				String l2 = s.substring(len - 2);
-				if (l2.equalsIgnoreCase("VO") || l2.equalsIgnoreCase("ID") || l2.equalsIgnoreCase("DO")) {
-					f = s.substring(0, len - 2);
+				for (String o : new String[] { "VO", "DO", "ID" }) {
+					if (l2.equalsIgnoreCase(o)) {
+						f = s.substring(0, len - 2);
+					}
 				}
 			}
 			if (f.length() == 0)
@@ -218,10 +209,6 @@ public class CommentHandler extends AbstractHandler {
 
 		private String getWords(String s) {
 			s = s.replace('_', ' ');
-			s = s.replace('>', ' ');
-			s = s.replaceAll("<", " of ");
-			if (s.contains("[]"))
-				s = "array of " + s.replaceAll("\\[\\]", "");
 			StringBuffer f = new StringBuffer(s.trim());
 			char c;
 			for (int i = 0; i < f.length(); i++) {
@@ -249,22 +236,17 @@ public class CommentHandler extends AbstractHandler {
 			if (s.length() >= 3) {
 				String l3 = s.substring(len - 3);
 				if (l3.equalsIgnoreCase("DAO")) {
-					if (s.startsWith("Ibatis")) {
-						f.append(" Ibatis");
-					}
 					f.append(" DAO");
 				}
 			}
 			if (len >= 2) {
 				String l2 = s.substring(len - 2);
-				if (l2.equalsIgnoreCase("VO")) {
-					f.append(" VO");
-				} else if (l2.equalsIgnoreCase("DO")) {
-					f.append(" DO");
-				} else if (l2.equalsIgnoreCase("ID")) {
-					if (len > 2)
-						f.append(" ");
-					f.append("ID");
+				for (String o : new String[] { "VO", "DO", "ID" }) {
+					if (l2.equalsIgnoreCase(o)) {
+						if (len > 2)
+							f.append(" ");
+						f.append(o);
+					}
 				}
 			}
 
