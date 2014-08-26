@@ -19,15 +19,26 @@ public class {table.className}DO {
 
 # for(i in table.columns) {
 #   var column = table.columns[i];
+	/** column.javaName */
 	private {column.javaTypeShort} {column.javaName};
 # }
 
 # for(i in table.columns) {
 #   var column = table.columns[i];
+    /**
+     * Setter method for property <tt>${bare_field_name}</tt>.
+     * 
+     * @param ${field} value to be assigned to property ${bare_field_name}
+     */
 	public void {column.setMethod}({column.javaTypeShort} {column.javaName}){
 		this.{column.javaName} = {column.javaName};
 	}
 	
+	/**
+     * Getter method for property <tt>${column.javaName}</tt>.
+     * 
+     * @return property value of {column.javaName}
+     */
 	public {column.javaTypeShort} {column.getMethod}(){
 		return this.{column.javaName};
 	}
