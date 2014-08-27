@@ -36,6 +36,20 @@ public class Ibatis{table.className}DAO extends SqlMapClientDaoSupport implement
 	public void update({table.className}DO {table.objectName}DO) throws DataAccessException {
 		getSqlMapClientTemplate().insert("{systemName}.{table.className}.update", {table.objectName}DO);
 	}
+# hasStatus = false;
+# for(i in table.columns) {
+#	column = table.columns[i]; 
+#	if(column.javaName=="status") {
+#		hasStatus=true;
+#		break;
+#	}
+# }
+# if(hasStatus) {
+
+	public void updateStatus({table.className}DO {table.objectName}DO) throws DataAccessException {
+		getSqlMapClientTemplate().insert("{systemName}.{table.className}.updateStatus", {table.objectName}DO);
+	}
+# }
 
 	@SuppressWarnings("unchecked")
 	public List<{table.className}DO> query(Map<String,String> parameters) throws DataAccessException {

@@ -63,6 +63,7 @@
 #   if(i>0) { setColumns+=","; }
 #   setColumns+=column.dbName+" = #"+column.javaName+"#";
 # }
+#
 		UPDATE {table.tableName} SET {setColumns}
 # var isStart = false;
 # for(i in table.columns) {
@@ -77,6 +78,31 @@
 #   }	 	   
 # }
 	</update>
+# hasStatus = false;
+# for(i in table.columns) {
+#	column = table.columns[i]; 
+#	if(column.javaName=="status") {
+#		hasStatus=true;
+#		break;
+#	}
+# }
+# if(hasStatus) {
+	<update id="{systemName}.{table.className}.updateStatus">
+		UPDATE {table.tableName} SET status = #status# \
+# var isStart = false;
+#	for(i in table.columns) {
+#	  column = table.columns[i]; 
+#	  if(column.pk) {
+#     	if(!isStart) {
+#         isStart=true;
+WHERE {column.dbName} = #{column.javaName}#
+# 		} else {
+ AND {column.dbName} = #{column.javaName}#
+#       }
+#     }
+#   }		
+	</update>
+# }
 	
 	<select id="{systemName}.{table.className}.queryCount" resultClass="long" >
     	SELECT /*{systemName}.{table.className}.queryCount*/

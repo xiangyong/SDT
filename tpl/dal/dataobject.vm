@@ -19,7 +19,7 @@ public class {table.className}DO {
 
 # for(i in table.columns) {
 #   var column = table.columns[i];
-	/** column.javaName */
+	/** {column.javaName} */
 	private {column.javaTypeShort} {column.javaName};
 # }
 

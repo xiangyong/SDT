@@ -25,6 +25,18 @@ public interface {table.className}DAO {
 	public void delete({table.className}DO {table.objectName}DO) throws DataAccessException;
 
 	public void update({table.className}DO {table.objectName}DO) throws DataAccessException;
+# hasStatus = false;
+# for(i in table.columns) {
+#	column = table.columns[i]; 
+#	if(column.javaName=="status") {
+#		hasStatus=true;
+#		break;
+#	}
+# }
+# if(hasStatus) {
+
+	public void updateStatus({table.className}DO {table.objectName}DO) throws DataAccessException;
+# }
 
 	public List<{table.className}DO> query(Map<String,String> parameters) throws DataAccessException;
 	

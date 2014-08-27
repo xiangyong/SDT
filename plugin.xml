@@ -83,6 +83,17 @@
                   overrideActionId="org.easyexplore.actions.EasyExploreAction">
          </action>
       </objectContribution>
+      <objectContribution
+            id="SDT.DeleteProject"
+            objectClass="org.eclipse.jdt.core.IJavaProject">
+         <action
+               class="sdt.opendir.OpenWorkingSet"
+               icon="icons/red.png"
+               id="sdt.opendir.DeleteProject"
+               label="Delete Project"
+               overrideActionId="org.eclipse.ui.DeleteResourceAction">
+         </action>
+      </objectContribution>
    </extension>
 
    <extension
