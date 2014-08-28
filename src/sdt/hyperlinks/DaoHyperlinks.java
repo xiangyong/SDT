@@ -37,6 +37,24 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 	@Override
 	public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region, boolean canShowMultipleHyperlinks) {
 
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPart part = page.getActiveEditor();
+		IEditorInput ei = null;
+		IFile editingFile = null;
+		if (part instanceof CompilationUnitEditor) {
+			ei = ((CompilationUnitEditor) part).getEditorInput();
+			if (ei instanceof FileEditorInput) {
+				editingFile = ((FileEditorInput) ei).getFile();
+
+			}
+		}
+
+		if (editingFile == null || !editingFile.getFileExtension().equals("java")
+				|| !editingFile.getName().endsWith("DAO.java"))
+			return null;
+
+		IProject proj = editingFile.getProject();
+
 		IDocument document = textViewer.getDocument();
 		if (document == null)
 			return null;
@@ -108,23 +126,6 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 		String name = pre.append(pos).toString();
 
 		// TOOD
-
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IWorkbenchPart part = page.getActiveEditor();
-
-		IProject proj = null;
-		IEditorInput ei = null;
-		IFile editingFile = null;
-		if (part instanceof CompilationUnitEditor) {
-			ei = ((CompilationUnitEditor) part).getEditorInput();
-			if (ei instanceof FileEditorInput) {
-				editingFile = ((FileEditorInput) ei).getFile();
-				proj = editingFile.getProject();
-			}
-		}
-
-		if (proj == null)
-			return null;
 
 		List<IHyperlink> result = new ArrayList<IHyperlink>();
 
