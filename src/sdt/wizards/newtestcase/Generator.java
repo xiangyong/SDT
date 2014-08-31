@@ -16,7 +16,6 @@ public class Generator {
 		Map<String, Object> ctx = new HashMap<String, Object>();
 		ctx.put("code", code);
 		String s = _.f(txt, ctx);
-		System.err.println(s);
 		_.writeToFile(new File("src/com/alipay/test/A_Test.java"), s);
 	}
 }
