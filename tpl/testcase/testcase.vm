@@ -1,0 +1,58 @@
+#if(code.pkg) {
+package {code.pkg};
+
+#}
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import {code.pkg}.{code.name};
+
+/** boolean,byte,char,short,int,long,float,double;String;[]...;mock */
+public class {code.name}_Test {
+#mockIndex=0;
+#objectName=code.getObjectName();
+    @Mock
+    private {code.name} mock_{code.name};
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        mock_{code.name} = new {code.name}();
+    }
+   
+#for(i=0;i<code.methods.size();i++){
+#   method=code.methods.get(i);
+#   parameterTypes="";
+#   for(j=0;j<method.parameters.size();j++){
+#       parameter=method.parameters.get(j);
+#       parameterTypes+="_"+parameter.getJavaType();
+#   }
+    @Test
+    public void test_{method.name}{parameterTypes}() {
+        // TODO Default Case
+        {
+#   for(j=0;j<method.parameters.size();j++) {
+#       parameter=method.parameters.get(j);
+            {parameter.getDefaultCase()}
+#   }
+#   parameters="";
+#   for(j=0;j<method.parameters.size();j++) {
+#       parameter=method.parameters.get(j);
+#       if(j!=0){
+#           parameters+=", ";
+#       }
+#       parameters+=parameter.name;
+#   }
+            {method.returnType.javaType} result = mock_{code.name}.{method.name}({parameters});
+            Assert.assertNotNull(result);
+        }
+    }
+#}
+
+}
