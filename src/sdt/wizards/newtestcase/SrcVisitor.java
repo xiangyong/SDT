@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -16,6 +17,9 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 import sdt.wizards.newtestcase.Code.Method;
@@ -27,7 +31,7 @@ public class SrcVisitor extends ASTVisitor {
 		System.err.println("=======================================================");
 		System.err.println("case:" + node.getExpression());
 		f(node.getExpression());
-		return false;
+		return true;
 	}
 
 	// get the mock expression
@@ -73,7 +77,25 @@ public class SrcVisitor extends ASTVisitor {
 		}
 	}
 
-	// 取当前方法的所有入参
+	// int i = 1;
+	@Override
+	public boolean visit(VariableDeclarationStatement node) {
+		System.err.println("=======================================================");
+		System.err.println("VariableDeclarationStatement:" + node);
+		System.err.println("VariableDeclarationStatement:" + node.getClass());
+		System.err.println("VariableDeclarationStatement:" + node.fragments());
+		return true;
+	}
+
+	// i = 1;
+	@Override
+	public boolean visit(Assignment node) {
+		System.err.println("=======================================================");
+		System.err.println("Assignment:" + node);
+		return true;
+	}
+
+	// visit method declaration
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(MethodDeclaration node) {
