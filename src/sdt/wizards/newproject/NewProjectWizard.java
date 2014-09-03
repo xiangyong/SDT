@@ -332,11 +332,11 @@ public class NewProjectWizard extends NewWizard {
 
 		wizardPage = new NewProjectWizardPage(data);
 		wizardPage.setTitle("New Project");
-		wizardPage.setDescription("New a Sofa Project");
+		wizardPage.setDescription("New a Project");
 		addPage(wizardPage);
 
 		previewPage = new NewPreviewWizardPage(data);
-		previewPage.setTitle("New Project Preview");
+		previewPage.setTitle("Preview");
 		previewPage.setDescription("Review Changes");
 		addPage(previewPage);
 

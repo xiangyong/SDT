@@ -1,27 +1,27 @@
-package sdt.wizards.newdal;
+package sdt.wizards.adddependency;
 
 import org.eclipse.jface.wizard.IWizardPage;
 
 import sdt.wizards.NewPreviewWizardPage;
 import sdt.wizards.NewWizard;
 
-public class NewSofaDalWizard extends NewWizard {
+public class AddDependencyWizard extends NewWizard {
 
-	private NewSofaDalWizardPage wizardPage;
+	private AddDependencyWizardPage wizardPage;
 
 	@Override
 	public void addPages() {
-		NewSofaDalState data = new NewSofaDalState();
-
-		wizardPage = new NewSofaDalWizardPage(selection, data);
-		wizardPage.setTitle("New Dal");
-		wizardPage.setDescription("New a Dal");
+		AddDependencyState data = new AddDependencyState();
+		wizardPage = new AddDependencyWizardPage(data);
+		wizardPage.setTitle("Add Dependency");
+		wizardPage.setDescription("Add Dependency");
 		addPage(wizardPage);
 
 		previewPage = new NewPreviewWizardPage(data);
 		previewPage.setTitle("Preview");
 		previewPage.setDescription("Review Changes");
 		addPage(previewPage);
+
 	}
 
 	@Override
@@ -32,5 +32,4 @@ public class NewSofaDalWizard extends NewWizard {
 		}
 		return null;
 	}
-
 }

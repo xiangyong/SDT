@@ -59,6 +59,12 @@
             id="SDT.NewClientWizard"
             name="Sofa Client">
       </wizard>
+      <wizard
+            category="SofaPlugin"
+            class="sdt.wizards.adddependency.AddDependencyWizard"
+            id="SDT.AddDependency"
+            name="Add Dependency">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -91,7 +97,7 @@
                icon="icons/red.png"
                id="sdt.opendir.DeleteProject"
                label="Delete Project"
-               overrideActionId="org.eclipse.ui.DeleteResourceAction">
+               overrideActionId="org.eclipse.ui.edit.delete">
          </action>
       </objectContribution>
    </extension>

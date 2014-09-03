@@ -13,12 +13,12 @@ public class NewClientWizard extends NewWizard {
 	public void addPages() {
 		NewClientState data = new NewClientState();
 		wizardPage = new NewClientWizardPage(data);
-		wizardPage.setTitle("New Controller");
-		wizardPage.setDescription("New Controller");
+		wizardPage.setTitle("New Client");
+		wizardPage.setDescription("New Client");
 		addPage(wizardPage);
 
 		previewPage = new NewPreviewWizardPage(data);
-		previewPage.setTitle("New Controller Preview");
+		previewPage.setTitle("Preview");
 		previewPage.setDescription("Review Changes");
 		addPage(previewPage);
 

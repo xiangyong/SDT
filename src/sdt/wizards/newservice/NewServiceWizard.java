@@ -18,7 +18,7 @@ public class NewServiceWizard extends NewWizard {
 		addPage(wizardPage);
 
 		previewPage = new NewPreviewWizardPage(data);
-		previewPage.setTitle("New Service Preview");
+		previewPage.setTitle("Preview");
 		previewPage.setDescription("Review Changes");
 		addPage(previewPage);
 

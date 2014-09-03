@@ -17,8 +17,6 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
@@ -30,51 +28,73 @@ public class SrcVisitor extends ASTVisitor {
 	public boolean visit(IfStatement node) {
 		System.err.println("=======================================================");
 		System.err.println("case:" + node.getExpression());
-		f(node.getExpression());
+		getMockExpression(node.getExpression());
 		return true;
 	}
 
 	// get the mock expression
-	public void f(ASTNode node) {
+	public void getMockExpression(ASTNode node) {
 		// System.err.println("node:" + node);
 		// System.err.println("node:" + node.getClass());
+		String f = null;
+		String e = null;
 		switch (node.getNodeType()) {
 		case ASTNode.SIMPLE_NAME:
 			SimpleName sn = (SimpleName) node;
 			System.err.println("\tmock:" + sn.getFullyQualifiedName());
+			f = sn.getFullyQualifiedName();
+			e = " == true";
 			break;
 		case ASTNode.QUALIFIED_NAME:
 			QualifiedName qn = (QualifiedName) node;
 			System.err.println("\tmock:" + qn.getFullyQualifiedName());
+			f = qn.getFullyQualifiedName();
+			e = " == true";
 			break;
 		case ASTNode.METHOD_INVOCATION:
 			MethodInvocation mi = (MethodInvocation) node;
 			System.err.println("\tmock:" + mi.toString());
+			f = mi.toString();
 			break;
 		case ASTNode.FIELD_ACCESS:
 			FieldAccess fa = (FieldAccess) node;
 			System.err.println("\tmock:" + fa);
+			f = fa.getName().getFullyQualifiedName();
+			e = " == true";
 			break;
 		case ASTNode.PREFIX_EXPRESSION:
 			PrefixExpression pre = (PrefixExpression) node;
-			f(pre.getOperand());
+			getMockExpression(pre.getOperand());
 			break;
 		case ASTNode.PARENTHESIZED_EXPRESSION:
 			ParenthesizedExpression pe = (ParenthesizedExpression) node;
-			f(pe.getExpression());
+			getMockExpression(pe.getExpression());
 			break;
 		case ASTNode.INFIX_EXPRESSION:
 			InfixExpression ie = (InfixExpression) node;
 			if (Operator.CONDITIONAL_AND.equals(ie.getOperator())
 					|| Operator.CONDITIONAL_OR.equals(ie.getOperator())) {
-				f(ie.getLeftOperand());
-				f(ie.getRightOperand());
+				getMockExpression(ie.getLeftOperand());
+				getMockExpression(ie.getRightOperand());
 			} else {
 				System.err.println("\tmock:" + ie.getLeftOperand() + " " + ie.getOperator() + " "
 						+ ie.getRightOperand());
+				f = ie.getLeftOperand().toString();
+				System.err.println(ie.getLeftOperand().getClass());
+				e = " " + ie.getOperator() + " " + ie.getRightOperand();
 			}
 			break;
 		}
+
+		f(f, e);
+	}
+
+	public void f(String name, String expression) {
+		if (name == null || !name.contains("."))
+			return;
+
+		String f = name.substring(0, name.indexOf("."));
+		System.err.println("\t\tMOCKV:" + f);
 	}
 
 	// int i = 1;

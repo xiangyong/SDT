@@ -87,6 +87,7 @@
 #	}
 # }
 # if(hasStatus) {
+	
 	<update id="{systemName}.{table.className}.updateStatus">
 		UPDATE {table.tableName} SET status = #status# \
 # var isStart = false;

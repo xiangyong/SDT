@@ -1,0 +1,23 @@
+# if(type=="parent") {
+
+			<dependency>
+				<groupId>{groupId}</groupId>
+				<artifactId>{artifactId}</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+# } else if(type=="module") {
+
+    <module>{module}</module>
+# } else if(type=="test") {
+
+		<dependency>
+			<groupId>{groupId}</groupId>
+			<artifactId>{artifactId}</artifactId>
+		</dependency>
+# } else if(type=="ace") {
+
+								<artifactItem>
+									<groupId>{groupId}</groupId>
+									<artifactId>{artifactId}</artifactId>
+								</artifactItem>
+# }
