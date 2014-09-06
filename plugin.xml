@@ -21,46 +21,46 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="SofaPlugin"
-            name="Alipay Sofa">
+            id="SDT.NewWizards"
+            name="SDT New Wizards">
       </category>
       <wizard
-            category="SofaPlugin"
+            category="SDT.NewWizards"
             class="sdt.wizards.newservice.NewServiceWizard"
             icon="icons/green.png"
             id="SDT.NewServiceWizard"
             name="Sofa Service">
       </wizard>
       <wizard
-            category="SofaPlugin"
+            category="SDT.NewWizards"
             class="sdt.wizards.newdal.NewSofaDalWizard"
             icon="icons/orange.png"
             id="SDT.NewDalWizard"
             name="Sofa Dal">
       </wizard>
       <wizard
-            category="SofaPlugin"
+            category="SDT.NewWizards"
             class="sdt.wizards.newproject.NewProjectWizard"
             icon="icons/group.png"
             id="SDT.NewProjectWizard"
             name="Sofa Project">
       </wizard>
       <wizard
-            category="SofaPlugin"
+            category="SDT.NewWizards"
             class="sdt.wizards.newcontroller.NewControllerWizard"
             icon="icons/blue.png"
             id="SDT.NewControllerWizard"
             name="Sofa Controller">
       </wizard>
       <wizard
-            category="SofaPlugin"
+            category="SDT.NewWizards"
             class="sdt.wizards.newclient.NewClientWizard"
             icon="icons/orange.png"
             id="SDT.NewClientWizard"
             name="Sofa Client">
       </wizard>
       <wizard
-            category="SofaPlugin"
+            category="SDT.NewWizards"
             class="sdt.wizards.adddependency.AddDependencyWizard"
             icon="icons/blue.png"
             id="SDT.AddDependency"
@@ -121,6 +121,54 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M3+L">
       </key>
+   </extension>
+   <extension
+         id="SDT.SofaBuilder"
+         name="SDT Sofa Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="sdt.natrue.SofaBuilder">
+         </run></builder>
+   </extension>
+   <extension
+         id="SDT.SofaNature"
+         name="SDT Sofa Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="sdt.natrue.SofaNature">
+         </run>
+      </runtime>
+      <builder
+            id="SDT.SofaBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="SDT.ImportWizards"
+            name="SDT Import Wizards">
+      </category>
+      <wizard
+            category="SDT.ImportWizards"
+            class="sdt.wizards.importprojects.ImportProjectsWizard"
+            icon="icons/group.png"
+            id="SDT.ImportProjects"
+            name="SDT Import Projects">
+      </wizard>
+   </extension>
+   <extension
+         id="SDT.XmlProblem"
+         name="SDT Xml Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
 
 </plugin>
