@@ -1,0 +1,2 @@
+dependency	=M {project}/pom.xml i </dependencies>
+test		=F {project}/pom.xml

@@ -62,6 +62,7 @@
       <wizard
             category="SofaPlugin"
             class="sdt.wizards.adddependency.AddDependencyWizard"
+            icon="icons/blue.png"
             id="SDT.AddDependency"
             name="Add Dependency">
       </wizard>
@@ -89,38 +90,37 @@
                   overrideActionId="org.easyexplore.actions.EasyExploreAction">
          </action>
       </objectContribution>
-      <objectContribution
-            id="SDT.DeleteProject"
-            objectClass="org.eclipse.jdt.core.IJavaProject">
-         <action
-               class="sdt.opendir.OpenWorkingSet"
-               icon="icons/red.png"
-               id="sdt.opendir.DeleteProject"
-               label="Delete Project"
-               overrideActionId="org.eclipse.ui.edit.delete">
-         </action>
-      </objectContribution>
    </extension>
 
    <extension
          point="org.eclipse.ui.commands">
       <command
-            id="SDT.GenerateComment"
-            name="SDT.GenerateComment">
-         <defaultHandler
-               class="sdt.generator.comment.CommentHandler">
-            <parameter
-                  name="SDT.GenerateComment"
-                  value="SDT.GenerateComment">
-            </parameter>
-         </defaultHandler>
+            categoryId="SDT.GenerateCommentCategory"
+            description="SDT Generate Comment Command"
+            id="SDT.GenerateCommentCommand"
+            name="SDT Generate Comment Command">
       </command>
-      <keyBinding
-            command="SDT.GenerateComment"
-            configuration="org.eclipse.ui.defaultAcceleratorConfiguration"
-            keySequence="Alt+J"></keyBinding>
-      <activeKeyConfiguration
-            value="org.eclipse.ui.defaultAcceleratorConfiguration"></activeKeyConfiguration>
+      <category
+            description="SDT Generate Comment Category"
+            id="SDT.GenerateCommentCategory"
+            name="SDT Generate Comment Category">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="sdt.generator.comment.CommentHandler"
+            commandId="SDT.GenerateCommentCommand">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="SDT.GenerateCommentCommand"
+            contextId="org.eclipse.jdt.ui.javaEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+L">
+      </key>
    </extension>
 
 </plugin>

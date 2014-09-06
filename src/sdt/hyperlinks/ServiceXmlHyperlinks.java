@@ -166,24 +166,28 @@ public class ServiceXmlHyperlinks extends AbstractHyperlinkDetector {
 	private Collection<BeanHyperlink> getCurrentPageLink(Set<String> cache, IRegion fregion, IDocument document,
 			String name, String... keys) {
 		Collection<BeanHyperlink> f = new ArrayList<BeanHyperlink>();
-		String doc = document.get();
+		try {
+			String doc = document.get();
 
-		for (String k : keys) {
-			String toString = k + "=\"" + name + "\"";
-			if (!cache.contains(toString) && doc.contains(toString)) {
-				cache.add(toString);
-				int toOffset, l = 0;
-				while ((toOffset = doc.indexOf(toString, l)) > 0) {
-					l = toOffset + toString.length();
-					int lineNo = 0;
-					try {
-						lineNo = document.getNumberOfLines(0, l);
-					} catch (BadLocationException e) {
-						e.printStackTrace();
+			for (String k : keys) {
+				String toString = k + "=\"" + name + "\"";
+				if (!cache.contains(toString) && doc.contains(toString)) {
+					cache.add(toString);
+					int toOffset, l = 0;
+					while ((toOffset = doc.indexOf(toString, l)) > 0) {
+						l = toOffset + toString.length();
+						int lineNo = 0;
+						try {
+							lineNo = document.getNumberOfLines(0, l);
+						} catch (BadLocationException e) {
+							e.printStackTrace();
+						}
+						f.add(new BeanHyperlink(fregion, toString, toOffset, lineNo));
 					}
-					f.add(new BeanHyperlink(fregion, toString, toOffset, lineNo));
 				}
 			}
+		} catch (Exception e) {
+			return new ArrayList<BeanHyperlink>();
 		}
 		return f;
 	}

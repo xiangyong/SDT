@@ -18,6 +18,11 @@ public class AddDependencyState implements NewWizardState {
 	@Override
 	public Change[] computeChanges() {
 		Map<String, Object> context = new HashMap<String, Object>();
+		context.put("project", fProject);
+		context.put("type", "test");
+		context.put("groupId", fGroupId);
+		context.put("artifactId", fArtifactId);
+		context.put("version", fVersion);
 
 		return ChangeEngine.run(context, "dependency");
 	}

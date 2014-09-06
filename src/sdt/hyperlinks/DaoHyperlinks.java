@@ -124,8 +124,9 @@ public class DaoHyperlinks extends AbstractHyperlinkDetector {
 		IRegion fregion = new Region(fstart, fend - fstart);
 
 		String name = pre.append(pos).toString();
-
-		// TOOD
+		if (!name.contains("."))
+			return null;
+		// TODO
 
 		List<IHyperlink> result = new ArrayList<IHyperlink>();
 
