@@ -38,17 +38,19 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
+			if (resource.getType() != IResource.FILE)
+				return true;
+
 			switch (delta.getKind()) {
 			case IResourceDelta.ADDED:
-				// handle added resource
 				checkResource(resource);
 				break;
 			case IResourceDelta.REMOVED:
-				// handle removed resource
 				checkResource(resource);
 				break;
 			case IResourceDelta.CHANGED:
-				// handle changed resource
+				if (!resource.getName().endsWith(".xml"))
+					break;
 				checkResource(resource);
 				break;
 			}
@@ -60,16 +62,17 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 	// TODO SampleResourceVisitor
 	class SampleResourceVisitor implements IResourceVisitor {
 		public boolean visit(IResource resource) {
+			if (resource.getType() != IResource.FILE)
+				return true;
 			checkResource(resource);
-			// return true to continue visiting children.
 			return true;
 		}
 	}
 
 	private void checkResource(IResource resource) {
-		if (resource instanceof IFile && resource.getName().endsWith(".xml")) {
+		if (resource.getName().endsWith(".xml")) {
 			checkXML(resource);
-		} else if (resource instanceof IFile && resource.getName().endsWith(".java")) {
+		} else if (resource.getName().endsWith(".java")) {
 			IFile file = (IFile) resource;
 			IProject p = file.getProject();
 			IFolder folder = p.getFolder(SDTPlugin.D_RES);
@@ -164,20 +167,16 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 	// TODO clean
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		// delete markers set and files created
 		getProject().deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 	}
 
 	void checkXML(IResource resource) {
-		if (resource instanceof IFile && resource.getName().endsWith(".xml")) {
-			IFile file = (IFile) resource;
-			deleteMarkers(file);
-			XMLErrorHandler handler = new XMLErrorHandler(file);
-			try {
-				// getParser().parse(file.getContents(), reporter);
-				parse(file, handler);
-			} catch (Exception e1) {
-			}
+		IFile file = (IFile) resource;
+		deleteMarkers(file);
+		XMLErrorHandler handler = new XMLErrorHandler(file);
+		try {
+			parse(file, handler);
+		} catch (Exception e1) {
 		}
 	}
 
@@ -196,7 +195,6 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 	}
 
 	protected void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
-		// the visitor does the work.
 		delta.accept(new SampleDeltaVisitor());
 	}
 
