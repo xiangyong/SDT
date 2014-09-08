@@ -3,6 +3,8 @@ SDT
 
 Sofa Development Tool
 
+http://github-ai.github.io/SDT/
+
 ---
 
 Functions:
