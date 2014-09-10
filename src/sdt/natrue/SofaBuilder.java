@@ -64,12 +64,24 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 		public boolean visit(IResource resource) {
 			if (resource.getType() != IResource.FILE)
 				return true;
-			checkResource(resource);
+			
+			String name = resource.getName();
+			System.err.println(resource);
+			
+			if (!name.endsWith(".xml") || resource.toString().contains("/target/"))
+				return true;
+			
+			checkXML(resource);
 			return true;
 		}
 	}
 
 	private void checkResource(IResource resource) {
+		try {
+			resource.getProject().hasNature(JavaCore.NATURE_ID);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 		if (resource.getName().endsWith(".xml")) {
 			checkXML(resource);
 		} else if (resource.getName().endsWith(".java")) {

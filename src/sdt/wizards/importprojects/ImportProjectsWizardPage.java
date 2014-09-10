@@ -22,6 +22,8 @@ public class ImportProjectsWizardPage extends WizardProjectsImportPage {
 		for (Object obj : selected) {
 			ProjectRecord pr = (ProjectRecord) obj;
 			IProject project = workspace.getRoot().getProject(pr.getProjectName());
+			if (project.getName().contains("-test")||project.getName().contains("-assembly-"))
+				continue;
 			addSofaSignature(project);
 		}
 
