@@ -64,19 +64,21 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 		public boolean visit(IResource resource) {
 			if (resource.getType() != IResource.FILE)
 				return true;
-			
+
 			String name = resource.getName();
 			System.err.println(resource);
-			
+
 			if (!name.endsWith(".xml") || resource.toString().contains("/target/"))
 				return true;
-			
+
 			checkXML(resource);
 			return true;
 		}
 	}
 
 	private void checkResource(IResource resource) {
+		if (resource.toString().contains("/target/"))
+			return;
 		try {
 			resource.getProject().hasNature(JavaCore.NATURE_ID);
 		} catch (CoreException e) {
@@ -225,9 +227,14 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 		if (content.isEmpty())
 			return;
 
+		String sofaReference = "sofa:reference";
 		String[] keyClasses = new String[] { "class=\"", "interface=\"" };
 		for (int i = 0; i < content.size(); i++) {
 			String s = content.get(i);
+			if (s.contains(sofaReference)
+					|| (i > 0 && !s.contains("<") && content.get(i - 1).contains(sofaReference))) {
+				continue;
+			}
 			for (String keyClass : keyClasses)
 				if (s.contains(keyClass)) {
 					int beginIndex = s.indexOf(keyClass) + keyClass.length();
