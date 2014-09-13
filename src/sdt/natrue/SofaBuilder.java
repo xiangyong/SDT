@@ -34,9 +34,17 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 
 	// TODO IResourceDeltaVisitor
 	class SofaDeltaVisitor implements IResourceDeltaVisitor {
+		private IProgressMonitor monitor;
+
+		public SofaDeltaVisitor(IProgressMonitor monitor) {
+			this.monitor = monitor;
+		}
 
 		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
+			if (monitor.isCanceled())
+				return false;
+
 			IResource resource = delta.getResource();
 
 			if (resource.getType() != IResource.FILE)
@@ -51,12 +59,7 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 			}
 
 			if (resource.getName().endsWith(".java") && (delta.getKind() == ADDED || delta.getKind() == REMOVED)) {
-				try {
-					resource.getProject().getFolder(SDTPlugin.D_RES).accept(new SofaResourceVisitor());
-				} catch (CoreException e1) {
-					e1.printStackTrace();
-				}
-
+				fullBuild(monitor);
 				return true;
 			}
 
@@ -66,7 +69,16 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 
 	// TODO IResourceVisitor
 	class SofaResourceVisitor implements IResourceVisitor {
+		private IProgressMonitor monitor;
+
+		public SofaResourceVisitor(IProgressMonitor monitor) {
+			this.monitor = monitor;
+		}
+
 		public boolean visit(IResource resource) {
+			if (monitor.isCanceled())
+				return false;
+
 			if (resource.getType() != IResource.FILE)
 				return true;
 
@@ -164,13 +176,13 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 
 	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
 		try {
-			getProject().accept(new SofaResourceVisitor());
+			getProject().getFolder(SDTPlugin.D_RES).accept(new SofaResourceVisitor(monitor));
 		} catch (CoreException e) {
 		}
 	}
 
 	protected void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
-		delta.accept(new SofaDeltaVisitor());
+		delta.accept(new SofaDeltaVisitor(monitor));
 	}
 
 	private void parse(IFile file, DefaultHandler handler) throws SAXException, CoreException {
