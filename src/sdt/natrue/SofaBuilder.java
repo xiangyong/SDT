@@ -1,14 +1,15 @@
 package sdt.natrue;
 
+import static org.eclipse.core.resources.IResourceDelta.ADDED;
+import static org.eclipse.core.resources.IResourceDelta.REMOVED;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -32,43 +33,37 @@ import sdt.SDTPlugin;
 
 public class SofaBuilder extends IncrementalProjectBuilder {
 
-	// TODO SampleDeltaVisitor
+	// TODO IResourceDeltaVisitor
 	class SampleDeltaVisitor implements IResourceDeltaVisitor {
 
 		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
+
 			if (resource.getType() != IResource.FILE)
 				return true;
 
-			switch (delta.getKind()) {
-			case IResourceDelta.ADDED:
-				checkResource(resource);
-				break;
-			case IResourceDelta.REMOVED:
-				checkResource(resource);
-				break;
-			case IResourceDelta.CHANGED:
-				if (!resource.getName().endsWith(".xml"))
-					break;
-				checkResource(resource);
-				break;
+			if (resource.getName().endsWith(".xml")) {
+				checkXML(resource);
+				return true;
 			}
-			// return true to continue visiting children.
+
+			if (resource.getName().endsWith(".java") && (delta.getKind() == ADDED || delta.getKind() == REMOVED)) {
+				checkAllXML(resource);
+				return true;
+			}
+
 			return true;
 		}
 	}
 
-	// TODO SampleResourceVisitor
+	// TODO IResourceVisitor
 	class SampleResourceVisitor implements IResourceVisitor {
 		public boolean visit(IResource resource) {
 			if (resource.getType() != IResource.FILE)
 				return true;
 
-			String name = resource.getName();
-			System.err.println(resource);
-
-			if (!name.endsWith(".xml") || resource.toString().contains("/target/"))
+			if (!resource.getName().endsWith(".xml") || resource.toString().contains("/target/"))
 				return true;
 
 			checkXML(resource);
@@ -76,45 +71,19 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	private void checkResource(IResource resource) {
+	private void checkAllXML(IResource resource) {
 		if (resource.toString().contains("/target/"))
 			return;
+
+		IFile file = (IFile) resource;
+		IProject p = file.getProject();
+		IFolder folder = p.getFolder(SDTPlugin.D_RES);
 		try {
-			resource.getProject().hasNature(JavaCore.NATURE_ID);
+			folder.accept(new SampleResourceVisitor());
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		if (resource.getName().endsWith(".xml")) {
-			checkXML(resource);
-		} else if (resource.getName().endsWith(".java")) {
-			IFile file = (IFile) resource;
-			IProject p = file.getProject();
-			IFolder folder = p.getFolder(SDTPlugin.D_RES);
-			Set<IFile> xmls = new HashSet<IFile>();
-			findXmls(folder, xmls);
 
-			for (IFile xmlFile : xmls) {
-				checkXML(xmlFile);
-			}
-		}
-	}
-
-	private void findXmls(IResource res, Set<IFile> xmls) {
-		if (res instanceof IFolder) {
-			IFolder folder = (IFolder) res;
-			try {
-				for (IResource ires : folder.members()) {
-					findXmls(ires, xmls);
-				}
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		} else if (res instanceof IFile) {
-			IFile file = (IFile) res;
-			if (file.getName().endsWith(".xml")) {
-				xmls.add(file);
-			}
-		}
 	}
 
 	// TODO XMLErrorHandler
