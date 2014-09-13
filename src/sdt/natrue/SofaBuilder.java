@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,7 +33,7 @@ import sdt.SDTPlugin;
 public class SofaBuilder extends IncrementalProjectBuilder {
 
 	// TODO IResourceDeltaVisitor
-	class SampleDeltaVisitor implements IResourceDeltaVisitor {
+	class SofaDeltaVisitor implements IResourceDeltaVisitor {
 
 		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
@@ -43,13 +42,21 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 			if (resource.getType() != IResource.FILE)
 				return true;
 
+			if (resource.toString().contains("/target/"))
+				return false;
+
 			if (resource.getName().endsWith(".xml")) {
 				checkXML(resource);
 				return true;
 			}
 
 			if (resource.getName().endsWith(".java") && (delta.getKind() == ADDED || delta.getKind() == REMOVED)) {
-				checkAllXML(resource);
+				try {
+					resource.getProject().getFolder(SDTPlugin.D_RES).accept(new SofaResourceVisitor());
+				} catch (CoreException e1) {
+					e1.printStackTrace();
+				}
+
 				return true;
 			}
 
@@ -58,7 +65,7 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 	}
 
 	// TODO IResourceVisitor
-	class SampleResourceVisitor implements IResourceVisitor {
+	class SofaResourceVisitor implements IResourceVisitor {
 		public boolean visit(IResource resource) {
 			if (resource.getType() != IResource.FILE)
 				return true;
@@ -69,21 +76,6 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 			checkXML(resource);
 			return true;
 		}
-	}
-
-	private void checkAllXML(IResource resource) {
-		if (resource.toString().contains("/target/"))
-			return;
-
-		IFile file = (IFile) resource;
-		IProject p = file.getProject();
-		IFolder folder = p.getFolder(SDTPlugin.D_RES);
-		try {
-			folder.accept(new SampleResourceVisitor());
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	// TODO XMLErrorHandler
@@ -172,13 +164,13 @@ public class SofaBuilder extends IncrementalProjectBuilder {
 
 	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
 		try {
-			getProject().accept(new SampleResourceVisitor());
+			getProject().accept(new SofaResourceVisitor());
 		} catch (CoreException e) {
 		}
 	}
 
 	protected void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
-		delta.accept(new SampleDeltaVisitor());
+		delta.accept(new SofaDeltaVisitor());
 	}
 
 	private void parse(IFile file, DefaultHandler handler) throws SAXException, CoreException {
