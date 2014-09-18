@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -286,30 +287,9 @@ public class SDTPlugin extends AbstractUIPlugin {
 		return f;
 	}
 
-	public static void findResource(List<IResource> list, IFolder root, String filter) {
-		IResource[] rs = null;
+	public static void findResource(final List<IResource> list, IFolder root, final String filter) {
 		try {
-			rs = root.members();
-			for (IResource r : rs) {
-				if (r.getType() == IFile.FILE) {
-					String name = r.getName();
-					String key = filter;
-					if (filter.charAt(0) == '^') {
-						key = key.substring(1);
-						if (name.startsWith(key))
-							list.add(r);
-					} else if (filter.charAt(filter.length() - 1) == '$') {
-						key = key.substring(0, key.length() - 1);
-						if (name.endsWith(key))
-							list.add(r);
-					} else {
-						if (name.contains(key))
-							list.add(r);
-					}
-				} else if (r.getType() == IFile.FOLDER) {
-					findResource(list, (IFolder) r, filter);
-				}
-			}
+			root.accept(new ResourceNameVisitor(list, filter));
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -385,5 +365,46 @@ public class SDTPlugin extends AbstractUIPlugin {
 			return null;
 		}
 		return null;
+	}
+
+	static class ResourceNameVisitor implements IResourceVisitor {
+		private List<IResource> fList;
+		private String fFilter;
+		private int fType;
+
+		public ResourceNameVisitor(List<IResource> list, String filter) {
+			fList = list;
+			if (filter.charAt(0) == '^') {
+				fType = 1;
+				fFilter = filter.substring(0, filter.length() - 1);
+			} else if (filter.charAt(filter.length() - 1) == '$') {
+				fType = 2;
+				fFilter = filter.substring(0, filter.length() - 1);
+			} else {
+				fFilter = filter;
+			}
+		}
+
+		@Override
+		public boolean visit(IResource resource) throws CoreException {
+			if (resource.getType() != IFile.FILE)
+				return true;
+			String name = resource.getName();
+			switch (fType) {
+			case 0:
+				if (name.contains(fFilter))
+					fList.add(resource);
+				break;
+			case 1:
+				if (name.startsWith(fFilter))
+					fList.add(resource);
+				break;
+			case 2:
+				if (name.endsWith(fFilter))
+					fList.add(resource);
+				break;
+			}
+			return false;
+		}
 	}
 }
